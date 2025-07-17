@@ -5,14 +5,16 @@ import { supabase } from '$lib/supabaseClient.js';
 export const actions = {
 	default: async ({ params }) => {
 		const { sessionId } = params;
+		const regenerationTime = new Date().toISOString();
 
 		try {
-			// Mark session as completed
+			// Mark session as completed AND store regeneration timestamp
 			await supabase
 				.from('questionnaire_sessions')
 				.update({
 					status: 'completed',
-					completed_at: new Date().toISOString()
+					completed_at: regenerationTime,
+					last_regeneration: regenerationTime // Add this field
 				})
 				.eq('id', sessionId);
 
@@ -38,7 +40,7 @@ export const actions = {
 			console.error('Error:', err);
 		}
 
-		// Always redirect to results
-		throw redirect(302, `/results/${sessionId}`);
+		// Always redirect to waiting page (not results)
+		throw redirect(302, `/results/${sessionId}/generating`);
 	}
 };

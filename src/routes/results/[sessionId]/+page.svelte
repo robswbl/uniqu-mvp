@@ -1,111 +1,170 @@
-<!-- /results/[sessionId]/+page.svelte -->
+<!-- src/routes/results/[sessionId]/+page.svelte -->
 <script>
-	import { onMount } from 'svelte';
+	// @ts-nocheck
+	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/supabaseClient.js';
 
 	let sessionId = $page.params.sessionId;
-	
-	/** @type {Array<{id: string, session_id: string, document_type: string, content_html: string, created_at: string}>} */
 	let documents = [];
-	
-	/** @type {Array<{id: number, session_id: string, company_name: string, company_id: string|null, letter_content_html: string|null, status: string, generated_at: string|null, sent_at: string|null, response_received_at: string|null, notes: string|null, created_at: string, updated_at: string}>} */
-	let motivationalLetters = [];
-	
 	let loading = true;
-	
-	/** @type {string|null} */
 	let error = null;
+	let refreshInterval = null;
+	let regenerationTimestamp = null;
 
-	/**
-	 * Get unique documents (existing deduplication logic)
-	 * @param {Array<{id: string, session_id: string, document_type: string, content_html: string, created_at: string}>} docs
-	 * @returns {Array<{id: string, session_id: string, document_type: string, content_html: string, created_at: string}>}
-	 */
-	function getUniqueDocuments(docs) {
-		const seen = new Set();
-		return docs.filter(doc => {
-			if (seen.has(doc.document_type)) {
-				return false;
-			}
-			seen.add(doc.document_type);
-			return true;
-		});
-	}
+	// Define the correct document order and metadata
+	const documentOrder = [
+		{
+			type: 'reflection_letter',
+			title: 'REFLECTION LETTER',
+			description: 'Your personalized reflection and motivation letter based on your career assessment.',
+			icon: '📝',
+			color: 'from-purple-500 to-pink-500'
+		},
+		{
+			type: 'career_themes',
+			title: 'Career Themes',
+			description: 'Key themes and insights about your ideal career path and working style.',
+			icon: '🎯',
+			color: 'from-blue-500 to-indigo-500'
+		},
+		{
+			type: 'ideal_companies',
+			title: 'IDEAL COMPANIES',
+			description: 'View this generated document based on your career assessment.',
+			icon: '🏢',
+			color: 'from-green-500 to-emerald-500'
+		}
+	];
 
-	/**
-	 * Fetch documents and motivational letters
-	 * @returns {Promise<void>}
-	 */
-	async function fetchData() {
+	async function fetchDocuments() {
 		try {
 			loading = true;
 
-			// Fetch generated documents (existing logic)
-			const { data: docsData, error: docsError } = await supabase
+			// Get regeneration timestamp first
+			const { data: sessionData } = await supabase
+				.from('questionnaire_sessions')
+				.select('last_regeneration, completed_at')
+				.eq('id', sessionId)
+				.single();
+
+			if (sessionData) {
+				regenerationTimestamp = sessionData.last_regeneration || sessionData.completed_at;
+			}
+
+			// Fetch documents excluding motivational letters
+			const { data: documentsData, error: documentsError } = await supabase
 				.from('generated_documents')
 				.select('*')
 				.eq('session_id', sessionId)
-				.neq('document_type', 'motivational_letter')  // ADD THIS LINE
+				.neq('document_type', 'motivational_letter')
 				.order('created_at', { ascending: false });
 
-			if (docsError) throw docsError;
+			if (documentsError) throw documentsError;
 
-			// Fetch motivational letters (new)
-			const { data: lettersData, error: lettersError } = await supabase
-				.from('motivational_letters')
-				.select('*')
-				.eq('session_id', sessionId)
-				.order('created_at', { ascending: false });
+			// If we have a regeneration timestamp, prioritize fresh documents
+			if (regenerationTimestamp) {
+				const freshDocs = (documentsData || []).filter(doc => doc.created_at >= regenerationTimestamp);
+				const oldDocs = (documentsData || []).filter(doc => doc.created_at < regenerationTimestamp);
+				
+				// Show fresh docs first, fall back to old docs if fresh ones don't exist yet
+				const docsToShow = [];
+				documentOrder.forEach(docInfo => {
+					const freshDoc = freshDocs.find(d => d.document_type === docInfo.type);
+					const oldDoc = oldDocs.find(d => d.document_type === docInfo.type);
+					
+					if (freshDoc) {
+						docsToShow.push(freshDoc);
+					} else if (oldDoc) {
+						docsToShow.push(oldDoc); // Fallback to old doc if fresh one doesn't exist yet
+					}
+				});
+				
+				documents = docsToShow;
+			} else {
+				documents = documentsData || [];
+			}
 
-			if (lettersError) throw lettersError;
-
-			documents = getUniqueDocuments(docsData || []);
-			motivationalLetters = lettersData || [];
-			
 		} catch (err) {
-			error = (err && typeof err === 'object' && 'message' in err && typeof err.message === 'string') 
-				? err.message 
-				: 'An unknown error occurred';
-			console.error('Error fetching data:', err);
+			error = err?.message || 'Failed to load documents';
+			console.error('Error fetching documents:', err);
 		} finally {
 			loading = false;
 		}
 	}
 
-	/**
-	 * Navigate to specific document
-	 * @param {string} documentType
-	 * @returns {void}
-	 */
-	function viewDocument(documentType) {
-		console.log('Navigating to document:', documentType);
-		goto(`/results/${sessionId}/${documentType}`);
+	// Get document by type
+	function getDocument(type) {
+		return documents.find(doc => doc.document_type === type);
 	}
 
-	/**
-	 * Navigate to letters page
-	 * @returns {void}
-	 */
-	function viewLetters() {
-		console.log('Navigating to letters page');
-		goto(`/results/${sessionId}/letters`);
+	// Check if all main documents are ready
+	function allMainDocumentsReady() {
+		return documentOrder.every(docInfo => getDocument(docInfo.type));
+	}
+
+	// Get document status for display
+	function getDocumentStatus(type) {
+		const doc = getDocument(type);
+		if (doc) {
+			return {
+				ready: true,
+				status: 'Ready',
+				statusColor: 'text-green-600',
+				document: doc
+			};
+		} else {
+			return {
+				ready: false,
+				status: 'Generating...',
+				statusColor: 'text-blue-600',
+				document: null
+			};
+		}
+	}
+
+	// View document function - navigate to proper document type pages
+	function viewDocument(doc) {
+		// Use the exact document_type from database (with underscores)
+		goto(`/results/${sessionId}/${doc.document_type}`);
 	}
 
 	onMount(() => {
-		fetchData();
+		fetchDocuments();
+		
+		// Set up auto-refresh every 5 seconds if documents are still generating
+		refreshInterval = setInterval(() => {
+			if (!allMainDocumentsReady()) {
+				fetchDocuments();
+			} else {
+				clearInterval(refreshInterval);
+				refreshInterval = null;
+			}
+		}, 5000);
+	});
+
+	onDestroy(() => {
+		if (refreshInterval) {
+			clearInterval(refreshInterval);
+		}
 	});
 </script>
 
+<svelte:head>
+	<title>Your Career Analysis Results - UniqU</title>
+</svelte:head>
+
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
 	<div class="max-w-6xl mx-auto">
+		
 		<!-- Header -->
 		<div class="mb-8">
 			<button 
 				on:click={() => goto(`/dashboard/${sessionId}`)}
 				class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-200 mb-4"
 				type="button"
+				aria-label="Back to Dashboard"
 			>
 				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -126,161 +185,178 @@
 				<h3 class="text-lg font-semibold text-red-800 mb-2">Error Loading Results</h3>
 				<p class="text-red-600">{error}</p>
 				<button 
-					on:click={fetchData}
+					on:click={fetchDocuments}
 					class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
 					type="button"
+					aria-label="Try Again"
 				>
 					Try Again
 				</button>
 			</div>
 		{:else}
-			<!-- Results Grid -->
-			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-				
-				<!-- Existing Document Cards -->
-				{#each documents as document}
-					<button 
-						class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 w-full text-left p-6 group"
-						on:click={() => viewDocument(document.document_type)}
-						type="button"
-					>
-						<div class="h-full flex flex-col">
-							<div class="flex items-start justify-between mb-4">
-								<div class="flex-1">
-									<h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">
-										{#if document.document_type === 'motivational_letter'}
-											📄 Motivational Letter
-										{:else if document.document_type === 'career_themes'}
-											🎯 Career Themes
-										{:else if document.document_type === 'matching_companies'}
-											🏢 Matching Companies
-										{:else}
-											📋 {document.document_type.replace('_', ' ').toUpperCase()}
-										{/if}
-									</h3>
-									<p class="text-gray-600 text-sm">
-										Generated {new Date(document.created_at).toLocaleDateString()}
-									</p>
-								</div>
-								<div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-									Ready
-								</div>
-							</div>
-							
-							<div class="flex-1">
-								<p class="text-gray-600 text-sm mb-4">
-									{#if document.document_type === 'motivational_letter'}
-										Your personalized reflection and motivation letter based on your career assessment.
-									{:else if document.document_type === 'career_themes'}
-										Key themes and insights about your ideal career path and working style.
-									{:else if document.document_type === 'matching_companies'}
-										Companies that align with your values, interests, and career goals.
-									{:else}
-										View this generated document based on your career assessment.
-									{/if}
-								</p>
-							</div>
-							
-							<div class="flex items-center justify-between pt-4 border-t border-gray-100">
-								<span class="text-indigo-600 font-medium text-sm group-hover:text-indigo-800 transition-colors">
-									View Document →
-								</span>
-								<svg class="w-5 h-5 text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-								</svg>
-							</div>
+			
+			<!-- Generation Status Banner (if still generating) -->
+			{#if !allMainDocumentsReady()}
+				<div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+					<div class="flex items-center space-x-3">
+						<div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
+						<div>
+							<h3 class="text-blue-900 font-medium">Analysis in Progress</h3>
+							<p class="text-blue-800 text-sm">Some documents are still being generated. This page will auto-refresh.</p>
 						</div>
-					</button>
-				{/each}
-
-				<!-- NEW: Motivational Letters Card -->
-				<button 
-					class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 w-full text-left p-6 group"
-					on:click={viewLetters}
-					type="button"
-				>
-					<div class="h-full flex flex-col">
-						<div class="flex items-start justify-between mb-4">
-							<div class="flex-1">
-								<h3 class="text-xl font-semibold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">
-									✉️ Application Letters
-								</h3>
-								<p class="text-gray-600 text-sm">
-									{#if motivationalLetters.length > 0}
-										{motivationalLetters.length} letter{motivationalLetters.length === 1 ? '' : 's'} generated
-									{:else}
-										No letters generated yet
-									{/if}
-								</p>
-							</div>
-							<div class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full text-xs font-medium">
-								{#if motivationalLetters.length > 0}
-									{motivationalLetters.length}
-								{:else}
-									New
-								{/if}
-							</div>
-						</div>
-						
-						<div class="flex-1">
-							<p class="text-gray-600 text-sm mb-4">
-								{#if motivationalLetters.length > 0}
-									Personalized motivational letters for companies that match your profile. Track application status and responses.
-								{:else}
-									Generate personalized motivational letters for companies that match your profile.
-								{/if}
-							</p>
-
-							{#if motivationalLetters.length > 0}
-								<div class="space-y-2 mb-4">
-									{#each motivationalLetters.slice(0, 2) as letter}
-										<div class="flex items-center justify-between text-xs">
-											<span class="text-gray-700 truncate mr-2">{letter.company_name}</span>
-											<span class="px-2 py-1 rounded-full text-xs font-medium
-												{letter.status === 'draft' ? 'bg-gray-100 text-gray-700' : 
-												 letter.status === 'sent' ? 'bg-blue-100 text-blue-700' :
-												 letter.status === 'interview' ? 'bg-green-100 text-green-700' :
-												 'bg-yellow-100 text-yellow-700'}">
-												{letter.status}
-											</span>
-										</div>
-									{/each}
-									{#if motivationalLetters.length > 2}
-										<p class="text-xs text-gray-500">+{motivationalLetters.length - 2} more...</p>
-									{/if}
-								</div>
-							{/if}
-						</div>
-						
-						<div class="flex items-center justify-between pt-4 border-t border-gray-100">
-							<span class="text-indigo-600 font-medium text-sm group-hover:text-indigo-800 transition-colors">
-								{motivationalLetters.length > 0 ? 'Manage Letters' : 'Generate Letters'} →
-							</span>
-							<svg class="w-5 h-5 text-gray-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-							</svg>
-						</div>
-					</div>
-				</button>
-
-			</div>
-
-			<!-- Quick Actions (if no documents exist) -->
-			{#if documents.length === 0 && motivationalLetters.length === 0}
-				<div class="text-center py-12">
-					<div class="bg-white rounded-xl shadow-lg p-8 max-w-md mx-auto">
-						<h3 class="text-xl font-semibold text-gray-900 mb-4">No Results Yet</h3>
-						<p class="text-gray-600 mb-6">Complete your questionnaire to generate your career analysis results.</p>
-						<button 
-							on:click={() => goto(`/questionnaire/${sessionId}`)}
-							class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium"
-							type="button"
-						>
-							Complete Questionnaire
-						</button>
 					</div>
 				</div>
 			{/if}
+
+			<!-- Main Documents Grid (in correct order) -->
+			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+				{#each documentOrder as docInfo}
+					{@const docStatus = getDocumentStatus(docInfo.type)}
+					<div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300">
+						
+						<!-- Header -->
+						<div class="bg-gradient-to-r {docInfo.color} p-6">
+							<div class="flex items-center justify-between">
+								<div class="flex items-center space-x-3">
+									<span class="text-2xl">{docInfo.icon}</span>
+									<h3 class="text-lg font-semibold text-white">{docInfo.title}</h3>
+								</div>
+								
+								{#if docStatus.ready}
+									<span class="bg-white bg-opacity-20 text-white text-xs px-2 py-1 rounded-full">
+										Ready
+									</span>
+								{:else}
+									<div class="flex items-center space-x-2">
+										<div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+										<span class="bg-white bg-opacity-20 text-white text-xs px-2 py-1 rounded-full">
+											Generating...
+										</span>
+									</div>
+								{/if}
+							</div>
+						</div>
+
+						<!-- Content -->
+						<div class="p-6">
+							{#if docStatus.ready}
+								<p class="text-gray-600 text-sm mb-4">{docInfo.description}</p>
+								<p class="text-xs text-gray-500 mb-4">
+									Generated {new Date(docStatus.document.created_at).toLocaleString()}
+								</p>
+								
+								<button 
+									on:click={() => viewDocument(docStatus.document)}
+									class="flex items-center space-x-2 w-full px-4 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
+									type="button"
+									aria-label="View {docInfo.title}"
+								>
+									<span>View Document</span>
+									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+									</svg>
+								</button>
+							{:else}
+								<p class="text-gray-600 text-sm mb-4">{docInfo.description}</p>
+								<div class="bg-blue-50 rounded-lg p-4">
+									<div class="flex items-center space-x-2 mb-2">
+										<div class="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+										<span class="text-blue-800 text-sm font-medium">AI is generating this document...</span>
+									</div>
+									<p class="text-blue-700 text-xs">This typically takes 30-60 seconds to complete.</p>
+								</div>
+							{/if}
+						</div>
+					</div>
+				{/each}
+			</div>
+
+			<!-- Application Letters Section (only show if all main documents are ready) -->
+			{#if allMainDocumentsReady()}
+				<div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8">
+					<div class="flex items-center justify-between mb-4">
+						<div class="flex items-center space-x-3">
+							<span class="text-2xl">💌</span>
+							<div>
+								<h3 class="text-xl font-semibold text-gray-900">Application Letters</h3>
+								<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">New</span>
+							</div>
+						</div>
+						
+						<button 
+							on:click={() => goto(`/results/${sessionId}/letters`)}
+							class="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+							type="button"
+							aria-label="Generate Application Letters"
+						>
+							<span>Generate Letters</span>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+							</svg>
+						</button>
+					</div>
+					
+					<p class="text-gray-600 text-sm mb-4">
+						Generate personalized motivational letters for companies that match your profile.
+					</p>
+					
+					<div class="bg-indigo-50 rounded-lg p-4">
+						<h4 class="text-indigo-900 font-medium text-sm mb-2">✨ What you can do:</h4>
+						<ul class="text-indigo-800 text-sm space-y-1">
+							<li>• Create custom letters for specific companies</li>
+							<li>• Track application status and follow-ups</li>
+							<li>• Use AI to tailor letters to company needs</li>
+						</ul>
+					</div>
+				</div>
+			{:else}
+				<!-- Placeholder for Application Letters -->
+				<div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center mb-8">
+					<div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+						<span class="text-2xl opacity-50">💌</span>
+					</div>
+					<h3 class="text-lg font-semibold text-gray-500 mb-2">Application Letters</h3>
+					<p class="text-gray-400 text-sm">
+						Available after your career analysis documents are complete
+					</p>
+					<div class="mt-4">
+						<div class="inline-flex items-center space-x-2 text-gray-400 text-xs">
+							<div class="animate-spin rounded-full h-3 w-3 border border-gray-400 border-t-transparent"></div>
+							<span>Waiting for main documents...</span>
+						</div>
+					</div>
+				</div>
+			{/if}
+
+			<!-- Additional Actions -->
+			<div class="bg-gray-50 rounded-xl p-6">
+				<h3 class="text-lg font-semibold text-gray-900 mb-4">Additional Actions</h3>
+				<div class="flex flex-wrap gap-4">
+					<button 
+						on:click={() => goto(`/questionnaire/${sessionId}`)}
+						class="flex items-center space-x-2 px-4 py-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors text-sm"
+						type="button"
+						aria-label="Update Responses and Regenerate"
+					>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+						</svg>
+						<span>Update responses and regenerate</span>
+					</button>
+					
+					<button 
+						on:click={fetchDocuments}
+						class="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors text-sm"
+						type="button"
+						aria-label="Refresh Documents"
+					>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+						</svg>
+						<span>Refresh</span>
+					</button>
+				</div>
+			</div>
 		{/if}
 	</div>
 </div>

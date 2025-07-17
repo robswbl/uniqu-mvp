@@ -1,247 +1,315 @@
+<!-- src/routes/results/[sessionId]/[documentType]/+page.svelte -->
 <script lang="ts">
   import { page } from '$app/stores';
   import { supabase } from '$lib/supabaseClient';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
 
-  // Make these reactive to route changes
-  $: sessionId = $page.params.sessionId;
-  $: documentType = $page.params.documentType;
-
-  let document: any = null;
+  const sessionId = $page.params.sessionId;
+  const documentType = $page.params.documentType;
+  
+  let documentData: any = null;
   let isLoading = true;
-  let error: string | null = null;
-  let availableDocuments: string[] = [];
-  
-  const documentOrder = ['reflection_letter', 'career_themes', 'ideal_companies'];
-  
-  // Make these reactive to documentType changes
-  $: currentIndex = documentOrder.indexOf(documentType);
-  $: nextDocument = currentIndex < documentOrder.length - 1 ? documentOrder[currentIndex + 1] : null;
-  $: prevDocument = currentIndex > 0 ? documentOrder[currentIndex - 1] : null;
 
-  // Reactive function that runs when sessionId or documentType changes
-  $: if (sessionId && documentType) {
-    loadDocument();
+  onMount(async () => {
+    console.log('Loading document:', { sessionId, documentType });
+    
+    try {
+      // Get the most recent document (in case of duplicates from regeneration)
+      const { data, error } = await supabase
+        .from('generated_documents')
+        .select('content_html, document_type, created_at, pdf_url')
+        .eq('session_id', sessionId)
+        .eq('document_type', documentType)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      console.log('Query result:', { data, error });
+
+      if (error) {
+        console.error('Supabase error:', error);
+      } else if (data && data.length > 0) {
+        documentData = data[0]; // Get the first (most recent) document
+        console.log('Document loaded:', documentData);
+      } else {
+        console.log('No document found');
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err);
+    } finally {
+      isLoading = false;
+    }
+  });
+
+  function getDocumentTitle(type: string): string {
+    switch(type) {
+      case 'reflection_letter': return 'Personal Reflection';
+      case 'career_themes': return 'Career Themes';
+      case 'ideal_companies': return 'Ideal Companies';
+      case 'matching_companies': return 'Matching Companies';
+      case 'motivational_letter': return 'Motivational Letter';
+      default: return type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
   }
 
-  async function loadDocument() {
-    isLoading = true;
-    error = null;
-    
-    console.log('Fetching document:', { sessionId, documentType });
-    
-    // First, try to find the exact document type
-    const { data, error: fetchError } = await supabase
-      .from('generated_documents')
-      .select('document_type, content_html, pdf_url')
-      .eq('session_id', sessionId)
-      .eq('document_type', documentType);
+  function getDocumentDescription(type: string): string {
+    switch(type) {
+      case 'reflection_letter': return 'Your personalized career reflection and insights';
+      case 'career_themes': return 'Key themes and patterns identified in your career path';
+      case 'ideal_companies': return 'Companies that align with your values and goals';
+      case 'matching_companies': return 'Companies that match your profile and interests';
+      case 'motivational_letter': return 'Your personalized motivational letter';
+      default: return 'Career analysis document';
+    }
+  }
 
-    console.log('Supabase response:', { data, error: fetchError });
-
-    if (fetchError) {
-      console.error('Supabase error:', fetchError);
-      error = fetchError.message;
-    } else if (data && data.length > 0) {
-      // Found the document!
-      document = data[0];
-      console.log('Document loaded:', document);
-    } else {
-      // Document not found - let's see what documents ARE available
-      console.log('No document found, checking available documents...');
-      
-      const { data: allDocs, error: allDocsError } = await supabase
-        .from('generated_documents')
-        .select('document_type')
-        .eq('session_id', sessionId);
-      
-      if (allDocs) {
-        availableDocuments = allDocs.map(d => d.document_type);
-        console.log('Available documents:', availableDocuments);
-      }
-      
-      document = null;
+  function downloadDocument(): void {
+    if (!documentData) {
+      alert('No document to download');
+      return;
     }
     
-    isLoading = false;
+    if (!documentData.pdf_url) {
+      alert('PDF not available for this document');
+      return;
+    }
+    
+    try {
+      console.log('Starting PDF download from URL:', documentData.pdf_url);
+      
+      const title = getDocumentTitle(documentData.document_type);
+      const link = document.createElement('a');
+      link.href = documentData.pdf_url;
+      link.download = `${title.replace(/\s+/g, '_')}_UniqU.pdf`;
+      link.target = '_blank'; // Open in new tab as backup
+      
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('PDF download initiated');
+    } catch (error) {
+      console.error('PDF download failed:', error);
+      alert('PDF download failed. Please try again.');
+    }
   }
-
-  onMount(() => {
-    // Initial load will be handled by the reactive statement
-  });
 </script>
 
-<div class="max-w-4xl mx-auto p-2">
-  {#if isLoading}
-    <div class="flex items-center justify-center h-32">
-      <p class="text-lg text-gray-600">Loading...</p>
-    </div>
-  {:else if error}
-    <div class="p-4 bg-red-100 text-red-800 rounded-lg">
-      <h3 class="font-bold">Error loading document</h3>
-      <p>{error}</p>
-    </div>
-  {:else if document}
-    <div class="p-4 border rounded-lg shadow-md bg-white">
-      <!-- Remove our heading since the document content has its own -->
-      <div class="prose max-w-none document-content">
-        {@html document.content_html}
-      </div>
+<svelte:head>
+  <title>{getDocumentTitle(documentType)} - UniqU</title>
+</svelte:head>
 
-      {#if document.pdf_url}
-        <div class="mt-4 text-right">
-          <a 
-            href={document.pdf_url} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Download PDF
-          </a>
+<div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-6">
+      <button 
+        on:click={() => goto(`/results/${sessionId}`)}
+        class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-200 mb-3"
+        type="button"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Results
+      </button>
+      
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold text-gray-900 mb-1">{getDocumentTitle(documentType)}</h1>
+          <p class="text-gray-600 text-sm">{getDocumentDescription(documentType)}</p>
         </div>
-      {/if}
-    </div>
-
-    <div class="flex justify-between mt-6">
-      {#if prevDocument}
-        <a 
-          href={`/results/${sessionId}/${prevDocument}`} 
-          class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300"
-        >
-          ← Previous
-        </a>
-      {:else}
-        <div></div>
-      {/if}
-
-      {#if nextDocument}
-        <a 
-          href={`/results/${sessionId}/${nextDocument}`} 
-          class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700"
-        >
-          Next →
-        </a>
-      {/if}
-    </div>
-
-  {:else}
-    <div class="p-4 bg-yellow-100 text-yellow-800 rounded-lg">
-      <h3 class="font-bold">Document not found</h3>
-      
-      {#if availableDocuments.length > 0}
-        <p class="mb-2">We couldn't find a document of type "<strong>{documentType}</strong>" for this session.</p>
-        <p class="mb-2">Available documents:</p>
-        <ul class="list-disc list-inside mb-4">
-          {#each availableDocuments as docType}
-            <li>
-              <a 
-                href={`/results/${sessionId}/${docType}`}
-                class="text-blue-600 hover:text-blue-800 underline"
-              >
-                {docType.replace(/_/g, ' ')}
-              </a>
-            </li>
-          {/each}
-        </ul>
-      {:else}
-        <p class="mb-2">This part of your analysis is being processed. Please check back in a moment.</p>
-      {/if}
-      
-      <div class="flex gap-2">
-        <button 
-          onclick={() => window.location.reload()} 
-          class="bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700"
-        >
-          Refresh
-        </button>
         
-        {#if availableDocuments.length > 0}
-          <a 
-            href={`/results/${sessionId}/${availableDocuments[0]}`}
-            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 inline-block"
+        <div class="flex items-center space-x-2">
+          <button 
+            on:click={() => goto(`/dashboard/${sessionId}`)}
+            class="flex items-center space-x-1 px-3 py-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors text-sm"
+            type="button"
           >
-            Go to first available
-          </a>
-        {/if}
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+            </svg>
+            <span>Dashboard</span>
+          </button>
+          
+          <button 
+            on:click={() => goto(`/questionnaire/${sessionId}`)}
+            class="flex items-center space-x-1 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm"
+            type="button"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            <span>Edit Answers</span>
+          </button>
+        </div>
       </div>
     </div>
-  {/if}
+    {#if isLoading}
+      <div class="flex justify-center items-center h-64">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    {:else if documentData}
+      <!-- Document Content -->
+      <div class="bg-white rounded-xl shadow-lg overflow-hidden relative">
+        <div class="document-content px-12 py-10">
+          {@html documentData.content_html}
+        </div>
+        
+        <!-- Download button positioned in bottom-right of document -->
+        <div class="absolute bottom-4 right-4">
+          <button 
+            on:click={downloadDocument}
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm flex items-center space-x-2 shadow-lg"
+            type="button"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-4-4m4 4l4-4m-6 4h8a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2h8"/>
+            </svg>
+            <span>Download</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Explore More Section -->
+      <div class="mt-6 bg-white rounded-xl shadow-lg p-6 text-center">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">✨ Explore More</h3>
+        <p class="text-gray-600 mb-4 text-sm">Check out your other career insights or update your profile for fresh perspectives.</p>
+        <div class="flex justify-center space-x-3 flex-wrap gap-y-2">
+          <button 
+            on:click={() => goto(`/results/${sessionId}`)}
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm"
+            type="button"
+          >
+            View All Results
+          </button>
+          <button 
+            on:click={() => goto(`/questionnaire/${sessionId}`)}
+            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm"
+            type="button"
+          >
+            Update Profile
+          </button>
+          <button 
+            on:click={() => goto(`/dashboard/${sessionId}`)}
+            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm"
+            type="button"
+          >
+            Dashboard
+          </button>
+        </div>
+      </div>
+    {:else}
+      <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">Document Not Found</h2>
+        <p class="text-red-500 text-lg mb-4">
+          The requested document could not be found. It may still be processing or there was an error generating it.
+        </p>
+        <div class="flex justify-center space-x-4">
+          <button 
+            on:click={() => goto(`/results/${sessionId}`)}
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold"
+            type="button"
+          >
+            Back to Results
+          </button>
+          <button 
+            on:click={() => goto(`/dashboard/${sessionId}`)}
+            class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold"
+            type="button"
+          >
+            Dashboard
+          </button>
+        </div>
+      </div>
+    {/if}
+  </div>
 </div>
 
-<style lang="postcss">
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
-
-  /* Override the document's own CSS styles */
-  :global(.document-content body) {
-    font-size: 1rem !important;
-    margin: 0 !important;
-    line-height: 1.6 !important;
-  }
-  
-  :global(.document-content h2) {
-    font-size: 1.5rem !important;
-    margin-top: 1.5rem !important;
-    margin-bottom: 0.75rem !important;
-    padding-top: 0 !important;
-    padding-bottom: 0.25rem !important;
-  }
-  
-  :global(.document-content h2:first-child) {
-    margin-top: 0 !important;
-  }
-  
-  :global(.document-content p) {
-    margin-top: 0.5rem !important;
-    margin-bottom: 0.5rem !important;
-    font-size: 1rem !important;
-  }
-  
-  :global(.document-content table) {
-    font-size: 0.9rem !important;
-    margin: 1rem 0 !important;
-  }
-  
-  :global(.document-content th), :global(.document-content td) {
-    padding: 0.5rem 0.75rem !important;
-    font-size: 0.9rem !important;
-  }
-  
-  :global(.document-content .callout) {
-    font-size: 0.95rem !important;
-    padding: 0.75rem 1rem !important;
-    margin: 1rem 0 !important;
-  }
-  
-  :global(.document-content ol), :global(.document-content ul) {
-    font-size: 1rem !important;
-    margin-bottom: 0.75rem !important;
-  }
-  
-  :global(.document-content li) {
-    margin-bottom: 0.25rem !important;
-    font-size: 1rem !important;
+<style>
+  :global(.document-content) {
+    line-height: 1.7;
+    font-size: 15px;
+    color: #374151;
   }
 
-  /* General prose styling for other content */
-  :global(.prose h1), :global(.prose h2), :global(.prose h3) {
-    margin-bottom: 0.75rem;
-    margin-top: 1rem;
+  :global(.document-content h1) {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+    line-height: 1.3;
   }
-  :global(.prose h1:first-child), :global(.prose h2:first-child), :global(.prose h3:first-child) {
+
+  :global(.document-content h1:first-child) {
     margin-top: 0;
   }
-  :global(.prose p) {
+
+  :global(.document-content h2) {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1f2937;
     margin-bottom: 0.75rem;
+    margin-top: 1.25rem;
+    line-height: 1.4;
   }
-  :global(.prose ul) {
-    list-style-type: disc;
-    list-style-position: inside;
-    margin-bottom: 0.75rem;
+
+  :global(.document-content h2:first-child) {
+    margin-top: 0;
   }
-  :global(.prose li) {
-    margin-bottom: 0.25rem;
+
+  :global(.document-content h3) {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  :global(.document-content p) {
+    color: #4b5563;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+  }
+
+  :global(.document-content ul), 
+  :global(.document-content ol) {
+    margin-bottom: 1rem;
+    margin-left: 1.5rem;
+  }
+
+  :global(.document-content li) {
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+
+  :global(.document-content strong) {
+    color: #1f2937;
+    font-weight: 600;
+  }
+
+  :global(.document-content em) {
+    color: #374151;
+    font-style: italic;
+  }
+
+  :global(.document-content blockquote) {
+    border-left: 4px solid #a78bfa;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: #374151;
+    background-color: #f9fafb;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
   }
 </style>

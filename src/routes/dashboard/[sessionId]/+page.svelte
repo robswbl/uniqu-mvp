@@ -85,8 +85,57 @@
           <p class="text-gray-600">Loading your session details...</p>
         </div>
       {:else if sessionData}
-        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
-          <h2 class="text-2xl font-semibold mb-6 text-gray-800">Your Profile Summary</h2>
+        <!-- View Results - Single prominent action -->
+        <div class="max-w-md mx-auto mb-8">
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800 mb-2">View Your Results</h3>
+              <p class="text-gray-600 mb-6">
+                {hasResults ? 'See your personalized career insights' : 'Results are being generated...'}
+              </p>
+              <button 
+                on:click={viewResults}
+                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                disabled={!hasResults}
+              >
+                {hasResults ? 'View Results' : 'Processing...'}
+              </button>
+            </div>
+          </div>
+        </div>
+  
+        {#if !hasResults}
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+              </svg>
+              <p class="text-yellow-800 text-sm">
+                Your results are still being generated. This usually takes a few minutes.
+              </p>
+            </div>
+          </div>
+        {/if}
+  
+        <!-- Profile Summary with integrated Edit button -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800">Your Profile Summary</h2>
+            <button 
+              on:click={editAnswers}
+              class="flex items-center space-x-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors font-medium"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+              <span>Edit</span>
+            </button>
+          </div>
           
           <div class="grid md:grid-cols-2 gap-6">
             <!-- Left Column -->
@@ -180,63 +229,6 @@
             </p>
           </div>
         </div>
-  
-        <!-- Action Buttons -->
-        <div class="grid md:grid-cols-2 gap-6">
-          <!-- Edit Answers Card -->
-          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <div class="text-center">
-              <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-semibold text-gray-800 mb-2">Edit Your Answers</h3>
-              <p class="text-gray-600 mb-6">Update your responses and generate fresh insights</p>
-              <button 
-                on:click={editAnswers}
-                class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-              >
-                Start Editing
-              </button>
-            </div>
-          </div>
-  
-          <!-- View Results Card -->
-          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <div class="text-center">
-              <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-semibold text-gray-800 mb-2">View Your Results</h3>
-              <p class="text-gray-600 mb-6">
-                {hasResults ? 'See your personalized career insights' : 'Results are being generated...'}
-              </p>
-              <button 
-                on:click={viewResults}
-                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-                disabled={!hasResults}
-              >
-                {hasResults ? 'View Results' : 'Processing...'}
-              </button>
-            </div>
-          </div>
-        </div>
-  
-        {#if !hasResults}
-          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-6">
-            <div class="flex items-center">
-              <svg class="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-              </svg>
-              <p class="text-yellow-800 text-sm">
-                Your results are still being generated. This usually takes a few minutes.
-              </p>
-            </div>
-          </div>
-        {/if}
       {:else}
         <div class="bg-white rounded-xl shadow-lg p-8 text-center">
           <p class="text-red-500 text-lg">Could not load session details.</p>

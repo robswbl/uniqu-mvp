@@ -1,352 +1,350 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { supabase } from '$lib/supabaseClient';
-	import { onMount } from 'svelte';
+	import { onMount, afterUpdate } from 'svelte';
+	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
-
+	import type { SubmitFunction } from '@sveltejs/kit';
+  
 	const sessionId = $page.params.sessionId;
-
+	
 	let goals = '';
-	let personality_values = '';
-	let doubts_barriers = '';
-	let life_context = '';
-	let emotional_landscape = '';
-	let core_summary = '';
-	let saveStatus = 'Ready';
+	let personalityValues = '';
+	let lifeContext = '';
+	let doubtsBarriers = '';
+	let emotionalLandscape = '';
+	let coreSummary = '';
+	
+	let saveStatus = '';
+	let timeoutId: ReturnType<typeof setTimeout> | null = null;
 	let isSubmitting = false;
-	let expandedInstructions: { [key: string]: boolean } = {};
-
-	function toggleInstructions(key: string) {
-		expandedInstructions[key] = !expandedInstructions[key];
-	}
-
-	function autogrow(element: HTMLTextAreaElement) {
-		element.style.height = 'auto';
-		const newHeight = Math.max(element.scrollHeight, 120);
-		element.style.height = `${newHeight}px`;
-	}
-
-	let timeoutId: ReturnType<typeof setTimeout>;
-	async function saveProgress() {
-		saveStatus = 'Saving...';
-		clearTimeout(timeoutId);
-		timeoutId = setTimeout(async () => {
-			const { error } = await supabase
-				.from('questionnaire_sessions')
-				.update({
-					goals,
-					personality_values,
-					doubts_barriers,
-					life_context,
-					emotional_landscape,
-					core_summary
-				})
-				.eq('id', sessionId);
-
-			if (error) {
-				saveStatus = `Error: ${error.message}`;
-			} else {
-				saveStatus = `Saved at ${new Date().toLocaleTimeString()}`;
-			}
-		}, 1000);
-	}
-
-	async function submitAndProcess() {
-		isSubmitting = true;
-		
-		// Save current progress
-		await saveProgress();
-		
-		// Update session status to completed
-		const { error } = await supabase
-			.from('questionnaire_sessions')
-			.update({ 
-				status: 'completed',
-				completed_at: new Date().toISOString()
-			})
-			.eq('id', sessionId);
-
-		if (error) {
-			alert('Error submitting questionnaire: ' + error.message);
-			isSubmitting = false;
-			return;
-		}
-
-		// Navigate to results or processing page
-		await goto(`/results/${sessionId}`);
-	}
-
-	async function goBack() {
-		await goto(`/questionnaire/${sessionId}/ikigai`);
-	}
-
+	let hasUnsavedChanges = false;
+  
 	onMount(async () => {
-		const { data } = await supabase
-			.from('questionnaire_sessions')
-			.select('goals, personality_values, doubts_barriers, life_context, emotional_landscape, core_summary')
-			.eq('id', sessionId)
-			.single();
-
-		if (data) {
-			goals = data.goals || '';
-			personality_values = data.personality_values || '';
-			doubts_barriers = data.doubts_barriers || '';
-			life_context = data.life_context || '';
-			emotional_landscape = data.emotional_landscape || '';
-			core_summary = data.core_summary || '';
-			saveStatus = 'Loaded existing data.';
-		}
-
-		// Auto-resize all textareas on load
-		setTimeout(() => {
-			const textareas = document.querySelectorAll('textarea');
-			textareas.forEach(textarea => autogrow(textarea as HTMLTextAreaElement));
-		}, 100);
+	  // Load existing data
+	  const { data, error } = await supabase
+		.from('questionnaire_sessions')
+		.select('goals, personality_values, life_context, doubts_barriers, emotional_landscape, core_summary')
+		.eq('id', sessionId)
+		.single();
+  
+	  if (data) {
+		goals = data.goals || '';
+		personalityValues = data.personality_values || '';
+		lifeContext = data.life_context || '';
+		doubtsBarriers = data.doubts_barriers || '';
+		emotionalLandscape = data.emotional_landscape || '';
+		coreSummary = data.core_summary || '';
+	  }
 	});
-</script>
-
-<div class="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-	<!-- Progress Bar -->
-	<div class="bg-white shadow-sm">
-		<div class="max-w-4xl mx-auto p-4">
-			<div class="flex items-center justify-between text-sm text-gray-600 mb-2">
-				<span>Step 3 of 3</span>
-				<span class="text-xs bg-gray-100 px-2 py-1 rounded">{saveStatus}</span>
+  
+	function markAsChanged() {
+	  hasUnsavedChanges = true;
+	  saveProgress();
+	}
+  
+	async function saveProgress() {
+	  saveStatus = 'Saving...';
+	  if (timeoutId) clearTimeout(timeoutId);
+	  timeoutId = setTimeout(async () => {
+		const { error } = await supabase
+		  .from('questionnaire_sessions')
+		  .update({
+			status: 'in-progress',
+			goals,
+			personality_values: personalityValues,
+			life_context: lifeContext,
+			doubts_barriers: doubtsBarriers,
+			emotional_landscape: emotionalLandscape,
+			core_summary: coreSummary
+		  })
+		  .eq('id', sessionId);
+  
+		if (error) {
+		  saveStatus = 'Error saving';
+		  setTimeout(() => saveStatus = '', 3000);
+		} else {
+		  saveStatus = 'Saved ✓';
+		  hasUnsavedChanges = false;
+		  setTimeout(() => saveStatus = '', 2000);
+		}
+	  }, 1000);
+	}
+  
+	function goToDashboard() {
+	  goto(`/dashboard/${sessionId}`);
+	}
+  
+	function goToIkigai() {
+	  goto(`/questionnaire/${sessionId}/ikigai`);
+	}
+  
+	const handleSubmit: SubmitFunction = () => {
+	  isSubmitting = true;
+	  return async ({ result }) => {
+		if (result.type === 'redirect') {
+		  await goto(result.location);
+		}
+		isSubmitting = false;
+	  };
+	}
+  </script>
+  
+  <svelte:head>
+	<title>Final Step - Goals & Context - UniqU</title>
+  </svelte:head>
+  
+  <div class="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-4">
+	<div class="max-w-4xl mx-auto">
+	  
+	  <!-- Header Navigation -->
+	  <div class="flex justify-between items-center mb-6">
+		<button 
+		  on:click={goToDashboard}
+		  class="flex items-center space-x-2 px-4 py-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors"
+		  type="button"
+		>
+		  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+		  </svg>
+		  <span>Back to Dashboard</span>
+		</button>
+		
+		<div class="flex items-center space-x-4">
+		  {#if hasUnsavedChanges}
+			<div class="bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2 flex items-center space-x-2">
+			  <svg class="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+				<path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+			  </svg>
+			  <span class="text-yellow-800 text-sm">Unsaved changes</span>
 			</div>
-			<div class="w-full bg-gray-200 rounded-full h-2">
-				<div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full w-full transition-all duration-300"></div>
+		  {/if}
+		  
+		  {#if saveStatus}
+			<div class="text-sm px-3 py-1 rounded"
+				 class:text-green-600={saveStatus.includes('✓')}
+				 class:text-blue-600={saveStatus.includes('Saving')}
+				 class:text-red-600={saveStatus.includes('Error')}>
+			  {saveStatus}
 			</div>
+		  {/if}
 		</div>
-	</div>
-
-	<div class="max-w-4xl mx-auto p-6 md:p-8">
-		<!-- Header -->
-		<div class="text-center mb-12">
-			<div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mb-6">
-				<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
-				</svg>
-			</div>
-			<h1 class="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
-				Complete Your Profile
-			</h1>
-			<p class="text-xl text-gray-600 max-w-2xl mx-auto">
-				Let's finish with some context about your current situation, goals, and what makes you uniquely you.
-			</p>
+	  </div>
+  
+	  <!-- Progress Header -->
+	  <div class="text-center mb-8">
+		<div class="flex items-center justify-center space-x-2 mb-4">
+		  <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">✓</div>
+		  <div class="w-16 h-0.5 bg-green-500"></div>
+		  <div class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">✓</div>
+		  <div class="w-16 h-0.5 bg-green-500"></div>
+		  <div class="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">3</div>
 		</div>
-
-		<!-- Final Questions -->
-		<div class="space-y-8">
-			<!-- Goals -->
-			<div class="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-emerald-400">
-				<div class="flex items-center mb-6">
-					<div class="w-12 h-12 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mr-4">
-						<span class="text-white font-bold text-lg">🎯</span>
-					</div>
-					<h2 class="text-2xl font-bold text-gray-800">Goals</h2>
-				</div>
-				
-				<div class="border border-gray-200 rounded-lg mb-4">
-					<button
-						type="button"
-						class="w-full p-3 text-left bg-emerald-50 hover:bg-emerald-100 rounded-t-lg flex justify-between items-center text-sm font-medium text-gray-700"
-						on:click={() => toggleInstructions('goals')}
-					>
-						<span>💡 Need inspiration?</span>
-						<span class="text-gray-400">{expandedInstructions['goals'] ? '−' : '+'}</span>
-					</button>
-					{#if expandedInstructions['goals']}
-						<div class="p-4 bg-emerald-50 rounded-b-lg border-t border-emerald-200">
-							<p class="text-gray-600 text-sm">What are your desired outcomes for your career, workplace, and life balance?</p>
-						</div>
-					{/if}
-				</div>
-
-				<textarea 
-					bind:value={goals} 
-					on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
-					rows="4" 
-					placeholder="Describe your career goals, lifestyle aspirations, and what success looks like to you..."
-					class="w-full rounded-xl border-gray-300 shadow-sm focus:border-emerald-400 focus:ring-emerald-400 resize-none overflow-hidden min-h-[120px] p-4"
-				></textarea>
+		<h1 class="text-3xl font-bold text-gray-800 mb-2">Final Step: Your Goals & Context</h1>
+		<p class="text-lg text-gray-600">Tell us about your aspirations and personal context to complete your profile</p>
+	  </div>
+  
+	  <form method="POST" use:enhance={handleSubmit} class="space-y-8">
+		<!-- Goals Section -->
+		<div class="bg-white rounded-2xl shadow-xl p-8">
+		  <div class="flex items-center space-x-3 mb-6">
+			<div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+			  <span class="text-2xl">🎯</span>
 			</div>
-
-			<!-- Personality & Values -->
-			<div class="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-blue-400">
-				<div class="flex items-center mb-6">
-					<div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mr-4">
-						<span class="text-white font-bold text-lg">🧠</span>
-					</div>
-					<h2 class="text-2xl font-bold text-gray-800">Personality & Values</h2>
-				</div>
-				
-				<div class="border border-gray-200 rounded-lg mb-4">
-					<button
-						type="button"
-						class="w-full p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-t-lg flex justify-between items-center text-sm font-medium text-gray-700"
-						on:click={() => toggleInstructions('personality')}
-					>
-						<span>💡 Need inspiration?</span>
-						<span class="text-gray-400">{expandedInstructions['personality'] ? '−' : '+'}</span>
-					</button>
-					{#if expandedInstructions['personality']}
-						<div class="p-4 bg-blue-50 rounded-b-lg border-t border-blue-200">
-							<p class="text-gray-600 text-sm">Describe your personality, what you value in life, and what defines you as a person.</p>
-						</div>
-					{/if}
-				</div>
-
-				<textarea 
-					bind:value={personality_values} 
-					on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
-					rows="4" 
-					placeholder="What are your core values, personality traits, and what matters most to you in life?"
-					class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-400 focus:ring-blue-400 resize-none overflow-hidden min-h-[120px] p-4"
-				></textarea>
+			<h2 class="text-2xl font-semibold text-gray-800">Your Career Goals</h2>
+		  </div>
+		  
+		  <div class="space-y-4">
+			<div class="bg-purple-50 p-4 rounded-lg">
+			  <p class="text-purple-800 text-sm mb-2">💡 <strong>Helpful prompts:</strong></p>
+			  <ul class="text-purple-700 text-sm space-y-1">
+				<li>• What kind of role or industry excites you?</li>
+				<li>• What impact do you want to have in your career?</li>
+				<li>• Any specific companies or work environments you're drawn to?</li>
+			  </ul>
 			</div>
-
+			
+			<label for="goals-textarea" class="sr-only">Career Goals</label>
+			<textarea
+			  id="goals-textarea"
+			  bind:value={goals}
+			  on:input={markAsChanged}
+			  placeholder="Describe your career goals and aspirations..."
+			  class="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+			  required
+			></textarea>
+		  </div>
+		</div>
+  
+		<!-- Personality & Values Section -->
+		<div class="bg-white rounded-2xl shadow-xl p-8">
+		  <div class="flex items-center space-x-3 mb-6">
+			<div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+			  <span class="text-2xl">💎</span>
+			</div>
+			<h2 class="text-2xl font-semibold text-gray-800">Your Personality & Values</h2>
+		  </div>
+		  
+		  <div class="space-y-4">
+			<div class="bg-blue-50 p-4 rounded-lg">
+			  <p class="text-blue-800 text-sm mb-2">💡 <strong>Consider:</strong></p>
+			  <ul class="text-blue-700 text-sm space-y-1">
+				<li>• How do you prefer to work? (independently, in teams, etc.)</li>
+				<li>• What values are most important to you?</li>
+				<li>• What kind of work environment brings out your best?</li>
+			  </ul>
+			</div>
+			
+			<label for="personality-textarea" class="sr-only">Personality and Values</label>
+			<textarea
+			  id="personality-textarea"
+			  bind:value={personalityValues}
+			  on:input={markAsChanged}
+			  placeholder="Tell us about your personality, work style, and core values..."
+			  class="w-full h-32 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+			  required
+			></textarea>
+		  </div>
+		</div>
+  
+		<!-- Life Context Section -->
+		<div class="bg-white rounded-2xl shadow-xl p-8">
+		  <div class="flex items-center space-x-3 mb-6">
+			<div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+			  <span class="text-2xl">🌟</span>
+			</div>
+			<h2 class="text-2xl font-semibold text-gray-800">Your Life Context</h2>
+		  </div>
+		  
+		  <div class="space-y-4">
+			<div class="bg-green-50 p-4 rounded-lg">
+			  <p class="text-green-800 text-sm mb-2">💡 <strong>Share any relevant context:</strong></p>
+			  <ul class="text-green-700 text-sm space-y-1">
+				<li>• Current life stage and priorities</li>
+				<li>• Geographic preferences or constraints</li>
+				<li>• Family considerations or other commitments</li>
+			  </ul>
+			</div>
+			
+			<label for="life-context-textarea" class="sr-only">Life Context</label>
+			<textarea
+			  id="life-context-textarea"
+			  bind:value={lifeContext}
+			  on:input={markAsChanged}
+			  placeholder="Tell us about your current life situation and any important context..."
+			  class="w-full h-28 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+			></textarea>
+		  </div>
+		</div>
+  
+		<!-- Optional Advanced Sections -->
+		<div class="bg-white rounded-2xl shadow-xl p-8">
+		  <h3 class="text-xl font-semibold text-gray-800 mb-6">Additional Insights (Optional)</h3>
+		  
+		  <div class="space-y-6">
 			<!-- Doubts & Barriers -->
-			<div class="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-amber-400">
-				<div class="flex items-center mb-6">
-					<div class="w-12 h-12 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center mr-4">
-						<span class="text-white font-bold text-lg">🤔</span>
-					</div>
-					<h2 class="text-2xl font-bold text-gray-800">Doubts / Barriers</h2>
-				</div>
-				
-				<div class="border border-gray-200 rounded-lg mb-4">
-					<button
-						type="button"
-						class="w-full p-3 text-left bg-amber-50 hover:bg-amber-100 rounded-t-lg flex justify-between items-center text-sm font-medium text-gray-700"
-						on:click={() => toggleInstructions('doubts')}
-					>
-						<span>💡 Need inspiration?</span>
-						<span class="text-gray-400">{expandedInstructions['doubts'] ? '−' : '+'}</span>
-					</button>
-					{#if expandedInstructions['doubts']}
-						<div class="p-4 bg-amber-50 rounded-b-lg border-t border-amber-200">
-							<p class="text-gray-600 text-sm">What questions, doubts, or barriers are on your mind? What's holding you back?</p>
-						</div>
-					{/if}
-				</div>
-
-				<textarea 
-					bind:value={doubts_barriers} 
-					on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
-					rows="4" 
-					placeholder="What concerns, obstacles, or uncertainties are you facing?"
-					class="w-full rounded-xl border-gray-300 shadow-sm focus:border-amber-400 focus:ring-amber-400 resize-none overflow-hidden min-h-[120px] p-4"
-				></textarea>
+			<div>
+			  <label for="doubts-textarea" class="block text-sm font-medium text-gray-700 mb-2">
+				<span class="text-lg">🤔</span> Any doubts or barriers you're facing?
+			  </label>
+			  <textarea
+				id="doubts-textarea"
+				bind:value={doubtsBarriers}
+				on:input={markAsChanged}
+				placeholder="What concerns or obstacles are you thinking about regarding your career path?"
+				class="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-sm"
+			  ></textarea>
 			</div>
-
-			<!-- Current Life Context -->
-			<div class="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-purple-400">
-				<div class="flex items-center mb-6">
-					<div class="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mr-4">
-						<span class="text-white font-bold text-lg">📍</span>
-					</div>
-					<h2 class="text-2xl font-bold text-gray-800">Current Life Context</h2>
-				</div>
-				
-				<div class="border border-gray-200 rounded-lg mb-4">
-					<button
-						type="button"
-						class="w-full p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-t-lg flex justify-between items-center text-sm font-medium text-gray-700"
-						on:click={() => toggleInstructions('life_context')}
-					>
-						<span>💡 Need inspiration?</span>
-						<span class="text-gray-400">{expandedInstructions['life_context'] ? '−' : '+'}</span>
-					</button>
-					{#if expandedInstructions['life_context']}
-						<div class="p-4 bg-purple-50 rounded-b-lg border-t border-purple-200">
-							<p class="text-gray-600 text-sm">Describe your current situation. Are you looking for a change, facing a challenge, or exploring new opportunities?</p>
-						</div>
-					{/if}
-				</div>
-
-				<textarea 
-					bind:value={life_context} 
-					on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
-					rows="4" 
-					placeholder="What's happening in your life right now? What brought you here?"
-					class="w-full rounded-xl border-gray-300 shadow-sm focus:border-purple-400 focus:ring-purple-400 resize-none overflow-hidden min-h-[120px] p-4"
-				></textarea>
+  
+			<!-- Emotional Landscape -->
+			<div>
+			  <label for="emotional-textarea" class="block text-sm font-medium text-gray-700 mb-2">
+				<span class="text-lg">💭</span> How are you feeling about your career journey?
+			  </label>
+			  <textarea
+				id="emotional-textarea"
+				bind:value={emotionalLandscape}
+				on:input={markAsChanged}
+				placeholder="Excited, uncertain, ready for change? Share your current emotional state..."
+				class="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-sm"
+			  ></textarea>
 			</div>
-
+  
 			<!-- Core Summary -->
-			<div class="bg-white rounded-2xl shadow-lg p-8 border-l-4 border-rose-400">
-				<div class="flex items-center mb-6">
-					<div class="w-12 h-12 bg-gradient-to-r from-rose-400 to-pink-500 rounded-full flex items-center justify-center mr-4">
-						<span class="text-white font-bold text-lg">💎</span>
-					</div>
-					<h2 class="text-2xl font-bold text-gray-800">Core Summary</h2>
-				</div>
-				
-				<div class="border border-gray-200 rounded-lg mb-4">
-					<button
-						type="button"
-						class="w-full p-3 text-left bg-rose-50 hover:bg-rose-100 rounded-t-lg flex justify-between items-center text-sm font-medium text-gray-700"
-						on:click={() => toggleInstructions('core_summary')}
-					>
-						<span>💡 Need inspiration?</span>
-						<span class="text-gray-400">{expandedInstructions['core_summary'] ? '−' : '+'}</span>
-					</button>
-					{#if expandedInstructions['core_summary']}
-						<div class="p-4 bg-rose-50 rounded-b-lg border-t border-rose-200">
-							<p class="text-gray-600 text-sm">In a few bullet points, summarize your background, soul's yearning, biggest fear, and superpower.</p>
-						</div>
-					{/if}
-				</div>
-
-				<textarea 
-					bind:value={core_summary} 
-					on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
-					rows="4" 
-					placeholder="• Background: ...\n• Soul's yearning: ...\n• Biggest fear: ...\n• Superpower: ..."
-					class="w-full rounded-xl border-gray-300 shadow-sm focus:border-rose-400 focus:ring-rose-400 resize-none overflow-hidden min-h-[120px] p-4"
-				></textarea>
+			<div>
+			  <label for="summary-textarea" class="block text-sm font-medium text-gray-700 mb-2">
+				<span class="text-lg">📝</span> Core Summary
+			  </label>
+			  <textarea
+				id="summary-textarea"
+				bind:value={coreSummary}
+				on:input={markAsChanged}
+				placeholder="In a few sentences, what's the essence of what you're looking for in your next career step?"
+				class="w-full h-24 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-sm"
+			  ></textarea>
 			</div>
+		  </div>
 		</div>
-
+  
 		<!-- Navigation -->
-		<div class="flex justify-between items-center mt-12">
-			<button
-				type="button"
-				on:click={goBack}
-				class="text-gray-600 hover:text-gray-800 font-medium flex items-center transition-colors duration-200"
-				disabled={isSubmitting}
-			>
-				<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-				</svg>
-				Back to Ikigai
-			</button>
-
-			<button
-				type="button"
-				on:click={submitAndProcess}
-				disabled={isSubmitting}
-				class="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center text-lg disabled:transform-none disabled:shadow-md"
-			>
-				{#if isSubmitting}
-					<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-					</svg>
-					Processing...
-				{:else}
-					🚀 Generate My Analysis
-					<svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-					</svg>
-				{/if}
-			</button>
+		<div class="flex justify-between items-center pt-6">
+		  <button
+			type="button"
+			on:click={goToIkigai}
+			class="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
+		  >
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+			</svg>
+			<span>Back to Ikigai</span>
+		  </button>
+  
+		  <button
+			type="submit"
+			disabled={isSubmitting}
+			class="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-lg transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+		  >
+			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+			</svg>
+			<span>
+			  {#if isSubmitting}
+				Regenerating Your Analysis...
+			  {:else}
+				Regenerate My Analysis
+			  {/if}
+			</span>
+			<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+			</svg>
+		  </button>
 		</div>
+  
+		<!-- Regeneration Warning -->
+		<div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mt-4">
+		  <div class="flex items-start space-x-3">
+			<svg class="w-5 h-5 text-orange-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+			  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+			</svg>
+			<div>
+			  <h4 class="text-orange-800 font-medium text-sm">Important Note</h4>
+			  <p class="text-orange-700 text-sm mt-1">
+				Clicking "Regenerate My Analysis" will create fresh career insights based on your updated responses. 
+				Your previous results will be replaced with new personalized documents.
+			  </p>
+			</div>
+		  </div>
+		</div>
+	  </form>
 	</div>
-</div>
-
-<style lang="postcss">
+  </div>
+  
+  <style lang="postcss">
 	@tailwind base;
 	@tailwind components;
 	@tailwind utilities;
-</style>
+	
+	textarea {
+	  transition: height 0.2s ease;
+	}
+  </style>

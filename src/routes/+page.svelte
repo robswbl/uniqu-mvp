@@ -64,9 +64,9 @@
   
         // 🚀 SMART ROUTING LOGIC
         if (sessionStatus === 'completed') {
-          feedbackMessage = 'Welcome back! Taking you to your results...';
+          feedbackMessage = 'Welcome back! Taking you to your dashboard...';
           setTimeout(async () => {
-            await goto(`/results/${sessionId}`);
+            await goto(`/dashboard/${sessionId}`);
           }, 1500);
         } else {
           feedbackMessage = sessionStatus === 'in-progress' 

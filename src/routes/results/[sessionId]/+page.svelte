@@ -47,6 +47,7 @@
 				.from('generated_documents')
 				.select('*')
 				.eq('session_id', sessionId)
+				.neq('document_type', 'motivational_letter')  // ADD THIS LINE
 				.order('created_at', { ascending: false });
 
 			if (docsError) throw docsError;

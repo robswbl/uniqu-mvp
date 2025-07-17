@@ -18,6 +18,11 @@
 	let painPoints = '';
 	let address = '';
 	let editingNotes = {};
+	
+	// Modal variables
+	let showLetterModal = false;
+	let currentLetterContent = '';
+	let currentLetterTitle = '';
 
 	// Status options for dropdown
 	const statusOptions = [
@@ -335,10 +340,42 @@
 		}
 	}
 
-	function toggleMenu(letterId) {
-		const menu = document.getElementById('menu-' + letterId);
-		if (menu) {
-			menu.classList.toggle('hidden');
+	// Modal-based viewLetter function
+	async function viewLetter(letterId) {
+		try {
+			console.log('Looking for generated document with document_id:', letterId);
+
+			const { data: generatedDoc, error } = await supabase
+				.from('generated_documents')
+				.select('*')
+				.eq('session_id', sessionId)
+				.eq('document_type', 'motivational_letter')
+				.eq('document_id', letterId.toString())
+				.single();
+
+			if (error) {
+				console.error('Database query error:', error);
+				if (error.code === 'PGRST116') {
+					alert('Letter content not yet generated. Please wait for the AI to finish processing, then try again.');
+				} else {
+					throw error;
+				}
+				return;
+			}
+
+			if (!generatedDoc || !generatedDoc.content_html) {
+				alert('Letter content not yet generated or is empty.');
+				return;
+			}
+
+			// Show in modal
+			currentLetterContent = generatedDoc.content_html;
+			currentLetterTitle = generatedDoc.title || `Letter for ${motivationalLetters.find(l => l.id == letterId)?.company_name || 'Company'}`;
+			showLetterModal = true;
+
+		} catch (err) {
+			console.error('Error viewing letter:', err);
+			alert('Error loading letter content: ' + (err.message || 'Unknown error'));
 		}
 	}
 
@@ -380,6 +417,7 @@
 				on:click={() => goto(`/results/${sessionId}`)}
 				class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-200 mb-4"
 				type="button"
+				aria-label="Back to Results"
 			>
 				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -397,6 +435,7 @@
 					on:click={() => showNewLetterForm = !showNewLetterForm}
 					class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
 					type="button"
+					aria-label="Generate New Letter"
 				>
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -418,6 +457,7 @@
 					on:click={fetchData}
 					class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
 					type="button"
+					aria-label="Try Again"
 				>
 					Try Again
 				</button>
@@ -503,6 +543,7 @@
 								disabled={generating || (!selectedCompany && !customCompany.trim()) || !painPoints.trim() || !address.trim()}
 								class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 								type="button"
+								aria-label="Generate Letter"
 							>
 								{#if generating}
 									<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -519,6 +560,7 @@
 								on:click={() => showNewLetterForm = false}
 								class="px-4 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
 								type="button"
+								aria-label="Cancel"
 							>
 								Cancel
 							</button>
@@ -542,6 +584,7 @@
 							on:click={() => showNewLetterForm = true}
 							class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium"
 							type="button"
+							aria-label="Generate First Letter"
 						>
 							Generate First Letter
 						</button>
@@ -570,47 +613,54 @@
 										value={letter.status}
 										on:change={(e) => handleStatusChange(letter.id, e)}
 										class="px-3 py-2 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 {getStatusColor(letter.status)}"
+										aria-label="Change letter status"
 									>
 										{#each statusOptions as option}
 											<option value={option.value}>{option.label}</option>
 										{/each}
 									</select>
 									
-									<!-- Actions Dropdown -->
-									<div class="relative">
+									<!-- Direct Action Buttons -->
+									<div class="flex items-center space-x-2">
+										<!-- Test Generate Button -->
 										<button 
-											class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+											on:click={() => triggerWebhookForLetter(letter)}
+											class="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
 											type="button"
-											on:click={() => toggleMenu(letter.id)}
+											aria-label="Test generate letter"
+											title="Test Generate Letter"
 										>
 											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
 											</svg>
 										</button>
 										
-										<div id="menu-{letter.id}" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-											<button 
-												on:click={() => triggerWebhookForLetter(letter)}
-												class="w-full text-left px-4 py-2 text-sm text-green-700 hover:bg-green-50 first:rounded-t-lg font-medium"
-												type="button"
-											>
-												🔄 Test Generate Letter
-											</button>
-											<button 
-												on:click={() => viewLetter(letter.id)}
-												class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-												type="button"
-											>
-												View Letter Content
-											</button>
-											<button 
-												on:click={() => deleteLetter(letter.id, letter.company_name)}
-												class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 last:rounded-b-lg"
-												type="button"
-											>
-												Delete Letter
-											</button>
-										</div>
+										<!-- View Letter Button -->
+										<button 
+											on:click={() => viewLetter(letter.id)}
+											class="p-2 text-green-600 hover:text-green-800 hover:bg-green-50 rounded-lg transition-colors"
+											type="button"
+											aria-label="View letter content"
+											title="View Letter Content"
+										>
+											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+											</svg>
+										</button>
+										
+										<!-- Delete Button -->
+										<button 
+											on:click={() => deleteLetter(letter.id, letter.company_name)}
+											class="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+											type="button"
+											aria-label="Delete letter"
+											title="Delete Letter"
+										>
+											<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+											</svg>
+										</button>
 									</div>
 								</div>
 							</div>
@@ -648,13 +698,14 @@
 							<!-- Notes Section -->
 							<div class="border-t border-gray-100 pt-4">
 								<div class="flex items-start justify-between mb-2">
-									<label class="text-sm font-medium text-gray-700">Notes:</label>
+									<label for="notes-{letter.id}" class="text-sm font-medium text-gray-700">Notes:</label>
 									{#if editingNotes[letter.id] !== undefined}
 										<div class="flex items-center space-x-2">
 											<button 
 												on:click={() => saveNotes(letter.id)}
 												class="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
 												type="button"
+												aria-label="Save notes"
 											>
 												Save
 											</button>
@@ -662,6 +713,7 @@
 												on:click={() => cancelEditingNotes(letter.id)}
 												class="text-xs px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
 												type="button"
+												aria-label="Cancel editing notes"
 											>
 												Cancel
 											</button>
@@ -671,6 +723,7 @@
 											on:click={() => startEditingNotes(letter.id, letter.notes)}
 											class="text-xs text-indigo-600 hover:text-indigo-800 transition-colors"
 											type="button"
+											aria-label={letter.notes ? 'Edit notes' : 'Add notes'}
 										>
 											{letter.notes ? 'Edit' : 'Add Note'}
 										</button>
@@ -679,10 +732,12 @@
 								
 								{#if editingNotes[letter.id] !== undefined}
 									<textarea
+										id="notes-{letter.id}"
 										bind:value={editingNotes[letter.id]}
 										placeholder="Add notes about this application..."
 										class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-sm"
 										rows="3"
+										aria-label="Letter notes"
 									></textarea>
 								{:else}
 									<p class="text-sm text-gray-600 italic min-h-[1.5rem]">
@@ -697,3 +752,63 @@
 		{/if}
 	</div>
 </div>
+
+<!-- Letter Modal -->
+{#if showLetterModal}
+	<div 
+		class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
+		on:click={() => showLetterModal = false}
+		on:keydown={(e) => e.key === 'Escape' && (showLetterModal = false)}
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="modal-title"
+		tabindex="0"
+	>
+		<div 
+			class="bg-white rounded-lg max-w-4xl max-h-[90vh] w-full mx-4 overflow-hidden" 
+			on:click|stopPropagation
+			on:keydown|stopPropagation
+			role="document"
+		>
+			<div class="flex items-center justify-between p-4 border-b border-gray-200">
+				<h3 id="modal-title" class="text-lg font-semibold text-gray-900">{currentLetterTitle}</h3>
+				<div class="flex items-center space-x-2">
+					<button 
+						on:click={() => {
+							const printWindow = window.open('', '_blank');
+							printWindow.document.write(`
+								<!DOCTYPE html>
+								<html><head><title>${currentLetterTitle}</title>
+								<style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:20px;line-height:1.6;}
+								@media print{body{margin:0;padding:15px;}}</style>
+								</head><body>${currentLetterContent}</body></html>
+							`);
+							printWindow.document.close();
+							printWindow.print();
+						}}
+						class="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+						type="button"
+						aria-label="Print letter"
+					>
+						Print
+					</button>
+					<button 
+						on:click={() => showLetterModal = false}
+						class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+						type="button"
+						aria-label="Close modal"
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
+			</div>
+			<div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+				<div class="prose max-w-none">
+					{@html currentLetterContent}
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}

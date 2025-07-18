@@ -33,6 +33,12 @@ export default defineConfig({
 			}
 		]
 	},
+	server: {
+		host: true, // bind to all interfaces
+		port: 6134, // match your Docker port
+		strictPort: true,
+		allowedHosts: 'all' // allow requests with any Host header
+	},
 	preview: {
 		allowedHosts: 'all'
 	}

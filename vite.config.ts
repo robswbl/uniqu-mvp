@@ -37,9 +37,11 @@ export default defineConfig({
 		host: true, // bind to all interfaces
 		port: 6134, // match your Docker port
 		strictPort: true,
-		allowedHosts: 'all' // allow requests with any Host header
+		allowedHosts: true // allow requests with any Host header
 	},
 	preview: {
-		allowedHosts: 'all'
+		host: true,
+		port: 6134,
+		allowedHosts: true // This should fix the "go.uniqu.ch" error
 	}
 });

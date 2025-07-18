@@ -37,11 +37,10 @@ export default defineConfig({
 		host: true, // bind to all interfaces
 		port: 6134, // match your Docker port
 		strictPort: true,
-		allowedHosts: true // allow requests with any Host header
+		allowedHosts: ["go.uniqu.ch", "localhost", "127.0.0.1"] // specify exact domains
 	},
 	preview: {
-		host: true,
 		port: 6134,
-		allowedHosts: true // This should fix the "go.uniqu.ch" error
+		allowedHosts: ["go.uniqu.ch", "localhost", "127.0.0.1"]
 	}
 });

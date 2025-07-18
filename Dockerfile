@@ -16,4 +16,4 @@ COPY --from=builder /app/.svelte-kit ./.svelte-kit
 COPY --from=builder /app/static ./static
 EXPOSE 6134
 ENV NODE_ENV=production
-CMD ["npm", "run", "preview", "--", "--port", "6134", "--host"] 
+CMD ["npm", "run", "preview"] 

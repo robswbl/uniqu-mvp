@@ -34,9 +34,6 @@ export default defineConfig({
 		]
 	},
 	preview: {
-		host: true, // listen on 0.0.0.0 for Docker/Apache compatibility
-		port: 6134, // match Docker mapping
-		strictPort: true, // fail if 6134 is busy
-		allowedHosts: ['go.uniqu.ch'] // explicitly allow the proxy hostname
+		allowedHosts: ['go.uniqu.ch']
 	}
 });

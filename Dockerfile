@@ -14,6 +14,7 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.svelte-kit ./.svelte-kit
 COPY --from=builder /app/static ./static
+COPY --from=builder /app/vite.config.ts ./
 EXPOSE 6134
 ENV NODE_ENV=production
-CMD ["npm", "run", "preview", "--", "--port", "6134", "--host", "0.0.0.0", "--strictPort"] 
+CMD ["npm", "run", "preview", "--", "--port", "6134", "--host", "0.0.0.0", "--strictPort"]

@@ -34,12 +34,13 @@ export default defineConfig({
 		]
 	},
 	server: {
-		host: true, // bind to all interfaces
+		host: '0.0.0.0', // bind to all interfaces
 		port: 6134, // match your Docker port
 		strictPort: true,
 		allowedHosts: ["go.uniqu.ch", "localhost", "127.0.0.1"] // specify exact domains
 	},
 	preview: {
+		host: '0.0.0.0', // also bind to all interfaces
 		port: 6134,
 		allowedHosts: ["go.uniqu.ch", "localhost", "127.0.0.1"]
 	}

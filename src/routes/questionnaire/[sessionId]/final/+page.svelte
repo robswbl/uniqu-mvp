@@ -338,13 +338,3 @@
 	  </form>
 	</div>
   </div>
-  
-  <style lang="postcss">
-	@tailwind base;
-	@tailwind components;
-	@tailwind utilities;
-	
-	textarea {
-	  transition: height 0.2s ease;
-	}
-  </style>

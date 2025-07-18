@@ -1,6 +1,6 @@
 // src/routes/questionnaire/[sessionId]/+page.server.ts
 import { error, redirect, isRedirect } from '@sveltejs/kit'; // Import the 'isRedirect' helper
-import { N8N_WEBHOOK_URL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { supabase } from '$lib/supabaseClient';
 
 export const actions = {
@@ -20,12 +20,12 @@ export const actions = {
 			}
 			const userId = sessionData.user_id;
 
-			if (!N8N_WEBHOOK_URL) {
+			if (!env.N8N_WEBHOOK_URL) {
 				throw error(500, 'Server configuration error: N8N_WEBHOOK_URL not set.');
 			}
 
 			// Fire and Forget
-			fetch(N8N_WEBHOOK_URL, {
+			fetch(env.N8N_WEBHOOK_URL, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ sessionId: sessionId, userId: userId })

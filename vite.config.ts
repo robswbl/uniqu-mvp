@@ -34,6 +34,6 @@ export default defineConfig({
 		]
 	},
 	preview: {
-		allowedHosts: ['go.uniqu.ch']
+		allowedHosts: 'all'
 	}
 });

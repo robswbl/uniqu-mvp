@@ -204,7 +204,7 @@
 				<span class="text-2xl font-mono font-bold text-gray-900">{formatTime(timeElapsed)}</span>
 			</div>
 			<p class="text-sm text-gray-600">
-				Analysis typically takes 30-60 seconds to complete
+				Analysis typically takes one to two minutes to complete
 			</p>
 		</div>
 
@@ -221,7 +221,9 @@
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
 							</svg>
 						</div>
-						<span class="text-green-700 font-medium">📝 Reflection Letter - Complete!</span>
+						<a href="/results/{sessionId}/reflection_letter" class="text-green-700 font-medium hover:text-green-800 transition-colors cursor-pointer">
+							📝 Reflection Letter - Complete! (Click to read)
+						</a>
 					{:else}
 						<div class="w-6 h-6 border-2 border-gray-300 rounded-full animate-pulse"></div>
 						<span class="text-gray-600">📝 Reflection Letter - Generating...</span>
@@ -236,7 +238,9 @@
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
 							</svg>
 						</div>
-						<span class="text-green-700 font-medium">🎯 Career Themes - Complete!</span>
+						<a href="/results/{sessionId}/career_themes" class="text-green-700 font-medium hover:text-green-800 transition-colors cursor-pointer">
+							🎯 Career Themes - Complete! (Click to read)
+						</a>
 					{:else}
 						<div class="w-6 h-6 border-2 border-gray-300 rounded-full animate-pulse"></div>
 						<span class="text-gray-600">🎯 Career Themes - Generating...</span>
@@ -251,13 +255,24 @@
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
 							</svg>
 						</div>
-						<span class="text-green-700 font-medium">🏢 Ideal Companies - Complete!</span>
+						<a href="/results/{sessionId}/ideal_companies" class="text-green-700 font-medium hover:text-green-800 transition-colors cursor-pointer">
+							🏢 Ideal Companies - Complete! (Click to read)
+						</a>
 					{:else}
 						<div class="w-6 h-6 border-2 border-gray-300 rounded-full animate-pulse"></div>
 						<span class="text-gray-600">🏢 Ideal Companies - Generating...</span>
 					{/if}
 				</div>
 			</div>
+
+			<!-- Early Reading Message -->
+			{#if totalDocuments > 0 && totalDocuments < 3}
+				<div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+					<p class="text-sm text-blue-800">
+						💡 <strong>Don't want to wait?</strong> You can start reading the completed documents above while the others finish generating!
+					</p>
+				</div>
+			{/if}
 
 			<!-- Progress Bar -->
 			<div class="mt-6">

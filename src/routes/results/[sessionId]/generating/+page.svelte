@@ -51,12 +51,11 @@
 		return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 	}
 
-	// Check if reflection letter is ready and redirect
+	// Check if we should redirect to results
 	async function checkAndRedirect() {
-		if (documentsFound.reflection_letter) {
-			console.log('Reflection letter ready! Redirecting to results...');
-			
-			// Clean up before redirect
+		// Only redirect when ALL documents are complete
+		if (totalDocuments >= 3) {
+			console.log('All documents complete! Redirecting to results...');
 			if (timer) clearInterval(timer);
 			if (subscription) subscription.unsubscribe();
 			
@@ -102,9 +101,9 @@
 				// Trigger reactivity
 				documentsFound = { ...documentsFound };
 
-				// If reflection letter already exists (and is fresh), redirect immediately
-				if (documentsFound.reflection_letter) {
-					console.log('Reflection letter already exists, redirecting...');
+				// Check if all documents are already complete
+				if (totalDocuments >= 3) {
+					console.log('All documents already exist, redirecting...');
 					await checkAndRedirect();
 					return;
 				}
@@ -279,8 +278,8 @@
 		<div class="bg-indigo-50 rounded-xl p-6">
 			<h3 class="text-lg font-semibold text-indigo-900 mb-3">What happens next?</h3>
 			<div class="text-sm text-indigo-800 space-y-2">
-				<p>✨ As soon as your <strong>Reflection Letter</strong> is ready, you'll be automatically redirected to view it</p>
-				<p>📊 The remaining documents will continue generating in the background</p>
+				<p>✨ Once all <strong>3 documents</strong> are ready, you'll be automatically redirected to view your complete analysis</p>
+				<p>📊 Documents are generated in parallel, so they may complete in any order</p>
 				<p>💌 You can then create personalized application letters for specific companies</p>
 			</div>
 		</div>

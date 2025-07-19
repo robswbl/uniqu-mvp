@@ -58,6 +58,8 @@
   
     onMount(async () => {
       try {
+        console.log('Loading dashboard for session:', sessionId);
+        
         // Fetch session data for summary (using correct column names from schema)
         const { data: session, error: sessionError } = await supabase
           .from('questionnaire_sessions')
@@ -65,9 +67,15 @@
           .eq('id', sessionId)
           .single();
         
+        console.log('Session fetch result:', { session, sessionError });
+        
         if (sessionError) {
           console.error('Session fetch error:', sessionError);
           throw sessionError;
+        }
+
+        if (!session) {
+          throw new Error('No session found with ID: ' + sessionId);
         }
   
         // Check if results exist
@@ -75,6 +83,8 @@
           .from('generated_documents')
           .select('document_type, created_at')
           .eq('session_id', sessionId);
+
+        console.log('Results fetch result:', { results, resultsError });
 
         if (!resultsError && results && results.length > 0) {
           hasResults = true;
@@ -89,8 +99,10 @@
   
         sessionData = session;
         calculateCompletionStats();
+        console.log('Dashboard loaded successfully:', { sessionData, hasResults, documentCount });
       } catch (error) {
         console.error('Error loading dashboard:', error);
+        // Don't throw here, let the UI show the error state
       } finally {
         isLoading = false;
       }
@@ -151,9 +163,8 @@
         <div class="flex items-center justify-center mb-4">
           <h1 class="text-4xl font-bold text-gray-800 mr-4">Welcome Back! 🎉</h1>
           {#if !isLoading && sessionData}
-            {@const badge = getAchievementBadge()}
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white {badge.color}">
-              {badge.icon} {badge.text}
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white {getAchievementBadge().color}">
+              {getAchievementBadge().icon} {getAchievementBadge().text}
             </span>
           {/if}
         </div>
@@ -396,13 +407,27 @@
         </div>
       {:else}
         <div class="bg-white rounded-xl shadow-lg p-8 text-center">
-          <p class="text-red-500 text-lg">Could not load session details.</p>
-          <button 
-            on:click={() => goto('/')}
-            class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg"
-          >
-            Go Back Home
-          </button>
+          <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">Could not load session details</h3>
+          <p class="text-gray-600 mb-4">There was an issue loading your profile information.</p>
+          <div class="space-y-2">
+            <button 
+              on:click={() => window.location.reload()}
+              class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg mr-2"
+            >
+              Try Again
+            </button>
+            <button 
+              on:click={() => goto('/')}
+              class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg"
+            >
+              Go Back Home
+            </button>
+          </div>
         </div>
       {/if}
     </div>

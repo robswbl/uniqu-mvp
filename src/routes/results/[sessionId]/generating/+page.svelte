@@ -212,6 +212,15 @@
 		<div class="bg-white rounded-xl shadow-lg p-6 mb-8">
 			<h3 class="text-lg font-semibold text-gray-900 mb-4">Documents Being Generated</h3>
 			
+			<!-- Early Reading Message -->
+			{#if totalDocuments > 0 && totalDocuments < 3}
+				<div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+					<p class="text-sm text-blue-800">
+						💡 <strong>Don't want to wait?</strong> You can start reading the completed documents below while the others finish generating!
+					</p>
+				</div>
+			{/if}
+			
 			<div class="space-y-3">
 				<!-- Reflection Letter -->
 				<div class="flex items-center space-x-3">
@@ -264,15 +273,6 @@
 					{/if}
 				</div>
 			</div>
-
-			<!-- Early Reading Message -->
-			{#if totalDocuments > 0 && totalDocuments < 3}
-				<div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-					<p class="text-sm text-blue-800">
-						💡 <strong>Don't want to wait?</strong> You can start reading the completed documents above while the others finish generating!
-					</p>
-				</div>
-			{/if}
 
 			<!-- Progress Bar -->
 			<div class="mt-6">

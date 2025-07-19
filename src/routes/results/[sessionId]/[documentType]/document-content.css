@@ -1,16 +1,21 @@
 :global(.document-content) {
   line-height: 1.5;
-  font-size: 10px;
+  font-size: 10px !important;
   color: #374151;
 }
 
+:global(.document-content *) {
+  font-size: 10px !important;
+  line-height: 1.5 !important;
+}
+
 :global(.document-content h1) {
-  font-size: 0.9rem;
+  font-size: 0.9rem !important;
   font-weight: 700;
   color: #1f2937;
   margin-bottom: 0.6rem;
   margin-top: 1rem;
-  line-height: 1.2;
+  line-height: 1.2 !important;
 }
 
 :global(.document-content h1:first-child) {
@@ -18,12 +23,12 @@
 }
 
 :global(.document-content h2) {
-  font-size: 0.8rem;
+  font-size: 0.8rem !important;
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 0.4rem;
   margin-top: 0.8rem;
-  line-height: 1.3;
+  line-height: 1.3 !important;
 }
 
 :global(.document-content h2:first-child) {
@@ -31,7 +36,7 @@
 }
 
 :global(.document-content h3) {
-  font-size: 0.7rem;
+  font-size: 0.7rem !important;
   font-weight: 600;
   color: #374151;
   margin-bottom: 0.3rem;
@@ -41,7 +46,8 @@
 :global(.document-content p) {
   color: #4b5563;
   margin-bottom: 0.6rem;
-  line-height: 1.5;
+  line-height: 1.5 !important;
+  font-size: 10px !important;
 }
 
 :global(.document-content ul), 
@@ -53,17 +59,20 @@
 :global(.document-content li) {
   color: #4b5563;
   margin-bottom: 0.2rem;
-  line-height: 1.4;
+  line-height: 1.4 !important;
+  font-size: 10px !important;
 }
 
 :global(.document-content strong) {
   color: #1f2937;
   font-weight: 600;
+  font-size: 10px !important;
 }
 
 :global(.document-content em) {
   color: #374151;
   font-style: italic;
+  font-size: 10px !important;
 }
 
 :global(.document-content blockquote) {
@@ -75,4 +84,14 @@
   background-color: #f9fafb;
   padding-top: 0.4rem;
   padding-bottom: 0.4rem;
+  font-size: 10px !important;
+}
+
+/* Override any inline styles that might be present */
+:global(.document-content [style*="font-size"]) {
+  font-size: 10px !important;
+}
+
+:global(.document-content [style*="font-size: 25.6px"]) {
+  font-size: 10px !important;
 } 

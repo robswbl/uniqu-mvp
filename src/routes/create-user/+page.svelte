@@ -12,6 +12,15 @@
   let message = '';
   let messageType = '';
 
+  // Generate UUID function
+  function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
   async function createUser() {
     if (!firstName || !lastName || !gender || !email || !language || !agency) {
       message = 'Please fill in all fields';
@@ -24,6 +33,7 @@
 
     try {
       const userData = {
+        uuid: generateUUID(),
         firstName,
         lastName,
         gender,

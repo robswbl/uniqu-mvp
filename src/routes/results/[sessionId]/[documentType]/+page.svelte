@@ -64,6 +64,18 @@
     }
   }
 
+  function processHtmlContent(html: string): string {
+    if (!html) return '';
+    
+    // Remove inline styles that might be causing font size issues
+    return html
+      .replace(/style="[^"]*font-size[^"]*"/gi, '') // Remove font-size from style attributes
+      .replace(/style="[^"]*font-family[^"]*"/gi, '') // Remove font-family from style attributes
+      .replace(/style="[^"]*"/gi, '') // Remove all style attributes
+      .replace(/font-size:\s*[^;]+;?/gi, '') // Remove font-size from style content
+      .replace(/font-family:\s*[^;]+;?/gi, ''); // Remove font-family from style content
+  }
+
   function downloadDocument(): void {
     if (!documentData) {
       alert('No document to download');
@@ -156,7 +168,7 @@
       <!-- Document Content -->
       <div class="bg-white rounded-xl shadow-lg overflow-hidden relative">
         <div class="document-content px-12 py-10">
-          {@html documentData.content_html}
+          {@html processHtmlContent(documentData.content_html)}
         </div>
         
         <!-- Download button positioned in bottom-right of document -->

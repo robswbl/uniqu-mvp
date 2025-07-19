@@ -25,7 +25,11 @@
         sessionData.ikigai_care_about,
         sessionData.ikigai_inspires,
         sessionData.goals,
-        sessionData.personality_values
+        sessionData.personality_values,
+        sessionData.life_context,
+        sessionData.doubts_barriers,
+        sessionData.emotional_landscape,
+        sessionData.core_summary
       ];
       
       const completedFields = fields.filter(field => field && field.trim().length > 0).length;
@@ -63,7 +67,7 @@
         // Fetch session data for summary (using correct column names from schema)
         const { data: session, error: sessionError } = await supabase
           .from('questionnaire_sessions')
-          .select('user_id, status, cv_text, ikigai_love, ikigai_good_at, ikigai_care_about, ikigai_inspires, goals, personality_values, created_at')
+          .select('user_id, status, cv_text, ikigai_love, ikigai_good_at, ikigai_care_about, ikigai_inspires, goals, personality_values, life_context, doubts_barriers, emotional_landscape, core_summary, created_at')
           .eq('id', sessionId)
           .single();
         
@@ -95,6 +99,22 @@
             new Date(current.created_at) > new Date(latest.created_at) ? current : latest
           );
           lastUpdated = new Date(latestDoc.created_at).toLocaleDateString();
+
+          // If documents exist but status is not completed, update it
+          if (session.status !== 'completed') {
+            console.log('Documents exist but status is not completed, updating status...');
+            const { error: statusUpdateError } = await supabase
+              .from('questionnaire_sessions')
+              .update({ status: 'completed' })
+              .eq('id', sessionId);
+            
+            if (!statusUpdateError) {
+              session.status = 'completed';
+              console.log('Status updated to completed');
+            } else {
+              console.error('Failed to update status:', statusUpdateError);
+            }
+          }
         }
   
         sessionData = session;
@@ -154,6 +174,10 @@
     function getGoalsStatus() { return getSectionStatus(sessionData?.goals); }
     function getInspiresStatus() { return getSectionStatus(sessionData?.ikigai_inspires); }
     function getValuesStatus() { return getSectionStatus(sessionData?.personality_values); }
+    function getLifeContextStatus() { return getSectionStatus(sessionData?.life_context); }
+    function getDoubtsStatus() { return getSectionStatus(sessionData?.doubts_barriers); }
+    function getEmotionalStatus() { return getSectionStatus(sessionData?.emotional_landscape); }
+    function getCoreSummaryStatus() { return getSectionStatus(sessionData?.core_summary); }
   </script>
   
   <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
@@ -402,6 +426,84 @@
                   {getDisplayText(sessionData.personality_values, 'values', 120)}
                 </p>
               </div>
+            </div>
+          </div>
+
+          <!-- Additional Row for Missing Fields -->
+          <div class="grid md:grid-cols-2 gap-6 mt-6">
+            <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('life_context')}>
+              <div class="flex justify-between items-start mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="text-lg">🏠</span>
+                  <h3 class="font-semibold text-gray-700">Life Context</h3>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm {getLifeContextStatus().color}">{getLifeContextStatus().icon}</span>
+                  <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                    {expandedSections['life_context'] ? '▼ Less' : '▶ More'}
+                  </button>
+                </div>
+              </div>
+              <p class="text-gray-600 text-sm leading-relaxed">
+                {getDisplayText(sessionData.life_context, 'life_context', 120)}
+              </p>
+            </div>
+
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('doubts')}>
+              <div class="flex justify-between items-start mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="text-lg">🤔</span>
+                  <h3 class="font-semibold text-gray-700">Doubts & Barriers</h3>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm {getDoubtsStatus().color}">{getDoubtsStatus().icon}</span>
+                  <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                    {expandedSections['doubts'] ? '▼ Less' : '▶ More'}
+                  </button>
+                </div>
+              </div>
+              <p class="text-gray-600 text-sm leading-relaxed">
+                {getDisplayText(sessionData.doubts_barriers, 'doubts', 120)}
+              </p>
+            </div>
+          </div>
+
+          <!-- Fourth Row for Remaining Fields -->
+          <div class="grid md:grid-cols-2 gap-6 mt-6">
+            <div class="bg-gradient-to-r from-rose-50 to-pink-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('emotional')}>
+              <div class="flex justify-between items-start mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="text-lg">💭</span>
+                  <h3 class="font-semibold text-gray-700">Emotional Landscape</h3>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm {getEmotionalStatus().color}">{getEmotionalStatus().icon}</span>
+                  <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                    {expandedSections['emotional'] ? '▼ Less' : '▶ More'}
+                  </button>
+                </div>
+              </div>
+              <p class="text-gray-600 text-sm leading-relaxed">
+                {getDisplayText(sessionData.emotional_landscape, 'emotional', 120)}
+              </p>
+            </div>
+
+            <div class="bg-gradient-to-r from-slate-50 to-gray-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('core_summary')}>
+              <div class="flex justify-between items-start mb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="text-lg">📋</span>
+                  <h3 class="font-semibold text-gray-700">Core Summary</h3>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm {getCoreSummaryStatus().color}">{getCoreSummaryStatus().icon}</span>
+                  <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                    {expandedSections['core_summary'] ? '▼ Less' : '▶ More'}
+                  </button>
+                </div>
+              </div>
+              <p class="text-gray-600 text-sm leading-relaxed">
+                {getDisplayText(sessionData.core_summary, 'core_summary', 120)}
+              </p>
             </div>
           </div>
         </div>

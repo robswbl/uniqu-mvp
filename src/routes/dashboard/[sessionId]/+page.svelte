@@ -32,8 +32,8 @@
       completionPercentage = Math.round((completedFields / fields.length) * 100);
       
       // Set last updated
-      if (sessionData.updated_at) {
-        const date = new Date(sessionData.updated_at);
+      if (sessionData.created_at) {
+        const date = new Date(sessionData.created_at);
         const now = new Date();
         const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
         
@@ -63,7 +63,7 @@
         // Fetch session data for summary (using correct column names from schema)
         const { data: session, error: sessionError } = await supabase
           .from('questionnaire_sessions')
-          .select('user_id, status, cv_text, ikigai_love, ikigai_good_at, ikigai_care_about, ikigai_inspires, goals, personality_values, updated_at')
+          .select('user_id, status, cv_text, ikigai_love, ikigai_good_at, ikigai_care_about, ikigai_inspires, goals, personality_values, created_at')
           .eq('id', sessionId)
           .single();
         

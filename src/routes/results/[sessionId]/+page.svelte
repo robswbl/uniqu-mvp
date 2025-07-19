@@ -275,13 +275,13 @@
 								</div>
 								
 								{#if docStatus.ready}
-									<span class="bg-white bg-opacity-20 text-white text-xs px-2 py-1 rounded-full">
+									<span class="bg-white bg-opacity-20 text-white text-xs px-3 py-1 rounded-full font-medium">
 										Ready
 									</span>
 								{:else}
 									<div class="flex items-center space-x-2">
 										<div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-										<span class="bg-white bg-opacity-20 text-white text-xs px-2 py-1 rounded-full">
+										<span class="bg-white bg-opacity-20 text-white text-xs px-3 py-1 rounded-full font-medium">
 											Generating...
 										</span>
 									</div>
@@ -393,7 +393,27 @@
 					</div>
 				</div>
 				
-				<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+				<div class="grid md:grid-cols-3 gap-4">
+					<!-- Top Row: Dashboard, Update Profile, Refresh -->
+					
+					<!-- Dashboard -->
+					<button 
+						on:click={() => goto(`/dashboard/${sessionId}`)}
+						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-slate-50 hover:from-gray-100 hover:to-slate-100 border border-gray-200 rounded-lg transition-all duration-300 group"
+						type="button"
+						aria-label="View Dashboard"
+					>
+						<div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+							</svg>
+						</div>
+						<div class="text-left">
+							<div class="font-medium text-gray-900">Dashboard</div>
+							<div class="text-xs text-gray-700">View profile summary</div>
+						</div>
+					</button>
+
 					<!-- Update Profile -->
 					<button 
 						on:click={() => goto(`/questionnaire/${sessionId}`)}
@@ -429,78 +449,69 @@
 							<div class="text-xs text-blue-700">Check for new documents</div>
 						</div>
 					</button>
+				</div>
 
-					<!-- Download All -->
-					<button 
-						on:click={() => downloadAllDocuments()}
-						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 border border-green-200 rounded-lg transition-all duration-300 group"
-						type="button"
-						aria-label="Download All Documents"
-					>
-						<div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-							</svg>
-						</div>
-						<div class="text-left">
-							<div class="font-medium text-green-900">Download All</div>
-							<div class="text-xs text-green-700">Save all documents</div>
-						</div>
-					</button>
+				<!-- Bottom Row: Coming Soon Features -->
+				<div class="mt-4 pt-4 border-t border-gray-200">
+					<h4 class="text-sm font-medium text-gray-500 mb-3">Coming Soon</h4>
+					<div class="grid md:grid-cols-3 gap-4">
+						<!-- Download All (Coming Soon) -->
+						<button 
+							disabled
+							class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-300 rounded-lg opacity-60 cursor-not-allowed"
+							type="button"
+							aria-label="Download All Documents (Coming Soon)"
+						>
+							<div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+								<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+								</svg>
+							</div>
+							<div class="text-left">
+								<div class="font-medium text-gray-600">Download All</div>
+								<div class="text-xs text-gray-500">Save all documents</div>
+								<div class="text-xs text-blue-600 font-medium mt-1">Coming Soon</div>
+							</div>
+						</button>
 
-					<!-- Share Results -->
-					<button 
-						on:click={() => shareResults()}
-						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-purple-50 to-violet-50 hover:from-purple-100 hover:to-violet-100 border border-purple-200 rounded-lg transition-all duration-300 group"
-						type="button"
-						aria-label="Share Results"
-					>
-						<div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-							</svg>
-						</div>
-						<div class="text-left">
-							<div class="font-medium text-purple-900">Share Results</div>
-							<div class="text-xs text-purple-700">Share with others</div>
-						</div>
-					</button>
+						<!-- Share Results (Coming Soon) -->
+						<button 
+							disabled
+							class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-300 rounded-lg opacity-60 cursor-not-allowed"
+							type="button"
+							aria-label="Share Results (Coming Soon)"
+						>
+							<div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+								<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+								</svg>
+							</div>
+							<div class="text-left">
+								<div class="font-medium text-gray-600">Share Results</div>
+								<div class="text-xs text-gray-500">Share with others</div>
+								<div class="text-xs text-blue-600 font-medium mt-1">Coming Soon</div>
+							</div>
+						</button>
 
-					<!-- View Dashboard -->
-					<button 
-						on:click={() => goto(`/dashboard/${sessionId}`)}
-						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-slate-50 hover:from-gray-100 hover:to-slate-100 border border-gray-200 rounded-lg transition-all duration-300 group"
-						type="button"
-						aria-label="View Dashboard"
-					>
-						<div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-							</svg>
-						</div>
-						<div class="text-left">
-							<div class="font-medium text-gray-900">Dashboard</div>
-							<div class="text-xs text-gray-700">View profile summary</div>
-						</div>
-					</button>
-
-					<!-- Help & Support -->
-					<button 
-						on:click={() => showHelp()}
-						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 hover:from-yellow-100 hover:to-amber-100 border border-yellow-200 rounded-lg transition-all duration-300 group"
-						type="button"
-						aria-label="Help & Support"
-					>
-						<div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-							</svg>
-						</div>
-						<div class="text-left">
-							<div class="font-medium text-yellow-900">Help</div>
-							<div class="text-xs text-yellow-700">Get support</div>
-						</div>
-					</button>
+						<!-- Help & Support (Coming Soon) -->
+						<button 
+							disabled
+							class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-100 to-gray-200 border border-gray-300 rounded-lg opacity-60 cursor-not-allowed"
+							type="button"
+							aria-label="Help & Support (Coming Soon)"
+						>
+							<div class="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+								<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+								</svg>
+							</div>
+							<div class="text-left">
+								<div class="font-medium text-gray-600">Help</div>
+								<div class="text-xs text-gray-500">Get support</div>
+								<div class="text-xs text-blue-600 font-medium mt-1">Coming Soon</div>
+							</div>
+						</button>
+					</div>
 				</div>
 			</div>
 		{/if}

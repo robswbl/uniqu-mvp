@@ -275,13 +275,13 @@
 								</div>
 								
 								{#if docStatus.ready}
-									<span class="bg-white bg-opacity-20 text-white text-xs px-3 py-1 rounded-full font-medium">
+									<span class="bg-white bg-opacity-90 text-gray-800 text-xs px-3 py-1 rounded-full font-medium">
 										Ready
 									</span>
 								{:else}
 									<div class="flex items-center space-x-2">
 										<div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-										<span class="bg-white bg-opacity-20 text-white text-xs px-3 py-1 rounded-full font-medium">
+										<span class="bg-white bg-opacity-90 text-gray-800 text-xs px-3 py-1 rounded-full font-medium">
 											Generating...
 										</span>
 									</div>

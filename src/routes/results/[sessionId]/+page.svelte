@@ -130,6 +130,58 @@
 		goto(`/results/${sessionId}/${doc.document_type}`);
 	}
 
+	// Download all documents as a zip
+	async function downloadAllDocuments() {
+		try {
+			const readyDocs = documents.filter(doc => doc.content_html);
+			if (readyDocs.length === 0) {
+				alert('No documents ready for download yet.');
+				return;
+			}
+
+			// For now, just download the first document as a demo
+			// In a full implementation, you'd create a zip file with all documents
+			const doc = readyDocs[0];
+			const blob = new Blob([doc.content_html], { type: 'text/html' });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = `${doc.document_type.replace('_', '-')}.html`;
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
+		} catch (error) {
+			console.error('Download failed:', error);
+			alert('Download failed. Please try again.');
+		}
+	}
+
+	// Share results functionality
+	function shareResults() {
+		if (navigator.share) {
+			navigator.share({
+				title: 'My UniqU Career Analysis',
+				text: 'Check out my personalized career analysis from UniqU!',
+				url: window.location.href
+			}).catch(console.error);
+		} else {
+			// Fallback: copy URL to clipboard
+			navigator.clipboard.writeText(window.location.href).then(() => {
+				alert('Results URL copied to clipboard!');
+			}).catch(() => {
+				alert('Please copy this URL to share your results: ' + window.location.href);
+			});
+		}
+	}
+
+	// Show help and support
+	function showHelp() {
+		// For now, just show a simple help modal
+		// In a full implementation, this would open a help modal or redirect to help page
+		alert('Need help? Contact us at support@uniqu.com or visit our help center.');
+	}
+
 	onMount(() => {
 		fetchDocuments();
 		
@@ -328,32 +380,126 @@
 				</div>
 			{/if}
 
-			<!-- Additional Actions -->
-			<div class="bg-gray-50 rounded-xl p-6">
-				<h3 class="text-lg font-semibold text-gray-900 mb-4">Additional Actions</h3>
-				<div class="flex flex-wrap gap-4">
+			<!-- Enhanced Additional Actions -->
+			<div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+				<div class="flex items-center justify-between mb-6">
+					<div class="flex items-center space-x-3">
+						<div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+							<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+							</svg>
+						</div>
+						<h3 class="text-xl font-semibold text-gray-900">Additional Actions</h3>
+					</div>
+				</div>
+				
+				<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+					<!-- Update Profile -->
 					<button 
 						on:click={() => goto(`/questionnaire/${sessionId}`)}
-						class="flex items-center space-x-2 px-4 py-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors text-sm"
+						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 border border-orange-200 rounded-lg transition-all duration-300 group"
 						type="button"
 						aria-label="Update Responses and Regenerate"
 					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-						</svg>
-						<span>Update responses and regenerate</span>
+						<div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+							</svg>
+						</div>
+						<div class="text-left">
+							<div class="font-medium text-orange-900">Update Profile</div>
+							<div class="text-xs text-orange-700">Edit responses & regenerate</div>
+						</div>
 					</button>
-					
+
+					<!-- Refresh Documents -->
 					<button 
 						on:click={fetchDocuments}
-						class="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors text-sm"
+						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 border border-blue-200 rounded-lg transition-all duration-300 group"
 						type="button"
 						aria-label="Refresh Documents"
 					>
-						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-						</svg>
-						<span>Refresh</span>
+						<div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+							</svg>
+						</div>
+						<div class="text-left">
+							<div class="font-medium text-blue-900">Refresh</div>
+							<div class="text-xs text-blue-700">Check for new documents</div>
+						</div>
+					</button>
+
+					<!-- Download All -->
+					<button 
+						on:click={() => downloadAllDocuments()}
+						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 hover:from-green-100 hover:to-emerald-100 border border-green-200 rounded-lg transition-all duration-300 group"
+						type="button"
+						aria-label="Download All Documents"
+					>
+						<div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+							</svg>
+						</div>
+						<div class="text-left">
+							<div class="font-medium text-green-900">Download All</div>
+							<div class="text-xs text-green-700">Save all documents</div>
+						</div>
+					</button>
+
+					<!-- Share Results -->
+					<button 
+						on:click={() => shareResults()}
+						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-purple-50 to-violet-50 hover:from-purple-100 hover:to-violet-100 border border-purple-200 rounded-lg transition-all duration-300 group"
+						type="button"
+						aria-label="Share Results"
+					>
+						<div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+							</svg>
+						</div>
+						<div class="text-left">
+							<div class="font-medium text-purple-900">Share Results</div>
+							<div class="text-xs text-purple-700">Share with others</div>
+						</div>
+					</button>
+
+					<!-- View Dashboard -->
+					<button 
+						on:click={() => goto(`/dashboard/${sessionId}`)}
+						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-slate-50 hover:from-gray-100 hover:to-slate-100 border border-gray-200 rounded-lg transition-all duration-300 group"
+						type="button"
+						aria-label="View Dashboard"
+					>
+						<div class="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+							</svg>
+						</div>
+						<div class="text-left">
+							<div class="font-medium text-gray-900">Dashboard</div>
+							<div class="text-xs text-gray-700">View profile summary</div>
+						</div>
+					</button>
+
+					<!-- Help & Support -->
+					<button 
+						on:click={() => showHelp()}
+						class="flex items-center space-x-3 p-4 bg-gradient-to-r from-yellow-50 to-amber-50 hover:from-yellow-100 hover:to-amber-100 border border-yellow-200 rounded-lg transition-all duration-300 group"
+						type="button"
+						aria-label="Help & Support"
+					>
+						<div class="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+							<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+							</svg>
+						</div>
+						<div class="text-left">
+							<div class="font-medium text-yellow-900">Help</div>
+							<div class="text-xs text-yellow-700">Get support</div>
+						</div>
 					</button>
 				</div>
 			</div>

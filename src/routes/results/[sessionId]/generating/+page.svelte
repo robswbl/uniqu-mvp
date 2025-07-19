@@ -67,7 +67,13 @@
 
 	// Check existing documents (only those created after regeneration)
 	async function checkExistingDocuments() {
-		if (!regenerationTimestamp) return;
+		if (!regenerationTimestamp) {
+			console.log('No regeneration timestamp, skipping existing documents check');
+			return;
+		}
+
+		console.log('Checking existing documents for session:', sessionId);
+		console.log('Looking for documents after:', regenerationTimestamp);
 
 		try {
 			const { data: existingDocs, error } = await supabase
@@ -77,16 +83,28 @@
 				.in('document_type', ['reflection_letter', 'career_themes', 'ideal_companies'])
 				.gte('created_at', regenerationTimestamp); // Only get documents created AFTER regeneration
 
+			if (error) {
+				console.error('Error fetching existing documents:', error);
+				return;
+			}
+
+			console.log('Found existing documents:', existingDocs);
+
 			if (existingDocs) {
 				existingDocs.forEach(doc => {
 					if (doc.document_type in documentsFound) {
 						documentsFound[doc.document_type] = true;
 						totalDocuments++;
+						console.log('Existing document found:', doc.document_type);
 					}
 				});
 
+				// Trigger reactivity
+				documentsFound = { ...documentsFound };
+
 				// If reflection letter already exists (and is fresh), redirect immediately
 				if (documentsFound.reflection_letter) {
+					console.log('Reflection letter already exists, redirecting...');
 					await checkAndRedirect();
 					return;
 				}
@@ -99,12 +117,15 @@
 
 	// Set up real-time subscription
 	function setupRealtimeSubscription() {
+		console.log('Setting up real-time subscription for session:', sessionId);
+		console.log('Regeneration timestamp:', regenerationTimestamp);
+		
 		subscription = supabase
 			.channel('document_updates')
 			.on('postgres_changes', 
 				{ 
 					event: 'INSERT', 
-					schema: 'public', 
+					schema: 'uniqu', 
 					table: 'generated_documents',
 					filter: `session_id=eq.${sessionId}`
 				}, 
@@ -114,20 +135,28 @@
 					// Only count documents created after regeneration timestamp
 					if (regenerationTimestamp && payload.new.created_at >= regenerationTimestamp) {
 						const docType = payload.new.document_type;
+						console.log('Processing document type:', docType);
+						
 						if (docType in documentsFound && !documentsFound[docType]) {
 							documentsFound[docType] = true;
 							totalDocuments++;
 							
-							// Trigger reactivity
+							console.log('Document completed:', docType, 'Total:', totalDocuments);
+							
+							// Trigger reactivity by creating a new object
 							documentsFound = { ...documentsFound };
 							
 							// Check if we should redirect
 							checkAndRedirect();
 						}
+					} else {
+						console.log('Document ignored - before regeneration timestamp or not in target types');
 					}
 				}
 			)
-			.subscribe();
+			.subscribe((status) => {
+				console.log('Subscription status:', status);
+			});
 	}
 
 	onMount(async () => {

@@ -1,16 +1,16 @@
 :global(.document-content) {
-  line-height: 1.6;
-  font-size: 14px;
+  line-height: 1.5;
+  font-size: 10px;
   color: #374151;
 }
 
 :global(.document-content h1) {
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #1f2937;
-  margin-bottom: 0.75rem;
-  margin-top: 1.25rem;
-  line-height: 1.3;
+  margin-bottom: 0.6rem;
+  margin-top: 1rem;
+  line-height: 1.2;
 }
 
 :global(.document-content h1:first-child) {
@@ -18,12 +18,12 @@
 }
 
 :global(.document-content h2) {
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #1f2937;
-  margin-bottom: 0.5rem;
-  margin-top: 1rem;
-  line-height: 1.4;
+  margin-bottom: 0.4rem;
+  margin-top: 0.8rem;
+  line-height: 1.3;
 }
 
 :global(.document-content h2:first-child) {
@@ -31,29 +31,29 @@
 }
 
 :global(.document-content h3) {
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: #374151;
-  margin-bottom: 0.4rem;
-  margin-top: 0.8rem;
+  margin-bottom: 0.3rem;
+  margin-top: 0.6rem;
 }
 
 :global(.document-content p) {
   color: #4b5563;
-  margin-bottom: 0.8rem;
-  line-height: 1.6;
+  margin-bottom: 0.6rem;
+  line-height: 1.5;
 }
 
 :global(.document-content ul), 
 :global(.document-content ol) {
-  margin-bottom: 0.8rem;
-  margin-left: 1.2rem;
+  margin-bottom: 0.6rem;
+  margin-left: 1rem;
 }
 
 :global(.document-content li) {
   color: #4b5563;
-  margin-bottom: 0.3rem;
-  line-height: 1.5;
+  margin-bottom: 0.2rem;
+  line-height: 1.4;
 }
 
 :global(.document-content strong) {
@@ -67,12 +67,12 @@
 }
 
 :global(.document-content blockquote) {
-  border-left: 3px solid #a78bfa;
-  padding-left: 0.8rem;
-  margin: 0.8rem 0;
+  border-left: 2px solid #a78bfa;
+  padding-left: 0.6rem;
+  margin: 0.6rem 0;
   font-style: italic;
   color: #374151;
   background-color: #f9fafb;
-  padding-top: 0.6rem;
-  padding-bottom: 0.6rem;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
 } 

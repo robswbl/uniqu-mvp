@@ -2,9 +2,6 @@
 import { redirect } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient.js';
 
-// Disable CSRF protection for this route to fix 403 error in Docker
-export const csrf = false;
-
 export const actions = {
 	default: async ({ params }) => {
 		const { sessionId } = params;

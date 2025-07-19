@@ -3,13 +3,13 @@
   line-height: 1.5 !important;
   font-size: 10px !important;
   color: #374151 !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 }
 
 :global(.document-content *) {
   font-size: 10px !important;
   line-height: 1.5 !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 }
 
 /* Override Tailwind Typography prose classes */
@@ -18,6 +18,7 @@
 :global(.prose .document-content) {
   font-size: 10px !important;
   line-height: 1.5 !important;
+  font-family: Georgia, serif !important;
 }
 
 :global(.document-content.prose *),
@@ -25,6 +26,7 @@
 :global(.prose .document-content *) {
   font-size: 10px !important;
   line-height: 1.5 !important;
+  font-family: Georgia, serif !important;
 }
 
 :global(.document-content h1) {
@@ -34,7 +36,7 @@
   margin-bottom: 0.6rem !important;
   margin-top: 1rem !important;
   line-height: 1.2 !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 }
 
 :global(.document-content h1:first-child) {
@@ -48,7 +50,7 @@
   margin-bottom: 0.4rem !important;
   margin-top: 0.8rem !important;
   line-height: 1.3 !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 }
 
 :global(.document-content h2:first-child) {
@@ -61,7 +63,7 @@
   color: #374151 !important;
   margin-bottom: 0.3rem !important;
   margin-top: 0.6rem !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 }
 
 :global(.document-content p) {
@@ -69,7 +71,7 @@
   margin-bottom: 0.6rem !important;
   line-height: 1.5 !important;
   font-size: 10px !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 }
 
 :global(.document-content ul), 
@@ -83,21 +85,21 @@
   margin-bottom: 0.2rem !important;
   line-height: 1.4 !important;
   font-size: 10px !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 }
 
 :global(.document-content strong) {
   color: #1f2937 !important;
   font-weight: 600 !important;
   font-size: 10px !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 }
 
 :global(.document-content em) {
   color: #374151 !important;
   font-style: italic !important;
   font-size: 10px !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 }
 
 :global(.document-content blockquote) {
@@ -110,7 +112,7 @@
   padding-top: 0.4rem !important;
   padding-bottom: 0.4rem !important;
   font-size: 10px !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 }
 
 /* Override any inline styles that might be present */
@@ -122,13 +124,6 @@
   font-size: 10px !important;
 }
 
-/* Override Georgia font specifically */
-:global(.document-content [style*="font-family: Georgia"]),
-:global(.document-content [style*="font-family: georgia"]) {
-  font-family: inherit !important;
-  font-size: 10px !important;
-}
-
 /* Nuclear option - override everything */
 :global(.document-content),
 :global(.document-content *),
@@ -136,5 +131,5 @@
 :global(.document-content *::after) {
   font-size: 10px !important;
   line-height: 1.5 !important;
-  font-family: inherit !important;
+  font-family: Georgia, serif !important;
 } 

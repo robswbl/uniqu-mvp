@@ -188,7 +188,7 @@
 
 	function goToNext() {
 		if (fromOnboarding) {
-			goto(`/questionnaire/${sessionId}/ikigai/love`);
+			goto(`/questionnaire/${sessionId}/step3/love?from=onboarding`);
 		} else {
 			goto(`/questionnaire/${sessionId}/step3`);
 		}
@@ -303,6 +303,9 @@
 						on:dragover|preventDefault={() => isDragging = true}
 						on:dragleave={() => isDragging = false}
 						on:drop={handleDrop}
+						tabindex="0"
+						role="button"
+						aria-label="Upload your CV file by drag and drop or click to select"
 					>
 						<input
 							id="cv-upload"
@@ -375,7 +378,7 @@
 				class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-colors text-lg"
 				disabled={!cv_text || pollingCvText}
 			>
-				{fromOnboarding ? 'Continue to Ikigai Questions' : 'Go to Step 3'}
+				{fromOnboarding ? 'Continue to Step 3' : 'Go to Step 3'}
 			</button>
 		</div>
 	</div>

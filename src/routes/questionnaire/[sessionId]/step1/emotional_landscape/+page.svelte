@@ -63,9 +63,9 @@
       .update({ last_question_step: 'step1', last_question_id: 'emotional_landscape' })
       .eq('id', sessionId);
     if (isLastStep1Question) {
-      goto(`/questionnaire/${sessionId}/cv?from=onboarding`);
+      goto(`/questionnaire/${sessionId}/step2?from=onboarding`);
     } else {
-      goto(`/questionnaire/${sessionId}/step1/core_summary`); // or next question in order
+      // If not last, go to the next question (implement as needed)
     }
   }
 
@@ -92,4 +92,4 @@
   nextLabel={isLastStep1Question ? 'Continue to Step 2' : 'Next'}
   backLabel="Back"
   disabled={isSaving}
-/> 
+/>

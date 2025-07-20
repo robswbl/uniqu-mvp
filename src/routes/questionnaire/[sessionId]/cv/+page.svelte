@@ -305,6 +305,9 @@
 						on:dragover|preventDefault={() => isDragging = true}
 						on:dragleave={() => isDragging = false}
 						on:drop={handleDrop}
+						tabindex="0"
+						role="button"
+						aria-label="Upload your CV file by drag and drop or click to select"
 					>
 						<input
 							id="cv-upload"

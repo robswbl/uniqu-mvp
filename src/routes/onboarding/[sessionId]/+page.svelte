@@ -12,6 +12,8 @@
 	let selectedSituation = '';
 	let isSubmitting = false;
 	let userId = '';
+	let whereNow = '';
+	let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	const situations = [
 		{
@@ -68,7 +70,7 @@
 		// Fetch session data to get user info
 		const { data: sessionData, error: sessionError } = await supabase
 			.from('questionnaire_sessions')
-			.select('user_id')
+			.select('user_id, where_now')
 			.eq('id', sessionId)
 			.single();
 
@@ -90,6 +92,7 @@
 				userFirstName = user.user_firstname;
 			}
 		}
+		if (sessionData?.where_now) whereNow = sessionData.where_now;
 	});
 
 	function selectSituation(situationId: string) {
@@ -97,26 +100,39 @@
 		currentStep = 1;
 	}
 
+	function handleWhereNowInput() {
+		if (saveTimeout) clearTimeout(saveTimeout);
+		saveTimeout = setTimeout(async () => {
+			await supabase
+				.from('questionnaire_sessions')
+				.update({ where_now: whereNow })
+				.eq('id', sessionId);
+		}, 600);
+	}
+
 	async function startJourney() {
 		isSubmitting = true;
 		
-		try {
-			// Save the user's situation to the session
-			await supabase
-				.from('questionnaire_sessions')
-				.update({ 
-					user_situation: selectedSituation,
-					onboarding_completed: true 
-				})
-				.eq('id', sessionId);
+		// Save situation and where_now
+		await supabase
+			.from('questionnaire_sessions')
+			.update({ 
+				user_situation: selectedSituation,
+				onboarding_completed: true,
+				where_now: whereNow
+			})
+			.eq('id', sessionId);
 
-			// Navigate to the questionnaire
-			goto(`/questionnaire/${sessionId}`);
-		} catch (error) {
-			console.error('Error saving situation:', error);
-		} finally {
-			isSubmitting = false;
-		}
+		// Fetch first question ID from question_order
+		const { data } = await supabase
+			.from('question_order')
+			.select('order')
+			.eq('step_id', 'step1')
+			.single();
+		const firstQuestionId = data?.order?.[0] || 'goals';
+
+		goto(`/questionnaire/${sessionId}/step1/${firstQuestionId}?from=onboarding`);
+		isSubmitting = false;
 	}
 
 	function goBack() {
@@ -224,6 +240,15 @@
 								{situation.message}
 							</p>
 						</div>
+
+						<!-- New where_now textarea -->
+						<textarea
+							class="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 resize-none p-4 text-gray-700 placeholder-gray-400 mb-8"
+							rows="3"
+							placeholder="Tell us a little bit more about your current situation."
+							bind:value={whereNow}
+							on:input={handleWhereNowInput}
+						></textarea>
 
 						<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
 							<h2 class="text-2xl font-semibold text-gray-800 mb-6">

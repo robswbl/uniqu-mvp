@@ -220,7 +220,7 @@
 				Upload your CV or tell us about your work experience, education, and key achievements.
 			  </p>
 			  <button 
-				on:click={() => goToStep('final')}
+				on:click={() => goToStep('step1')}
 				class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
 			  >
 				{sessionData.cv_text ? 'Edit Experience' : 'Start Here'}
@@ -248,7 +248,7 @@
 				Explore what you love, what you're good at, what inspires you, and what you care about.
 			  </p>
 			  <button 
-				on:click={() => goToStep('cv')}
+				on:click={() => goToStep('step2')}
 				class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors {isStep1Started() ? '' : 'opacity-50 pointer-events-none cursor-not-allowed'}"
 				disabled={!isStep1Started()}
 				title={!isStep1Started() ? 'Complete Step 1 first.' : ''}
@@ -278,7 +278,7 @@
 				Tell us about your career goals, personality, and life context to complete your profile.
 			  </p>
 			  <button 
-				on:click={() => goToStep('ikigai')}
+				on:click={() => goToStep('step3')}
 				class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors {isStep2Started() ? '' : 'opacity-50 pointer-events-none cursor-not-allowed'}"
 				disabled={!isStep2Started()}
 				title={!isStep2Started() ? 'Complete Step 2 first.' : ''}

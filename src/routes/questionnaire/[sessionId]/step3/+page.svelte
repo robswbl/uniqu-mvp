@@ -340,24 +340,7 @@
 				Back to Step 2
 			</button>
 
-			<button
-				type="button"
-				on:click={proceedToStep3}
-				class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center"
-			>
-				Finish
-				<svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-				</svg>
-			</button>
-		</div>
-
-		<!-- Regenerate Warning Box and Button -->
-		<div class="mt-12 flex flex-col items-center">
-			<div class="bg-orange-100 border-l-4 border-orange-400 text-orange-800 p-4 rounded-lg mb-4 max-w-xl w-full">
-				<strong>Warning:</strong> Regenerating will overwrite your previous results. Are you sure you want to proceed?
-			</div>
-			<form method="POST" action="/questionnaire/{sessionId}/step3/regenerate" on:submit|preventDefault={handleRegenerate} class="w-full flex justify-center">
+			<form method="POST" action="/questionnaire/{sessionId}/step3/regenerate" on:submit|preventDefault={handleRegenerate} class="w-full flex justify-end">
 				<button
 					type="submit"
 					class="bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-bold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center"
@@ -368,6 +351,13 @@
 					Regenerate
 				</button>
 			</form>
+		</div>
+
+		<!-- Warning Box below navigation -->
+		<div class="flex justify-center mt-6">
+			<div class="bg-orange-100 border-l-4 border-orange-400 text-orange-800 p-4 rounded-lg max-w-xl w-full text-center">
+				<strong>Warning:</strong> Regenerating will overwrite your previous results. Are you sure you want to proceed?
+			</div>
 		</div>
 	</div>
 </div> 

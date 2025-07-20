@@ -15,10 +15,11 @@
 		"allowSyntheticDefaultImports": true,
 		"noEmit": true
 	},
+	"extends": "./.svelte-kit/tsconfig.json",
 	"include": [
-		"./src/**/*.d.ts",
-		"./src/**/*.ts",
-		"./src/**/*.svelte"
+		"src/**/*.d.ts",
+		"src/**/*.ts",
+		"src/**/*.svelte"
 	],
 	"exclude": [
 		"node_modules/*",

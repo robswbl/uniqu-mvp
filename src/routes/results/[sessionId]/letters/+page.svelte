@@ -921,6 +921,7 @@
 
 <!-- Letter Modal -->
 {#if showLetterModal}
+	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 	<div 
 		class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
 		on:click={() => showLetterModal = false}

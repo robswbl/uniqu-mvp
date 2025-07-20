@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { supabase } from '$lib/supabaseClient.ts';
+	import { supabase } from '$lib/supabaseClient';
 
 	export let data;
 	const { sessionId } = data;
@@ -214,72 +214,74 @@
 			<div class="max-w-2xl mx-auto text-center">
 				{#if selectedSituation}
 					{@const situation = situations.find(s => s.id === selectedSituation)}
-					<div class="mb-8">
-						<span class="text-6xl mb-4 block">{situation.icon}</span>
-						<h1 class="text-3xl font-bold text-gray-900 mb-4">
-							{situation.title}
-						</h1>
-						<p class="text-xl text-gray-600 leading-relaxed mb-8">
-							{situation.message}
-						</p>
-					</div>
+					{#if situation}
+						<div class="mb-8">
+							<span class="text-6xl mb-4 block">{situation.icon}</span>
+							<h1 class="text-3xl font-bold text-gray-900 mb-4">
+								{situation.title}
+							</h1>
+							<p class="text-xl text-gray-600 leading-relaxed mb-8">
+								{situation.message}
+							</p>
+						</div>
 
-					<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-						<h2 class="text-2xl font-semibold text-gray-800 mb-6">
-							Let's take this one step at a time
-						</h2>
-						<p class="text-gray-600 mb-6">
-							I'm here to guide you through a thoughtful reflection process. There are no perfect answers — 
-							just honesty about where you are and where you'd like to go.
-						</p>
-						
-						<div class="space-y-4 text-left">
-							<div class="flex items-start space-x-3">
-								<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-									<span class="text-indigo-600 text-sm font-medium">1</span>
+						<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+							<h2 class="text-2xl font-semibold text-gray-800 mb-6">
+								Let's take this one step at a time
+							</h2>
+							<p class="text-gray-600 mb-6">
+								I'm here to guide you through a thoughtful reflection process. There are no perfect answers — 
+								just honesty about where you are and where you'd like to go.
+							</p>
+							
+							<div class="space-y-4 text-left">
+								<div class="flex items-start space-x-3">
+									<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+										<span class="text-indigo-600 text-sm font-medium">1</span>
+									</div>
+									<p class="text-gray-700">We'll explore your past experiences and what you've built</p>
 								</div>
-								<p class="text-gray-700">We'll explore your past experiences and what you've built</p>
-							</div>
-							<div class="flex items-start space-x-3">
-								<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-									<span class="text-indigo-600 text-sm font-medium">2</span>
+								<div class="flex items-start space-x-3">
+									<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+										<span class="text-indigo-600 text-sm font-medium">2</span>
+									</div>
+									<p class="text-gray-700">Discover what truly motivates and energizes you</p>
 								</div>
-								<p class="text-gray-700">Discover what truly motivates and energizes you</p>
-							</div>
-							<div class="flex items-start space-x-3">
-								<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-									<span class="text-indigo-600 text-sm font-medium">3</span>
+								<div class="flex items-start space-x-3">
+									<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+										<span class="text-indigo-600 text-sm font-medium">3</span>
+									</div>
+									<p class="text-gray-700">Create a clear roadmap for your next chapter</p>
 								</div>
-								<p class="text-gray-700">Create a clear roadmap for your next chapter</p>
 							</div>
 						</div>
-					</div>
 
-					<div class="flex flex-col sm:flex-row gap-4 justify-center">
-						<button
-							on:click={() => currentStep = 0}
-							class="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-gray-400 transition-colors"
-							type="button"
-						>
-							Go back
-						</button>
-						<button
-							on:click={startJourney}
-							disabled={isSubmitting}
-							class="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400 transition-colors flex items-center justify-center"
-							type="button"
-						>
-							{#if isSubmitting}
-								<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-									<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-									<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-								</svg>
-								Starting your journey...
-							{:else}
-								Begin your journey
-							{/if}
-						</button>
-					</div>
+						<div class="flex flex-col sm:flex-row gap-4 justify-center">
+							<button
+								on:click={() => currentStep = 0}
+								class="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-gray-400 transition-colors"
+								type="button"
+							>
+								Go back
+							</button>
+							<button
+								on:click={startJourney}
+								disabled={isSubmitting}
+								class="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400 transition-colors flex items-center justify-center"
+								type="button"
+							>
+								{#if isSubmitting}
+									<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+										<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									</svg>
+									Starting your journey...
+								{:else}
+									Begin your journey
+								{/if}
+							</button>
+						</div>
+					{/if}
 				{/if}
 			</div>
 		{/if}

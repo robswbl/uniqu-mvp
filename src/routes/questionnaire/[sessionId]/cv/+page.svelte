@@ -9,6 +9,7 @@
 	let cv_text = '';
 	let saveStatus = 'Ready';
 	let uploadMethod: 'paste' | 'upload' = 'paste';
+	let userFirstName = '';
 
 	function autogrow(element: HTMLTextAreaElement) {
 		element.style.height = 'auto';
@@ -34,21 +35,131 @@
 		}, 1000);
 	}
 
+	// Remove .txt logic and update file upload for PDF/DOC/DOCX only
+	let uploadStatus = '';
+	let userId = '';
+	let isDragging = false;
+	let uploadProgress = 0;
+	let pollingCvText = false;
+	let pollingInterval: ReturnType<typeof setInterval> | null = null;
+
+	function handleDrop(event: DragEvent) {
+		event.preventDefault();
+		isDragging = false;
+		if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
+			const file = event.dataTransfer.files[0];
+			// Simulate input event for handleFileUpload
+			const fakeEvent = { target: { files: [file] } } as unknown as Event;
+			handleFileUpload(fakeEvent);
+		}
+	}
+
+	onMount(async () => {
+		const { data: sessionData } = await supabase
+			.from('questionnaire_sessions')
+			.select('cv_text, user_id')
+			.eq('id', sessionId)
+			.single();
+
+		if (sessionData?.cv_text) {
+			cv_text = sessionData.cv_text;
+			saveStatus = 'Loaded existing data.';
+			setTimeout(() => {
+				const textarea = document.getElementById('cv-textarea') as HTMLTextAreaElement;
+				if (textarea) autogrow(textarea);
+			}, 100);
+		}
+		if (sessionData?.user_id) {
+			userId = sessionData.user_id;
+			
+			// Fetch user first name for personalization
+			const { data: user } = await supabase
+				.from('users')
+				.select('user_firstname')
+				.eq('user_uuid', sessionData.user_id)
+				.single();
+			
+			if (user?.user_firstname) {
+				userFirstName = user.user_firstname;
+			}
+		}
+	});
+
 	async function handleFileUpload(event: Event) {
 		const input = event.target as HTMLInputElement;
 		const file = input.files?.[0];
-		
-		if (file) {
-			if (file.type === 'text/plain') {
-				const text = await file.text();
-				cv_text = text;
-				autogrow(document.getElementById('cv-textarea') as HTMLTextAreaElement);
-				saveProgress();
-			} else {
-				alert('Please upload a text file (.txt) or paste your CV content directly.');
-			}
+		if (!file) return;
+		const allowedTypes = [
+			'application/pdf'
+		];
+		const ext = file.name.split('.').pop()?.toLowerCase();
+		if (!allowedTypes.includes(file.type) && ext !== 'pdf') {
+			alert('Please upload a PDF document (.pdf)');
+			return;
 		}
+		if (file.size > 20 * 1024 * 1024) {
+			alert('File size must be less than 20MB');
+			return;
+		}
+		uploadStatus = 'Uploading...';
+		uploadProgress = 0;
+		// Use XMLHttpRequest for progress
+		const formData = new FormData();
+		formData.append('file', file);
+		formData.append('user_id', userId);
+		formData.append('session_id', sessionId);
+		await new Promise<void>((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.open('POST', 'https://manage.app.n8n.cloud/webhook/clients/uniqu-cvupload');
+			xhr.upload.onprogress = (e) => {
+				if (e.lengthComputable) {
+					uploadProgress = Math.round((e.loaded / e.total) * 100);
+				}
+			};
+			xhr.onload = () => {
+				if (xhr.status >= 200 && xhr.status < 300) {
+					uploadStatus = 'Upload complete!';
+					uploadProgress = 100;
+					resolve();
+				} else {
+					uploadStatus = 'Upload failed.';
+					uploadProgress = 0;
+					reject();
+				}
+			};
+			xhr.onerror = () => {
+				uploadStatus = 'Upload failed.';
+				uploadProgress = 0;
+				reject();
+			};
+			xhr.send(formData);
+		});
+		// After upload, start polling for cv_text
+		pollingCvText = true;
+		uploadStatus = 'Processing your CV...';
+		pollForCvText();
 	}
+
+	function pollForCvText() {
+		if (pollingInterval) clearInterval(pollingInterval);
+		pollingInterval = setInterval(async () => {
+			const { data } = await supabase
+				.from('questionnaire_sessions')
+				.select('cv_text')
+				.eq('id', sessionId)
+				.single();
+			if (data?.cv_text && data.cv_text.length > 0) {
+				cv_text = data.cv_text;
+				pollingCvText = false;
+				uploadStatus = 'CV processed!';
+				if (pollingInterval) clearInterval(pollingInterval);
+			}
+		}, 2000);
+	}
+
+	// Clean up polling on destroy
+	import { onDestroy } from 'svelte';
+	onDestroy(() => { if (pollingInterval) clearInterval(pollingInterval); });
 
 	async function proceedToStep2() {
 		if (!cv_text.trim()) {
@@ -62,24 +173,6 @@
 		// Navigate to step 2
 		await goto(`/questionnaire/${sessionId}/ikigai`);
 	}
-
-	onMount(async () => {
-		const { data } = await supabase
-			.from('questionnaire_sessions')
-			.select('cv_text')
-			.eq('id', sessionId)
-			.single();
-
-		if (data?.cv_text) {
-			cv_text = data.cv_text;
-			saveStatus = 'Loaded existing data.';
-			
-			setTimeout(() => {
-				const textarea = document.getElementById('cv-textarea') as HTMLTextAreaElement;
-				if (textarea) autogrow(textarea);
-			}, 100);
-		}
-	});
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -105,7 +198,7 @@
 				</svg>
 			</div>
 			<h1 class="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
-				Share Your Professional Story
+				Share Your Professional Story, {userFirstName || 'there'}
 			</h1>
 			<p class="text-xl text-gray-600 max-w-2xl mx-auto">
 				Let's start with your CV or resume. This helps us understand your background and experience.
@@ -142,7 +235,7 @@
 						</svg>
 					</div>
 					<h3 class="text-lg font-semibold text-gray-800 mb-2">Upload File</h3>
-					<p class="text-gray-600 text-sm">Upload a text file (.txt) of your CV</p>
+					<p class="text-gray-600 text-sm">Upload a PDF document (.pdf)</p>
 				</button>
 			</div>
 
@@ -156,10 +249,10 @@
 						<textarea 
 							id="cv-textarea"
 							bind:value={cv_text} 
-							on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
-							rows="10" 
+							on:input={saveProgress} 
 							placeholder="Paste your CV or resume content here... Include your work experience, education, skills, and any other relevant information."
-							class="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 resize-none overflow-hidden min-h-[200px] p-4 text-gray-700 placeholder-gray-400"
+							class="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 resize-none overflow-y-auto p-4 text-gray-700 placeholder-gray-400"
+							style="height: 200px !important; max-height: 200px !important;"
 						></textarea>
 						{#if cv_text.length > 0}
 							<div class="absolute bottom-3 right-3 text-xs text-gray-500 bg-white bg-opacity-90 px-2 py-1 rounded">
@@ -173,11 +266,15 @@
 					<label for="cv-upload" class="block text-lg font-medium text-gray-800">
 						Upload your CV file
 					</label>
-					<div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-indigo-400 transition-colors duration-200">
+					<div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-indigo-400 transition-colors duration-200 {isDragging ? 'border-indigo-500 bg-indigo-50' : ''}"
+						on:dragover|preventDefault={() => isDragging = true}
+						on:dragleave={() => isDragging = false}
+						on:drop={handleDrop}
+					>
 						<input
 							id="cv-upload"
 							type="file"
-							accept=".txt"
+							accept=".pdf"
 							on:change={handleFileUpload}
 							class="hidden"
 						/>
@@ -191,14 +288,45 @@
 						>
 							Choose a file
 						</button>
-						<p class="text-gray-500 text-sm mt-2">or drag and drop a .txt file here</p>
+						<p class="text-gray-500 text-sm mt-2">or drag and drop a .pdf file here (max 20MB)</p>
+						{#if uploadStatus}
+							<div class="mt-4 text-lg font-semibold {uploadStatus.includes('complete') || uploadStatus.includes('processed') ? 'text-green-600' : uploadStatus.includes('Processing') ? 'text-blue-600' : 'text-red-600'}">{uploadStatus}</div>
+						{/if}
+						{#if uploadProgress > 0 && uploadProgress < 100}
+							<div class="w-full bg-gray-200 rounded-full h-3 mt-4">
+								<div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-3 rounded-full transition-all duration-300" style="width: {uploadProgress}%"></div>
+							</div>
+							<div class="text-xs text-gray-600 mt-1">{uploadProgress}%</div>
+						{/if}
 					</div>
 
 					{#if cv_text}
 						<div class="bg-gray-50 rounded-xl p-4">
-							<h4 class="font-medium text-gray-800 mb-2">Preview:</h4>
-							<div class="text-sm text-gray-600 max-h-32 overflow-y-auto">
-								{cv_text.substring(0, 500)}{cv_text.length > 500 ? '...' : ''}
+							<h4 class="font-medium text-gray-800 mb-2">Your CV Content (Editable):</h4>
+							<p class="text-sm text-gray-600 mb-3">The content below was extracted from your uploaded file. You can edit it if needed:</p>
+							<div class="relative">
+								<textarea 
+									bind:value={cv_text} 
+									on:input={saveProgress} 
+									placeholder="Your CV content will appear here after processing..."
+									class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 resize-none overflow-y-auto p-4 text-gray-700 placeholder-gray-400 bg-white"
+									style="height: 200px !important; max-height: 200px !important;"
+								></textarea>
+								{#if cv_text.length > 0}
+									<div class="absolute bottom-3 right-3 text-xs text-gray-500 bg-white bg-opacity-90 px-2 py-1 rounded border">
+										{cv_text.length} characters
+									</div>
+								{/if}
+							</div>
+							<div class="mt-3 flex items-center justify-between text-xs text-gray-500">
+								<span>✅ Content processed and ready to edit</span>
+								<button 
+									type="button"
+									on:click={() => cv_text = ''}
+									class="text-red-600 hover:text-red-800 underline"
+								>
+									Clear content
+								</button>
 							</div>
 						</div>
 					{/if}
@@ -222,6 +350,8 @@
 				type="button"
 				on:click={proceedToStep2}
 				class="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-bold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center"
+				disabled={!cv_text || pollingCvText}
+				title={!cv_text || pollingCvText ? 'Please wait for your CV to be processed.' : ''}
 			>
 				Continue to Ikigai Questions
 				<svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

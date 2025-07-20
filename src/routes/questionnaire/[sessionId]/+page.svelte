@@ -8,6 +8,8 @@
 	let sessionData: any = null;
 	let isLoading = true;
 	let hasUnsavedChanges = false;
+	let userFirstName = '';
+	let userEmail = '';
   
 	onMount(async () => {
 	  // Fetch session data
@@ -19,6 +21,20 @@
   
 	  if (data) {
 		sessionData = data;
+		
+		// Fetch user data for personalization
+		if (data.user_id) {
+		  const { data: user, error: userError } = await supabase
+			.from('users')
+			.select('user_firstname, user_email')
+			.eq('user_uuid', data.user_id)
+			.single();
+		  
+		  if (!userError && user) {
+			userFirstName = user.user_firstname || '';
+			userEmail = user.user_email || '';
+		  }
+		}
 	  }
 	  isLoading = false;
 	});
@@ -33,6 +49,14 @@
   
 	function goToDashboard() {
 	  goto(`/dashboard/${sessionId}`);
+	}
+  
+	// Helper functions to determine if steps are started
+	function isStep1Started() {
+	  return (sessionData?.cv_text && sessionData.cv_text.length >= 200);
+	}
+	function isStep2Started() {
+	  return (sessionData?.ikigai_love && sessionData.ikigai_love.length >= 50);
 	}
   </script>
   
@@ -70,7 +94,7 @@
 		<!-- Welcome Header -->
 		<div class="text-center mb-12">
 		  <h1 class="text-4xl font-bold text-gray-800 mb-4">
-			Welcome to Your UniqU Journey! 🌟
+			{userFirstName ? `${userFirstName}, Welcome to Your UniqU Journey! 🌟` : 'Welcome to Your UniqU Journey! 🌟'}
 		  </h1>
 		  <p class="text-xl text-gray-600 max-w-2xl mx-auto">
 			Let's discover your unique career path through a thoughtful 3-step process. 
@@ -187,11 +211,12 @@
 				Explore what you love, what you're good at, what inspires you, and what you care about.
 			  </p>
 			  <button 
-				on:click={() => goToStep('ikigai')}
-				class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-				disabled={!sessionData.cv_text}
+				on:click={() => isStep1Started() && goToStep('ikigai')}
+				class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors {isStep1Started() ? '' : 'opacity-50 pointer-events-none cursor-not-allowed'}"
+				disabled={!isStep1Started()}
+				title={!isStep1Started() ? 'Complete Step 1 first.' : ''}
 			  >
-				{sessionData.ikigai_love ? 'Edit Ikigai' : sessionData.cv_text ? 'Continue' : 'Complete Step 1 First'}
+				{sessionData.ikigai_love ? 'Edit Ikigai' : isStep1Started() ? 'Continue' : 'Complete Step 1 First'}
 			  </button>
 			</div>
 		  </div>
@@ -216,11 +241,12 @@
 				Tell us about your career goals, personality, and life context to complete your profile.
 			  </p>
 			  <button 
-				on:click={() => goToStep('final')}
-				class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
-				disabled={!sessionData.ikigai_love}
+				on:click={() => isStep2Started() && goToStep('final')}
+				class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors {isStep2Started() ? '' : 'opacity-50 pointer-events-none cursor-not-allowed'}"
+				disabled={!isStep2Started()}
+				title={!isStep2Started() ? 'Complete Step 2 first.' : ''}
 			  >
-				{sessionData.goals ? 'Edit Goals' : sessionData.ikigai_love ? 'Continue' : 'Complete Step 2 First'}
+				{sessionData.goals ? 'Edit Goals' : isStep2Started() ? 'Continue' : 'Complete Step 2 First'}
 			  </button>
 			</div>
 		  </div>
@@ -238,6 +264,15 @@
 			⏱️ Total time: 15-20 minutes • 🔒 Your data is private and secure
 		  </div>
 		</div>
+
+		<!-- User Email Display -->
+		{#if userEmail}
+		  <div class="text-center mt-4">
+			<p class="text-xs text-gray-400">
+			  Session for: {userEmail}
+			</p>
+		  </div>
+		{/if}
 	  {:else}
 		<div class="bg-white rounded-2xl shadow-xl p-8 text-center">
 		  <p class="text-red-500 text-lg">Session not found.</p>

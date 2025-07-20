@@ -12,6 +12,7 @@
 	let error = null;
 	let refreshInterval = null;
 	let regenerationTimestamp = null;
+	let userFirstName = '';
 
 	// Define the correct document order and metadata
 	const documentOrder = [
@@ -91,6 +92,25 @@
 			console.error('Error fetching documents:', err);
 		} finally {
 			loading = false;
+		}
+	}
+
+	async function fetchUserFirstName() {
+		// Get user_id from session
+		const { data: sessionData, error: sessionError } = await supabase
+			.from('questionnaire_sessions')
+			.select('user_id')
+			.eq('id', sessionId)
+			.single();
+		if (sessionError || !sessionData) return;
+		// Get first name from users table
+		const { data: user, error: userError } = await supabase
+			.from('users')
+			.select('user_firstname')
+			.eq('user_uuid', sessionData.user_id)
+			.single();
+		if (!userError && user && user.user_firstname) {
+			userFirstName = user.user_firstname;
 		}
 	}
 
@@ -184,6 +204,7 @@
 
 	onMount(() => {
 		fetchDocuments();
+		fetchUserFirstName();
 		
 		// Set up auto-refresh every 5 seconds if documents are still generating
 		refreshInterval = setInterval(() => {
@@ -224,7 +245,9 @@
 				Back to Dashboard
 			</button>
 			
-			<h1 class="text-3xl font-bold text-gray-900 mb-2">Your Career Analysis Results</h1>
+			<h1 class="text-3xl font-bold text-gray-900 mb-2">
+				{userFirstName ? `${userFirstName}, here are your Career Analysis Results` : 'Your Career Analysis Results'}
+			</h1>
 			<p class="text-gray-600">View and download your personalized career guidance documents</p>
 		</div>
 
@@ -339,9 +362,9 @@
 							on:click={() => goto(`/results/${sessionId}/letters`)}
 							class="flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
 							type="button"
-							aria-label="Generate Application Letters"
+							aria-label="Manage and Generate Application Letters"
 						>
-							<span>Generate Letters</span>
+							<span>Manage & Generate Letters</span>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
 							</svg>

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
-    import { supabase } from '$lib/supabaseClient';
+    import { supabase } from '$lib/supabaseClient.ts';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
   
@@ -13,6 +13,7 @@
     let completionPercentage = 0;
     let documentCount = 0;
     let recentActivity = '';
+    let userData: any = null;
 
     // Calculate completion stats
     function calculateCompletionStats() {
@@ -67,7 +68,7 @@
         // Fetch session data for summary (using correct column names from schema)
         const { data: session, error: sessionError } = await supabase
           .from('questionnaire_sessions')
-          .select('user_id, status, cv_text, ikigai_love, ikigai_good_at, ikigai_care_about, ikigai_inspires, goals, personality_values, life_context, doubts_barriers, emotional_landscape, core_summary, created_at')
+          .select('user_id, status, cv_text, ikigai_love, ikigai_good_at, ikigai_care_about, ikigai_inspires, goals, personality_values, life_context, doubts_barriers, emotional_landscape, core_summary, created_at, onboarding_completed')
           .eq('id', sessionId)
           .single();
         
@@ -81,7 +82,30 @@
         if (!session) {
           throw new Error('No session found with ID: ' + sessionId);
         }
-  
+
+        // Fetch user data to get first name and email
+        if (session.user_id) {
+          console.log('Fetching user data for user_id:', session.user_id);
+          
+          // First, try to get all columns to see what's available
+          const { data: user, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('user_uuid', session.user_id)
+            .single();
+          
+          console.log('User fetch result (all columns):', { user, userError });
+          
+          if (!userError && user) {
+            userData = user;
+            console.log('User data set:', userData);
+          } else {
+            console.error('User fetch error:', userError);
+          }
+        } else {
+          console.log('No user_id found in session:', session);
+        }
+
         // Check if results exist
         const { data: results, error: resultsError } = await supabase
           .from('generated_documents')
@@ -119,7 +143,7 @@
   
         sessionData = session;
         calculateCompletionStats();
-        console.log('Dashboard loaded successfully:', { sessionData, hasResults, documentCount });
+        console.log('Dashboard loaded successfully:', { sessionData, hasResults, documentCount, userData });
       } catch (error) {
         console.error('Error loading dashboard:', error);
         // Don't throw here, let the UI show the error state
@@ -178,6 +202,10 @@
     function getDoubtsStatus() { return getSectionStatus(sessionData?.doubts_barriers); }
     function getEmotionalStatus() { return getSectionStatus(sessionData?.emotional_landscape); }
     function getCoreSummaryStatus() { return getSectionStatus(sessionData?.core_summary); }
+
+    function viewAllDocuments() {
+      goto(`/results/${sessionId}/all-documents`);
+    }
   </script>
   
   <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
@@ -185,7 +213,9 @@
       <!-- Enhanced Header with Achievement Badge -->
       <div class="text-center mb-8 pt-8">
         <div class="flex items-center justify-center mb-4">
-          <h1 class="text-4xl font-bold text-gray-800 mr-4">Welcome Back! 🎉</h1>
+          <h1 class="text-4xl font-bold text-gray-800 mr-4">
+            Welcome back{userData?.user_firstname ? `, ${userData.user_firstname}` : ''}! 🎉
+          </h1>
           {#if !isLoading && sessionData}
             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium text-white {getAchievementBadge().color}">
               {getAchievementBadge().icon} {getAchievementBadge().text}
@@ -194,7 +224,12 @@
         </div>
         <p class="text-xl text-gray-600 mb-2">You have a completed UniqU profile. What would you like to do?</p>
         {#if recentActivity}
-          <p class="text-sm text-gray-500">Last updated: {recentActivity}</p>
+          <p class="text-sm text-gray-500">
+            Last updated: {recentActivity}
+            {#if userData?.user_email || userData?.email}
+              • {userData.user_email || userData.email}
+            {/if}
+          </p>
         {/if}
       </div>
 
@@ -225,8 +260,8 @@
               <div class="text-2xl font-bold text-indigo-600">{completionPercentage}%</div>
               <div class="text-sm text-gray-600">Profile Complete</div>
             </div>
-            <div class="text-center p-4 bg-green-50 rounded-lg">
-              <div class="text-2xl font-bold text-green-600">{documentCount}</div>
+            <div class="text-center p-4 bg-green-50 rounded-lg cursor-pointer hover:bg-green-100 transition-colors" on:click={viewAllDocuments} title="View all generated documents">
+              <div class="text-2xl font-bold text-green-600 underline">{documentCount}</div>
               <div class="text-sm text-gray-600">Documents Generated</div>
             </div>
             <div class="text-center p-4 bg-purple-50 rounded-lg">
@@ -282,6 +317,8 @@
             </div>
           </div>
         </div>
+
+
 
         {#if !hasResults}
           <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-6 mb-8">

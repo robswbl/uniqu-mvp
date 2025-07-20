@@ -69,12 +69,26 @@
             await goto(`/dashboard/${sessionId}`);
           }, 1500);
         } else {
-          feedbackMessage = sessionStatus === 'in-progress' 
-            ? 'Resuming your questionnaire...'
-            : 'Starting your journey...';
-          setTimeout(async () => {
-            await goto(`/questionnaire/${sessionId}`);
-          }, 1000);
+          // Check if onboarding is completed
+          const { data: sessionDetails } = await supabase
+            .from('questionnaire_sessions')
+            .select('onboarding_completed')
+            .eq('id', sessionId)
+            .single();
+          
+          if (!sessionDetails?.onboarding_completed) {
+            feedbackMessage = 'Welcome! Let\'s start with a guided introduction...';
+            setTimeout(async () => {
+              await goto(`/onboarding/${sessionId}`);
+            }, 1000);
+          } else {
+            feedbackMessage = sessionStatus === 'in-progress' 
+              ? 'Resuming your questionnaire...'
+              : 'Starting your journey...';
+            setTimeout(async () => {
+              await goto(`/questionnaire/${sessionId}`);
+            }, 1000);
+          }
         }
   
       } catch (e) {

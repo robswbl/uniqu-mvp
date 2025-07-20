@@ -35,7 +35,6 @@
 		}, 1000);
 	}
 
-	// Remove .txt logic and update file upload for PDF/DOC/DOCX only
 	let uploadStatus = '';
 	let userId = '';
 	let isDragging = false;
@@ -48,7 +47,6 @@
 		isDragging = false;
 		if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
 			const file = event.dataTransfer.files[0];
-			// Simulate input event for handleFileUpload
 			const fakeEvent = { target: { files: [file] } } as unknown as Event;
 			handleFileUpload(fakeEvent);
 		}
@@ -73,20 +71,15 @@
 		}
 		if (sessionData?.user_id) {
 			userId = sessionData.user_id;
-			
-			// Fetch user first name for personalization
 			const { data: user } = await supabase
 				.from('users')
 				.select('user_firstname')
 				.eq('user_uuid', sessionData.user_id)
 				.single();
-			
 			if (user?.user_firstname) {
 				userFirstName = user.user_firstname;
 			}
 		}
-
-		// Fetch the last Step 1 question from question_order
 		const { data, error } = await supabase
 			.from('question_order')
 			.select('order')
@@ -95,7 +88,7 @@
 		if (data && data.order && Array.isArray(data.order) && data.order.length > 0) {
 			lastStep1Question = data.order[data.order.length - 1];
 		} else {
-			lastStep1Question = 'emotional_landscape'; // fallback
+			lastStep1Question = 'emotional_landscape';
 		}
 	});
 
@@ -117,7 +110,6 @@
 		}
 		uploadStatus = 'Uploading...';
 		uploadProgress = 0;
-		// Use XMLHttpRequest for progress
 		const formData = new FormData();
 		formData.append('file', file);
 		formData.append('user_id', userId);
@@ -148,7 +140,6 @@
 			};
 			xhr.send(formData);
 		});
-		// After upload, start polling for cv_text
 		pollingCvText = true;
 		uploadStatus = 'Processing your CV...';
 		pollForCvText();
@@ -171,7 +162,6 @@
 		}, 2000);
 	}
 
-	// Clean up polling on destroy
 	import { onDestroy } from 'svelte';
 	onDestroy(() => { if (pollingInterval) clearInterval(pollingInterval); });
 
@@ -180,15 +170,10 @@
 			alert('Please add your CV content before proceeding.');
 			return;
 		}
-		
-		// Save current progress
 		await saveProgress();
-		
-		// Navigate to step 2
 		await goto(`/questionnaire/${sessionId}/ikigai`);
 	}
 
-	// Determine context from query param
 	let fromOnboarding = false;
 
 	$: fromOnboarding = $page.url.searchParams.get('from') === 'onboarding';
@@ -197,7 +182,7 @@
 		if (fromOnboarding) {
 			goto(`/questionnaire/${sessionId}/step1/${lastStep1Question}`);
 		} else {
-			goto(`/questionnaire/${sessionId}/final`);
+			goto(`/questionnaire/${sessionId}/step1`);
 		}
 	}
 
@@ -205,22 +190,36 @@
 		if (fromOnboarding) {
 			goto(`/questionnaire/${sessionId}/ikigai/love`);
 		} else {
-			goto(`/questionnaire/${sessionId}/ikigai`);
+			goto(`/questionnaire/${sessionId}/step3`);
 		}
 	}
 </script>
 
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-	<!-- Progress Bar -->
-	<div class="bg-white shadow-sm">
-		<div class="max-w-4xl mx-auto p-4">
-			<div class="flex items-center justify-between text-sm text-gray-600 mb-2">
-				<span>Step 1 of 3</span>
-				<span class="text-xs bg-gray-100 px-2 py-1 rounded">{saveStatus}</span>
+	<!-- Progress Header (match /step1 style) -->
+	<div class="max-w-4xl mx-auto">
+		<div class="flex justify-between items-center mb-6">
+			<button 
+				on:click={() => goto(`/dashboard/${sessionId}`)}
+				class="flex items-center space-x-2 px-4 py-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors"
+				type="button"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+				</svg>
+				<span>Back to Dashboard</span>
+			</button>
+		</div>
+		<div class="text-center mb-8">
+			<div class="flex items-center justify-center space-x-2 mb-4">
+				<div class="w-8 h-8 bg-gray-200 text-gray-400 rounded-full flex items-center justify-center text-sm font-semibold">1</div>
+				<div class="w-16 h-0.5 bg-gray-300"></div>
+				<div class="w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">2</div>
+				<div class="w-16 h-0.5 bg-gray-300"></div>
+				<div class="w-8 h-8 bg-gray-200 text-gray-400 rounded-full flex items-center justify-center text-sm font-semibold">3</div>
 			</div>
-			<div class="w-full bg-gray-200 rounded-full h-2">
-				<div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full w-1/3 transition-all duration-300"></div>
-			</div>
+			<h1 class="text-3xl font-bold text-gray-800 mb-2">Step 2: Share Your Professional Story</h1>
+			<p class="text-lg text-gray-600">Let's continue with your CV or resume. This helps us understand your background and experience.</p>
 		</div>
 	</div>
 
@@ -233,17 +232,16 @@
 				</svg>
 			</div>
 			<h1 class="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
-				Share Your Professional Story, {userFirstName || 'there'}
+				Choose How to Provide Your Background
 			</h1>
 			<p class="text-xl text-gray-600 max-w-2xl mx-auto">
-				Let's start with your CV or resume. This helps us understand your background and experience.
+				You can either upload your CV as a PDF, or, if you don't have a CV, describe the most important stations of your professional life in the text field below.
 			</p>
 		</div>
 
 		<!-- Method Selection -->
 		<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-			<h2 class="text-2xl font-bold text-gray-800 mb-6">How would you like to share your CV?</h2>
-			
+			<h2 class="text-2xl font-bold text-gray-800 mb-6">How would you like to share your story?</h2>
 			<div class="grid md:grid-cols-2 gap-6 mb-8">
 				<button
 					type="button"
@@ -255,8 +253,8 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
 						</svg>
 					</div>
-					<h3 class="text-lg font-semibold text-gray-800 mb-2">Paste Text</h3>
-					<p class="text-gray-600 text-sm">Copy and paste your CV content directly</p>
+					<h3 class="text-lg font-semibold text-gray-800 mb-2">Type or Paste Text</h3>
+					<p class="text-gray-600 text-sm">Describe the important points of your professional life in the box below</p>
 				</button>
 
 				<button
@@ -269,7 +267,7 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
 						</svg>
 					</div>
-					<h3 class="text-lg font-semibold text-gray-800 mb-2">Upload File</h3>
+					<h3 class="text-lg font-semibold text-gray-800 mb-2">Upload CV</h3>
 					<p class="text-gray-600 text-sm">Upload a PDF document (.pdf)</p>
 				</button>
 			</div>
@@ -334,7 +332,6 @@
 							<div class="text-xs text-gray-600 mt-1">{uploadProgress}%</div>
 						{/if}
 					</div>
-
 					{#if cv_text}
 						<div class="bg-gray-50 rounded-xl p-4">
 							<h4 class="font-medium text-gray-800 mb-2">Your CV Content (Editable):</h4>
@@ -368,7 +365,6 @@
 				</div>
 			{/if}
 		</div>
-
 		<!-- Navigation -->
 		<div class="flex justify-between mt-8">
 			<button on:click={goToBack} class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
@@ -379,8 +375,8 @@
 				class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-colors text-lg"
 				disabled={!cv_text || pollingCvText}
 			>
-				{fromOnboarding ? 'Continue to Ikigai Questions' : 'Go to Ikigai Overview'}
+				{fromOnboarding ? 'Continue to Ikigai Questions' : 'Go to Step 3'}
 			</button>
 		</div>
 	</div>
-</div>
+</div> 

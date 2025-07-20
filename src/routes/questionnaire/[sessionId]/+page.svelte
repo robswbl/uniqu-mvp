@@ -11,6 +11,32 @@
 	let userFirstName = '';
 	let userEmail = '';
   
+	// Add helper to get first step1 question from admin order
+	const defaultSteps = [
+	  {
+		id: 'step1',
+		name: 'Step 1: Your Life Context',
+		questions: [
+		  'goals',
+		  'personality_values',
+		  'life_context',
+		  'doubts_barriers',
+		  'emotional_landscape'
+		]
+	  },
+	  {
+		id: 'step2',
+		name: 'Step 2: Your Experience',
+		questions: ['cv']
+	  },
+	  {
+		id: 'step3',
+		name: 'Step 3: Your Ikigai',
+		questions: ['love', 'good_at', 'care_about', 'inspires', 'want_to_be']
+	  }
+	];
+	let firstStep1Question = 'goals';
+  
 	onMount(async () => {
 	  // Fetch session data
 	  const { data, error } = await supabase
@@ -36,6 +62,17 @@
 		  }
 		}
 	  }
+  
+	  // Fetch first step1 question from question_order
+	  const { data: orderData } = await supabase
+		.from('question_order')
+		.select('order')
+		.eq('step_id', 'step1')
+		.single();
+	  if (orderData && orderData.order && Array.isArray(orderData.order) && orderData.order.length > 0) {
+		firstStep1Question = orderData.order[0];
+	  }
+  
 	  isLoading = false;
 	});
   
@@ -168,7 +205,7 @@
 			<div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
 			  <div class="text-white">
 				<div class="flex items-center justify-between mb-2">
-				  <h3 class="text-lg font-semibold">Step 1: Your Experience</h3>
+				  <h3 class="text-lg font-semibold">Step 1: Your Life Context</h3>
 				  {#if sessionData.cv_text}
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -183,7 +220,7 @@
 				Upload your CV or tell us about your work experience, education, and key achievements.
 			  </p>
 			  <button 
-				on:click={() => goToStep('cv')}
+				on:click={() => goToStep('final')}
 				class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
 			  >
 				{sessionData.cv_text ? 'Edit Experience' : 'Start Here'}
@@ -196,7 +233,7 @@
 			<div class="bg-gradient-to-r from-green-500 to-teal-600 p-6">
 			  <div class="text-white">
 				<div class="flex items-center justify-between mb-2">
-				  <h3 class="text-lg font-semibold">Step 2: Your Ikigai</h3>
+				  <h3 class="text-lg font-semibold">Step 2: Your Experience</h3>
 				  {#if sessionData.ikigai_love}
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -211,7 +248,7 @@
 				Explore what you love, what you're good at, what inspires you, and what you care about.
 			  </p>
 			  <button 
-				on:click={() => isStep1Started() && goToStep('ikigai')}
+				on:click={() => goToStep('cv')}
 				class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors {isStep1Started() ? '' : 'opacity-50 pointer-events-none cursor-not-allowed'}"
 				disabled={!isStep1Started()}
 				title={!isStep1Started() ? 'Complete Step 1 first.' : ''}
@@ -226,7 +263,7 @@
 			<div class="bg-gradient-to-r from-purple-500 to-pink-600 p-6">
 			  <div class="text-white">
 				<div class="flex items-center justify-between mb-2">
-				  <h3 class="text-lg font-semibold">Step 3: Your Goals</h3>
+				  <h3 class="text-lg font-semibold">Step 3: Your Ikigai</h3>
 				  {#if sessionData.goals}
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -241,7 +278,7 @@
 				Tell us about your career goals, personality, and life context to complete your profile.
 			  </p>
 			  <button 
-				on:click={() => isStep2Started() && goToStep('final')}
+				on:click={() => goToStep('ikigai')}
 				class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors {isStep2Started() ? '' : 'opacity-50 pointer-events-none cursor-not-allowed'}"
 				disabled={!isStep2Started()}
 				title={!isStep2Started() ? 'Complete Step 2 first.' : ''}

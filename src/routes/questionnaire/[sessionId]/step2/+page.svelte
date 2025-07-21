@@ -3,6 +3,7 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { get } from 'svelte/store';
 
 	const sessionId = $page.params.sessionId;
 
@@ -187,6 +188,8 @@
 	}
 
 	function goToNext() {
+		const urlParams = get(page).url.searchParams;
+		const fromOnboarding = urlParams.get('from') === 'onboarding';
 		if (fromOnboarding) {
 			goto(`/questionnaire/${sessionId}/step3/love?from=onboarding`);
 		} else {

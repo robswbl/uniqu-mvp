@@ -56,13 +56,16 @@
     if (data && data.order && Array.isArray(data.order)) {
       const order = data.order;
       const currentIndex = order.indexOf('doubts_barriers');
+      const urlParams = get(page).url.searchParams;
+      const fromOnboarding = urlParams.get('from') === 'onboarding';
       if (currentIndex !== -1 && currentIndex < order.length - 1) {
         const nextQuestion = order[currentIndex + 1];
-        goto(`/questionnaire/${sessionId}/step1/${nextQuestion}`);
+        const nextUrl = fromOnboarding
+          ? `/questionnaire/${sessionId}/step1/${nextQuestion}?from=onboarding`
+          : `/questionnaire/${sessionId}/step1/${nextQuestion}`;
+        goto(nextUrl);
       } else {
         // If last question, go to step2
-        const urlParams = get(page).url.searchParams;
-        const fromOnboarding = urlParams.get('from') === 'onboarding';
         const step2Url = fromOnboarding
           ? `/questionnaire/${sessionId}/step2?from=onboarding`
           : `/questionnaire/${sessionId}/step2`;

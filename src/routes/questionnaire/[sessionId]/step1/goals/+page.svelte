@@ -3,6 +3,7 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { get } from 'svelte/store';
 
 	const sessionId = $page.params.sessionId;
 
@@ -49,7 +50,56 @@
 			.from('questionnaire_sessions')
 			.update({ last_question_step: 'step1', last_question_id: 'personality_values' })
 			.eq('id', sessionId);
-		goto(`/questionnaire/${sessionId}/step1/personality_values`);
+		// Fetch the order from the DB
+		const { data, error } = await supabase
+			.from('question_order')
+			.select('order')
+			.eq('step_id', 'step1')
+			.single();
+
+		if (data && data.order && Array.isArray(data.order)) {
+			const order = data.order;
+			const currentIndex = order.indexOf('goals');
+			const urlParams = get(page).url.searchParams;
+			const fromOnboarding = urlParams.get('from') === 'onboarding';
+			if (currentIndex !== -1 && currentIndex < order.length - 1) {
+				const nextQuestion = order[currentIndex + 1];
+				const nextUrl = fromOnboarding
+					? `/questionnaire/${sessionId}/step1/${nextQuestion}?from=onboarding`
+					: `/questionnaire/${sessionId}/step1/${nextQuestion}`;
+				goto(nextUrl);
+			} else {
+				// If last question, go to step2
+				const step2Url = fromOnboarding
+					? `/questionnaire/${sessionId}/step2?from=onboarding`
+					: `/questionnaire/${sessionId}/step2`;
+				goto(step2Url);
+			}
+		}
+	}
+
+	function goToBack() {
+		// Fetch the order from the DB and go to the previous question
+		supabase
+			.from('question_order')
+			.select('order')
+			.eq('step_id', 'step1')
+			.single()
+			.then(({ data }) => {
+				if (data && data.order && Array.isArray(data.order)) {
+					const order = data.order;
+					const currentIndex = order.indexOf('goals');
+					const urlParams = get(page).url.searchParams;
+					const fromOnboarding = urlParams.get('from') === 'onboarding';
+					if (currentIndex > 0) {
+						const prevQuestion = order[currentIndex - 1];
+						const prevUrl = fromOnboarding
+							? `/questionnaire/${sessionId}/step1/${prevQuestion}?from=onboarding`
+							: `/questionnaire/${sessionId}/step1/${prevQuestion}`;
+						goto(prevUrl);
+					}
+				}
+			});
 	}
 </script>
 
@@ -90,7 +140,10 @@
 					required
 				></textarea>
 			</div>
-			<div class="flex justify-end mt-8">
+			<div class="flex justify-between mt-8">
+				<button on:click={goToBack} class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors" type="button">
+					Back
+				</button>
 				<button on:click={goToNext} class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors" disabled={isSaving}>
 					Next
 				</button>

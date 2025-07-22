@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import QuestionCard from '$lib/QuestionCard.svelte';
+	import { get } from 'svelte/store';
 
 	const sessionId = $page.params.sessionId;
 
@@ -45,11 +46,32 @@
 	}
 
 	async function goToNext() {
-		await supabase
-			.from('questionnaire_sessions')
-			.update({ last_question_step: 'step1', last_question_id: 'life_context' })
-			.eq('id', sessionId);
-		goto(`/questionnaire/${sessionId}/step1/life_context`);
+		// Fetch the order from the DB
+		const { data, error } = await supabase
+			.from('question_order')
+			.select('order')
+			.eq('step_id', 'step1')
+			.single();
+
+		if (data && data.order && Array.isArray(data.order)) {
+			const order = data.order;
+			const currentIndex = order.indexOf('personality_values');
+			const urlParams = get(page).url.searchParams;
+			const fromOnboarding = urlParams.get('from') === 'onboarding';
+			if (currentIndex !== -1 && currentIndex < order.length - 1) {
+				const nextQuestion = order[currentIndex + 1];
+				const nextUrl = fromOnboarding
+					? `/questionnaire/${sessionId}/step1/${nextQuestion}?from=onboarding`
+					: `/questionnaire/${sessionId}/step1/${nextQuestion}`;
+				goto(nextUrl);
+			} else {
+				// If last question, go to step2
+				const step2Url = fromOnboarding
+					? `/questionnaire/${sessionId}/step2?from=onboarding`
+					: `/questionnaire/${sessionId}/step2`;
+				goto(step2Url);
+			}
+		}
 	}
 
 	function goToBack() {

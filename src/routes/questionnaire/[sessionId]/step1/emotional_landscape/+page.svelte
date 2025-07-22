@@ -4,6 +4,7 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import QuestionCard from '$lib/QuestionCard.svelte';
+  import { get } from 'svelte/store';
 
   const sessionId = $page.params.sessionId;
 
@@ -63,7 +64,12 @@
       .update({ last_question_step: 'step1', last_question_id: 'emotional_landscape' })
       .eq('id', sessionId);
     if (isLastStep1Question) {
-      goto(`/questionnaire/${sessionId}/step2?from=onboarding`);
+      const urlParams = get(page).url.searchParams;
+      const fromOnboarding = urlParams.get('from') === 'onboarding';
+      const step2Url = fromOnboarding
+        ? `/questionnaire/${sessionId}/step2?from=onboarding`
+        : `/questionnaire/${sessionId}/step2`;
+      goto(step2Url);
     } else {
       // If not last, go to the next question (implement as needed)
     }

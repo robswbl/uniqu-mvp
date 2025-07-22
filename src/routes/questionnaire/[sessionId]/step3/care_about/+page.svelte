@@ -4,6 +4,7 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import QuestionCard from '$lib/QuestionCard.svelte';
+  import { get } from 'svelte/store';
 
   const sessionId = $page.params.sessionId;
   let ikigaiCareAbout = '';
@@ -45,10 +46,20 @@
   }
 
   function goToNext() {
-    goto(`/questionnaire/${sessionId}/step3/inspires`);
+    const urlParams = get(page).url.searchParams;
+    const fromOnboarding = urlParams.get('from') === 'onboarding';
+    const nextUrl = fromOnboarding
+      ? `/questionnaire/${sessionId}/step3/inspires?from=onboarding`
+      : `/questionnaire/${sessionId}/step3/inspires`;
+    goto(nextUrl);
   }
   function goToBack() {
-    goto(`/questionnaire/${sessionId}/step3/good_at`);
+    const urlParams = get(page).url.searchParams;
+    const fromOnboarding = urlParams.get('from') === 'onboarding';
+    const backUrl = fromOnboarding
+      ? `/questionnaire/${sessionId}/step3/good_at?from=onboarding`
+      : `/questionnaire/${sessionId}/step3/good_at`;
+    goto(backUrl);
   }
 </script>
 

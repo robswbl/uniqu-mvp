@@ -3,6 +3,7 @@
   import { goto } from '$app/navigation';
   import { fade, scale } from 'svelte/transition';
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
 
   const sessionId = $page.params.sessionId;
   let isGenerating = false;
@@ -21,7 +22,12 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'regenerate' })
     });
-    goto(`/results/${sessionId}/generating`);
+    const urlParams = get(page).url.searchParams;
+    const fromOnboarding = urlParams.get('from') === 'onboarding';
+    const nextUrl = fromOnboarding
+      ? `/results/${sessionId}/generating?from=onboarding`
+      : `/results/${sessionId}/generating`;
+    goto(nextUrl);
   }
 </script>
 

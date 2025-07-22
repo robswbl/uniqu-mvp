@@ -50,7 +50,7 @@
       case 'career_themes': return 'Career Themes';
       case 'ideal_companies': return 'Ideal Companies';
       case 'matching_companies': return 'Matching Companies';
-      case 'motivational_letter': return 'Motivational Letter';
+      case 'application_letter': return 'Application Letter';
       default: return type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
   }
@@ -61,7 +61,7 @@
       case 'career_themes': return 'Key themes and patterns identified in your career path';
       case 'ideal_companies': return 'Companies that align with your values and goals';
       case 'matching_companies': return 'Companies that match your profile and interests';
-      case 'motivational_letter': return 'Your personalized motivational letter';
+      case 'application_letter': return 'Your personalized application letter';
       default: return 'Career analysis document';
     }
   }

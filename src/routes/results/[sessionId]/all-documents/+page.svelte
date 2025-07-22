@@ -16,6 +16,7 @@
 
   // For versioning
   const mainTypes = ['reflection_letter', 'career_themes', 'ideal_companies'];
+  const applicationLetterType = 'application_letter';
 
   // Compute version numbers for main docs
   function getVersion(doc: any, docs: any[]) {
@@ -125,7 +126,7 @@
           <option value="reflection_letter">Reflection Letter</option>
           <option value="career_themes">Career Themes</option>
           <option value="ideal_companies">Ideal Companies</option>
-          <option value="motivational_letter">Motivational Letter</option>
+          <option value="application_letter">Application Letter</option>
         </select>
         <button on:click={() => goto(`/dashboard/${sessionId}`)} class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-200" type="button">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -155,7 +156,7 @@
           <thead>
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" on:click={() => setSort('document_type')}>Type {sortBy === 'document_type' ? (sortAsc ? '▲' : '▼') : ''}</th>
-              {#if filterType === 'motivational_letter' || filterType === 'all'}
+              {#if filterType === applicationLetterType || filterType === 'all'}
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" on:click={() => setSort('company_name')}>Company {sortBy === 'company_name' ? (sortAsc ? '▲' : '▼') : ''}</th>
               {/if}
               {#if filterType === 'all' || mainTypes.includes(filterType)}
@@ -169,9 +170,9 @@
           <tbody class="bg-white divide-y divide-gray-200">
             {#each filteredDocs() as doc}
               <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{doc.document_type.replace('_', ' ')}</td>
-                {#if (filterType === 'motivational_letter' || filterType === 'all')}
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{doc.document_type === 'motivational_letter' ? doc.company_name || '-' : ''}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{doc.document_type.replace('_', ' ') === 'application letter' ? 'Application Letter' : doc.document_type.replace('_', ' ')}</td>
+                {#if (filterType === applicationLetterType || filterType === 'all')}
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{doc.document_type === applicationLetterType ? doc.company_name || '-' : ''}</td>
                 {/if}
                 {#if (filterType === 'all' || mainTypes.includes(filterType))}
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{mainTypes.includes(doc.document_type) ? getVersion(doc, documents) : ''}</td>

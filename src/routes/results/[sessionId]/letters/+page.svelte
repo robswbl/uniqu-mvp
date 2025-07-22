@@ -7,7 +7,7 @@
 	import { supabase } from '$lib/supabaseClient.js';
 
 	let sessionId = $page.params.sessionId;
-	let motivationalLetters = [];
+	let applicationLetters = [];
 	let matchedCompanies = [];
 	let loading = true;
 	let generating = false;
@@ -57,9 +57,9 @@
 		try {
 			loading = true;
 
-			// Fetch motivational letters
+			// Fetch application letters
 			const { data: lettersData, error: lettersError } = await supabase
-				.from('motivational_letters')
+				.from('application_letters')
 				.select('*')
 				.eq('session_id', sessionId)
 				.order('created_at', { ascending: false });
@@ -78,19 +78,19 @@
 				console.warn('No matching companies document found:', companiesError);
 			}
 
-			// Fetch generated motivational_letter documents
+			// Fetch generated application_letter documents
 			const { data: generatedDocs, error: generatedDocsError } = await supabase
 				.from('generated_documents')
 				.select('document_id')
 				.eq('session_id', sessionId)
-				.eq('document_type', 'motivational_letter');
+				.eq('document_type', 'application_letter');
 			if (!generatedDocsError && generatedDocs) {
 				generatedLetterIds = new Set(generatedDocs.map(doc => doc.document_id.toString()));
 			} else {
 				generatedLetterIds = new Set();
 			}
 
-			motivationalLetters = lettersData || [];
+			applicationLetters = lettersData || [];
 			
 			// Extract company names from the companies document (simple parsing)
 			if (companiesDoc?.content_html) {
@@ -166,7 +166,7 @@
 
 			// Create initial record with pain points and address
 			const { data: newLetter, error: insertError } = await supabase
-				.from('motivational_letters')
+				.from('application_letters')
 				.insert({
 					session_id: sessionId,
 					company_name: companyName.trim(),
@@ -181,7 +181,7 @@
 			if (insertError) throw insertError;
 
 			// Add to local state immediately
-			motivationalLetters = [newLetter, ...motivationalLetters];
+			applicationLetters = [newLetter, ...applicationLetters];
 			// Track local creation time for progress bar
 			localLetterCreatedAt[newLetter.id] = Date.now();
 			
@@ -197,18 +197,16 @@
 				console.log('Calling n8n webhook with data:', {
 					user_id: sessionData.user_id,
 					session_id: sessionId,
-					motivational_letter_id: newLetter.id
+					application_letter_id: newLetter.id
 				});
 
-				const webhookResponse = await fetch('https://manage.app.n8n.cloud/webhook/clients/uniqu-motivationletter', {
+				const webhookResponse = await fetch('/api/proxy-applicationletter', {
 					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
+					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
 						user_id: sessionData.user_id,
 						session_id: sessionId,
-						motivational_letter_id: newLetter.id
+						application_letter_id: newLetter.id
 					})
 				});
 
@@ -252,15 +250,15 @@
 	        .from('generated_documents')
 	        .select('document_id')
 	        .eq('session_id', sessionId)
-	        .eq('document_type', 'motivational_letter')
+	        .eq('document_type', 'application_letter')
 	        .eq('document_id', letterId.toString());
 	      if (!error && data && data.length > 0) {
 	        generatedLetterIds.add(letterId.toString());
 	        pollingErrors[letterId] = false;
 	        delete localLetterCreatedAt[letterId];
 	        justGenerated[letterId] = true;
-	        setTimeout(() => { delete justGenerated[letterId]; motivationalLetters = [...motivationalLetters]; }, 5000);
-	        motivationalLetters = [...motivationalLetters];
+	        setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
+	        applicationLetters = [...applicationLetters];
 	        return;
 	      }
 	      elapsed += interval;
@@ -269,7 +267,7 @@
 	      } else {
 	        pollingErrors[letterId] = true;
 	        delete localLetterCreatedAt[letterId];
-	        motivationalLetters = [...motivationalLetters];
+	        applicationLetters = [...applicationLetters];
 	      }
 	    }, interval);
 	  }
@@ -291,14 +289,14 @@
 			}
 
 			const { error: updateError } = await supabase
-				.from('motivational_letters')
+				.from('application_letters')
 				.update(updates)
 				.eq('id', letterId);
 
 			if (updateError) throw updateError;
 
 			// Update local state
-			motivationalLetters = motivationalLetters.map(letter =>
+			applicationLetters = applicationLetters.map(letter =>
 				letter.id === letterId 
 					? { ...letter, ...updates }
 					: letter
@@ -313,7 +311,7 @@
 	async function updateNotes(letterId, notes) {
 		try {
 			const { error: updateError } = await supabase
-				.from('motivational_letters')
+				.from('application_letters')
 				.update({
 					notes: notes.trim() || null,
 					updated_at: new Date().toISOString()
@@ -323,7 +321,7 @@
 			if (updateError) throw updateError;
 
 			// Update local state
-			motivationalLetters = motivationalLetters.map(letter =>
+			applicationLetters = applicationLetters.map(letter =>
 				letter.id === letterId 
 					? { ...letter, notes: notes.trim() || null }
 					: letter
@@ -347,14 +345,14 @@
 
 		try {
 			const { error: deleteError } = await supabase
-				.from('motivational_letters')
+				.from('application_letters')
 				.delete()
 				.eq('id', letterId);
 
 			if (deleteError) throw deleteError;
 
 			// Update local state
-			motivationalLetters = motivationalLetters.filter(letter => letter.id !== letterId);
+			applicationLetters = applicationLetters.filter(letter => letter.id !== letterId);
 
 		} catch (err) {
 			console.error('Error deleting letter:', err);
@@ -377,15 +375,13 @@
 
 			console.log('Testing webhook for letter:', letter.id);
 
-			const webhookResponse = await fetch('https://manage.app.n8n.cloud/webhook/clients/uniqu-motivationletter', {
+			const webhookResponse = await fetch('/api/proxy-applicationletter', {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
+				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					user_id: sessionData.user_id,
 					session_id: sessionId,
-					motivational_letter_id: letter.id
+					application_letter_id: letter.id
 				})
 			});
 
@@ -413,7 +409,7 @@
 				.from('generated_documents')
 				.select('*')
 				.eq('session_id', sessionId)
-				.eq('document_type', 'motivational_letter')
+				.eq('document_type', 'application_letter')
 				.eq('document_id', letterId.toString())
 				.single();
 
@@ -434,7 +430,7 @@
 
 			// Show in modal
 			currentLetterContent = generatedDoc.content_html;
-			currentLetterTitle = generatedDoc.title || `Letter for ${motivationalLetters.find(l => l.id == letterId)?.company_name || 'Company'}`;
+			currentLetterTitle = generatedDoc.title || `Letter for ${applicationLetters.find(l => l.id == letterId)?.company_name || 'Company'}`;
 			showLetterModal = true;
 
 		} catch (err) {
@@ -488,7 +484,7 @@
 
 	// Watch for new letters in 'draft' state with no generated document
 	$: {
-	  motivationalLetters.forEach(letter => {
+	  applicationLetters.forEach(letter => {
 	    if (letter.status === 'draft' && letterProgress[letter.id] === undefined) {
 	      startLetterProgress(letter.id);
 	    }
@@ -535,7 +531,7 @@
 			<div class="flex items-center justify-between">
 				<div>
 					<h1 class="text-3xl font-bold text-gray-900 mb-2">Application Letters</h1>
-					<p class="text-gray-600">Generate and track your personalized motivational letters</p>
+					<p class="text-gray-600">Generate and track your personalized application letters</p>
 				</div>
 				
 				<button
@@ -574,7 +570,7 @@
 			<!-- New Letter Form -->
 			{#if showNewLetterForm}
 				<div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200">
-					<h3 class="text-xl font-semibold text-gray-900 mb-4">Generate New Motivational Letter</h3>
+					<h3 class="text-xl font-semibold text-gray-900 mb-4">Generate New Application Letter</h3>
 					
 					<div class="space-y-4">
 						{#if matchedCompanies.length > 0}
@@ -677,7 +673,7 @@
 			{/if}
 
 			<!-- Letters List -->
-			{#if motivationalLetters.length === 0}
+			{#if applicationLetters.length === 0}
 				<div class="text-center py-12">
 					<div class="bg-white rounded-xl shadow-lg p-8 max-w-md mx-auto">
 						<div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -686,7 +682,7 @@
 							</svg>
 						</div>
 						<h3 class="text-xl font-semibold text-gray-900 mb-2">No Letters Yet</h3>
-						<p class="text-gray-600 mb-6">Generate your first motivational letter to get started with your job applications.</p>
+						<p class="text-gray-600 mb-6">Generate your first application letter to get started with your job applications.</p>
 						<button 
 							on:click={() => showNewLetterForm = true}
 							class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium"
@@ -699,7 +695,7 @@
 				</div>
 			{:else}
 				<div class="space-y-6">
-					{#each motivationalLetters as letter, index}
+					{#each applicationLetters as letter, index}
 						<div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
 							
 							<!-- Letter Header -->

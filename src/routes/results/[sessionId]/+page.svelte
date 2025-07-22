@@ -54,12 +54,12 @@
 				regenerationTimestamp = sessionData.last_regeneration || sessionData.completed_at;
 			}
 
-			// Fetch documents excluding motivational letters
+			// Fetch documents excluding application letters
 			const { data: documentsData, error: documentsError } = await supabase
 				.from('generated_documents')
 				.select('*')
 				.eq('session_id', sessionId)
-				.neq('document_type', 'motivational_letter')
+				.neq('document_type', 'application_letter')
 				.order('created_at', { ascending: false });
 
 			if (documentsError) throw documentsError;
@@ -372,7 +372,7 @@
 					</div>
 					
 					<p class="text-gray-600 text-sm mb-4">
-						Generate personalized motivational letters for companies that match your profile.
+						Generate personalized application letters for companies that match your profile.
 					</p>
 					
 					<div class="bg-indigo-50 rounded-lg p-4">

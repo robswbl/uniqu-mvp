@@ -42,6 +42,8 @@
     fetchDocument();
   }
 
+  $: fromOnboarding = $page.url.searchParams.get('from') === 'onboarding';
+
   function getDocumentTitle(type: string): string {
     switch(type) {
       case 'reflection_letter': return 'Personal Reflection';
@@ -115,7 +117,7 @@
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
   <div class="max-w-4xl mx-auto">
-    
+    {#if !fromOnboarding}
     <!-- Header -->
     <div class="mb-6">
       <button 
@@ -128,13 +130,11 @@
         </svg>
         Back to Results
       </button>
-      
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-xl font-bold text-gray-900 mb-1">{getDocumentTitle(documentType)}</h1>
           <p class="text-gray-600 text-sm">{getDocumentDescription(documentType)}</p>
         </div>
-        
         <div class="flex items-center space-x-2">
           <button 
             on:click={() => goto(`/dashboard/${sessionId}`)}
@@ -146,7 +146,6 @@
             </svg>
             <span>Dashboard</span>
           </button>
-          
           <button 
             on:click={() => goto(`/questionnaire/${sessionId}`)}
             class="flex items-center space-x-1 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm"
@@ -160,6 +159,7 @@
         </div>
       </div>
     </div>
+    {/if}
     {#if isLoading}
       <div class="flex justify-center items-center h-64">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
@@ -187,6 +187,7 @@
       </div>
 
       <!-- Explore More Section -->
+      {#if !fromOnboarding}
       <div class="mt-6 bg-white rounded-xl shadow-lg p-6 text-center">
         <h3 class="text-lg font-semibold text-gray-800 mb-2">✨ Explore More</h3>
         <p class="text-gray-600 mb-4 text-sm">Check out your other career insights or update your profile for fresh perspectives.</p>
@@ -214,17 +215,18 @@
           </button>
         </div>
       </div>
+      {/if}
       <div class="mt-8 flex justify-center">
         {#if documentType === 'reflection_letter'}
-          <button on:click={() => goto(`/results/${sessionId}/career_themes`)} class="px-8 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:from-pink-600 hover:to-orange-600 transition-colors text-lg">
+          <button on:click={() => goto(`/results/${sessionId}/career_themes${fromOnboarding ? '?from=onboarding' : ''}`)} class="px-8 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:from-pink-600 hover:to-orange-600 transition-colors text-lg">
             Reveal Next Insight
           </button>
         {:else if documentType === 'career_themes'}
-          <button on:click={() => goto(`/results/${sessionId}/ideal_companies`)} class="px-8 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:from-pink-600 hover:to-orange-600 transition-colors text-lg">
+          <button on:click={() => goto(`/results/${sessionId}/ideal_companies${fromOnboarding ? '?from=onboarding' : ''}`)} class="px-8 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:from-pink-600 hover:to-orange-600 transition-colors text-lg">
             Reveal Final Suggestion
           </button>
         {:else if documentType === 'ideal_companies'}
-          <button on:click={() => goto(`/results/${sessionId}/next-steps`)} class="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 transition-colors text-lg">
+          <button on:click={() => goto(`/results/${sessionId}/next-steps${fromOnboarding ? '?from=onboarding' : ''}`)} class="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 transition-colors text-lg">
             See What Happens Next
           </button>
         {/if}

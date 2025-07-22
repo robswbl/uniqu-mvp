@@ -2,8 +2,10 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   const sessionId = $page.params.sessionId;
+  $: fromOnboarding = $page.url.searchParams.get('from') === 'onboarding';
   function goToLetters() {
-    goto(`/results/${sessionId}/letters`);
+    const param = fromOnboarding ? '?from=onboarding' : '';
+    goto(`/results/${sessionId}/letters${param}`);
   }
 </script>
 

@@ -55,12 +55,11 @@
 	async function checkAndRedirect() {
 		// Only redirect when ALL documents are complete
 		if (totalDocuments >= 3) {
-			console.log('All documents complete! Redirecting to results...');
+			console.log('All documents complete! Redirecting to ready page...');
 			if (timer) clearInterval(timer);
 			if (subscription) subscription.unsubscribe();
-			
-			// Redirect to results page
-			await goto(`/results/${sessionId}`);
+			// Redirect to the new bridge page
+			await goto(`/results/${sessionId}/ready`);
 		}
 	}
 

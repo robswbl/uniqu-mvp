@@ -5,6 +5,7 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import './document-content.css';
+  import { get } from 'svelte/store';
 
   const sessionId = $page.params.sessionId;
   const documentType = $page.params.documentType;
@@ -12,11 +13,10 @@
   let documentData: any = null;
   let isLoading = true;
 
-  onMount(async () => {
-    console.log('Loading document:', { sessionId, documentType });
-    
+  async function fetchDocument() {
+    isLoading = true;
+    documentData = null;
     try {
-      // Get the most recent document (in case of duplicates from regeneration)
       const { data, error } = await supabase
         .from('generated_documents')
         .select('content_html, document_type, created_at, pdf_url')
@@ -24,23 +24,23 @@
         .eq('document_type', documentType)
         .order('created_at', { ascending: false })
         .limit(1);
-
-      console.log('Query result:', { data, error });
-
       if (error) {
         console.error('Supabase error:', error);
       } else if (data && data.length > 0) {
-        documentData = data[0]; // Get the first (most recent) document
-        console.log('Document loaded:', documentData);
-      } else {
-        console.log('No document found');
+        documentData = data[0];
       }
     } catch (err) {
       console.error('Unexpected error:', err);
     } finally {
       isLoading = false;
     }
-  });
+  }
+
+  onMount(fetchDocument);
+
+  $: if ($page.params.documentType) {
+    fetchDocument();
+  }
 
   function getDocumentTitle(type: string): string {
     switch(type) {
@@ -213,6 +213,21 @@
             Dashboard
           </button>
         </div>
+      </div>
+      <div class="mt-8 flex justify-center">
+        {#if documentType === 'reflection_letter'}
+          <button on:click={() => goto(`/results/${sessionId}/career_themes`)} class="px-8 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:from-pink-600 hover:to-orange-600 transition-colors text-lg">
+            Reveal Next Insight
+          </button>
+        {:else if documentType === 'career_themes'}
+          <button on:click={() => goto(`/results/${sessionId}/ideal_companies`)} class="px-8 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:from-pink-600 hover:to-orange-600 transition-colors text-lg">
+            Reveal Final Suggestion
+          </button>
+        {:else if documentType === 'ideal_companies'}
+          <button on:click={() => goto(`/results/${sessionId}/next-steps`)} class="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 transition-colors text-lg">
+            See What Happens Next
+          </button>
+        {/if}
       </div>
     {:else}
       <div class="bg-white rounded-xl shadow-lg p-8 text-center">

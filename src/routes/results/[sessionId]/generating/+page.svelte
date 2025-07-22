@@ -10,7 +10,7 @@
 	let timeElapsed = 0;
 	let timer = null;
 	let subscription = null;
-	let regenerationTimestamp = null;
+	let generationId = null;
 	let documentsFound = {
 		reflection_letter: false,
 		career_themes: false,
@@ -18,22 +18,21 @@
 	};
 	let totalDocuments = 0;
 
-	// Get regeneration timestamp from session
-	async function getRegenerationTimestamp() {
+	// Get generation_id from session
+	async function getGenerationId() {
 		try {
 			const { data: sessionData, error } = await supabase
 				.from('questionnaire_sessions')
-				.select('last_regeneration, completed_at')
+				.select('generation_id')
 				.eq('id', sessionId)
 				.single();
 
 			if (sessionData) {
-				// Use last_regeneration if available, otherwise completed_at
-				regenerationTimestamp = sessionData.last_regeneration || sessionData.completed_at;
-				console.log('Regeneration timestamp:', regenerationTimestamp);
+				generationId = sessionData.generation_id;
+				console.log('Generation ID:', generationId);
 			}
 		} catch (err) {
-			console.error('Error getting regeneration timestamp:', err);
+			console.error('Error getting generation_id:', err);
 		}
 	}
 
@@ -53,33 +52,31 @@
 
 	// Check if we should redirect to results
 	async function checkAndRedirect() {
-		// Only redirect when ALL documents are complete
 		if (totalDocuments >= 3) {
 			console.log('All documents complete! Redirecting to ready page...');
 			if (timer) clearInterval(timer);
 			if (subscription) subscription.unsubscribe();
-			// Redirect to the new bridge page
 			await goto(`/results/${sessionId}/ready`);
 		}
 	}
 
-	// Check existing documents (only those created after regeneration)
+	// Check existing documents (by generation_id)
 	async function checkExistingDocuments() {
-		if (!regenerationTimestamp) {
-			console.log('No regeneration timestamp, skipping existing documents check');
+		if (!generationId) {
+			console.log('No generation_id, skipping existing documents check');
 			return;
 		}
 
 		console.log('Checking existing documents for session:', sessionId);
-		console.log('Looking for documents after:', regenerationTimestamp);
+		console.log('Looking for documents with generation_id:', generationId);
 
 		try {
 			const { data: existingDocs, error } = await supabase
 				.from('generated_documents')
-				.select('document_type, created_at')
+				.select('document_type, generation_id')
 				.eq('session_id', sessionId)
-				.in('document_type', ['reflection_letter', 'career_themes', 'ideal_companies'])
-				.gte('created_at', regenerationTimestamp); // Only get documents created AFTER regeneration
+				.eq('generation_id', generationId)
+				.in('document_type', ['reflection_letter', 'career_themes', 'ideal_companies']);
 
 			if (error) {
 				console.error('Error fetching existing documents:', error);
@@ -100,7 +97,6 @@
 				// Trigger reactivity
 				documentsFound = { ...documentsFound };
 
-				// Check if all documents are already complete
 				if (totalDocuments >= 3) {
 					console.log('All documents already exist, redirecting...');
 					await checkAndRedirect();
@@ -116,7 +112,7 @@
 	// Set up real-time subscription
 	function setupRealtimeSubscription() {
 		console.log('Setting up real-time subscription for session:', sessionId);
-		console.log('Regeneration timestamp:', regenerationTimestamp);
+		console.log('Generation ID:', generationId);
 		
 		subscription = supabase
 			.channel('document_updates')
@@ -129,26 +125,18 @@
 				}, 
 				(payload) => {
 					console.log('New document generated:', payload.new);
-					
-					// Only count documents created after regeneration timestamp
-					if (regenerationTimestamp && payload.new.created_at >= regenerationTimestamp) {
+					if (generationId && payload.new.generation_id === generationId) {
 						const docType = payload.new.document_type;
 						console.log('Processing document type:', docType);
-						
 						if (docType in documentsFound && !documentsFound[docType]) {
 							documentsFound[docType] = true;
 							totalDocuments++;
-							
 							console.log('Document completed:', docType, 'Total:', totalDocuments);
-							
-							// Trigger reactivity by creating a new object
 							documentsFound = { ...documentsFound };
-							
-							// Check if we should redirect
 							checkAndRedirect();
 						}
 					} else {
-						console.log('Document ignored - before regeneration timestamp or not in target types');
+						console.log('Document ignored - wrong generation_id or not in target types');
 					}
 				}
 			)
@@ -159,7 +147,7 @@
 
 	onMount(async () => {
 		startTimer();
-		await getRegenerationTimestamp();
+		await getGenerationId();
 		await checkExistingDocuments();
 		setupRealtimeSubscription();
 	});

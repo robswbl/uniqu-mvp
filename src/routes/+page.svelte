@@ -15,14 +15,13 @@
       feedbackMessage = '';
   
       try {
-        // 🔄 DIRECT DATABASE APPROACH (No RPC function)
-        
         // 1. Find the user
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('user_uuid')
           .eq('user_email', userEmail)
           .single();
+        console.log('User lookup:', { userData, userError });
   
         if (userError || !userData) {
           throw new Error(`User with email ${userEmail} not found`);
@@ -33,12 +32,14 @@
           .from('questionnaire_sessions')
           .select('id, status')
           .eq('user_id', userData.user_uuid)
-          .single();
+          .maybeSingle();
+        console.log('Session lookup:', { sessionData, sessionError });
   
         let sessionId, sessionStatus;
   
         if (sessionError && sessionError.code === 'PGRST116') {
           // No session exists - create one
+          console.log('No session found, creating new session for user:', userData.user_uuid);
           const { data: newSession, error: createError } = await supabase
             .from('questionnaire_sessions')
             .insert({
@@ -47,12 +48,13 @@
             })
             .select('id, status')
             .single();
+          console.log('Session creation:', { newSession, createError });
   
           if (createError) throw createError;
-          
           sessionId = newSession.id;
           sessionStatus = newSession.status;
         } else if (sessionError) {
+          console.error('Session fetch error:', sessionError);
           throw sessionError;
         } else {
           // Session exists
@@ -70,12 +72,12 @@
           }, 1500);
         } else {
           // Check if onboarding is completed
-          const { data: sessionDetails } = await supabase
+          const { data: sessionDetails, error: detailsError } = await supabase
             .from('questionnaire_sessions')
             .select('onboarding_completed')
             .eq('id', sessionId)
             .single();
-          
+          console.log('Session details lookup:', { sessionDetails, detailsError });
           if (!sessionDetails?.onboarding_completed) {
             feedbackMessage = 'Welcome! Let\'s start with a guided introduction...';
             setTimeout(async () => {

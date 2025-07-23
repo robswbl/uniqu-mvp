@@ -10,6 +10,7 @@ import { onMount } from 'svelte';
 import { locale, waitLocale } from '$lib/i18n';
 import { t } from 'svelte-i18n';
 import { supabase } from '$lib/supabaseClient';
+import { goto } from '$app/navigation';
 
 let userLang = '';
 let localeReady = false;
@@ -51,6 +52,14 @@ waitLocale().then(() => {
 });
 
 onMount(async () => {
+  // Guard: If userId is missing and not on root, redirect to root
+  if (typeof window !== 'undefined') {
+    const userId = localStorage.getItem('userId');
+    if (!userId && window.location.pathname !== '/') {
+      goto('/');
+      return;
+    }
+  }
   // If userId is available, fetch language from DB
   if (userId) {
     await fetchUserLanguage();

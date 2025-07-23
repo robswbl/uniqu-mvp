@@ -1,11 +1,16 @@
 <script lang="ts">
     import { supabase } from '$lib/supabaseClient';
     import { goto } from '$app/navigation';
-    import { t } from 'svelte-i18n';
+    import { t, waitLocale } from 'svelte-i18n';
   
     let userEmail = '';
     let isLoading = false;
     let feedbackMessage = '';
+    let localeReady = false;
+
+    waitLocale().then(() => {
+      localeReady = true;
+    });
   
     async function handleStart() {
       if (!userEmail) {
@@ -112,6 +117,7 @@
     }
   </script>
   
+{#if localeReady}
   <div class="flex min-h-screen items-center justify-center bg-gray-100 p-4">
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <div class="text-center">
@@ -159,3 +165,4 @@
       {/if}
     </div>
   </div>
+{/if}

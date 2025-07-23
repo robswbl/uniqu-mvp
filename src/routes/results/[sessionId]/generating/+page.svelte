@@ -18,6 +18,7 @@
 		ideal_companies: false
 	};
 	let totalDocuments = 0;
+	let pollInterval = null;
 
 	// Get generation_id from session
 	async function getGenerationId() {
@@ -112,9 +113,11 @@
 
 	// Set up real-time subscription
 	function setupRealtimeSubscription() {
-		console.log('Setting up real-time subscription for session:', sessionId);
-		console.log('Generation ID:', generationId);
-		
+		console.log('[Realtime] Setting up subscription for generation_id:', generationId, 'session:', sessionId);
+		if (subscription) {
+			console.log('[Realtime] Unsubscribing from previous subscription');
+			subscription.unsubscribe();
+		}
 		subscription = supabase
 			.channel('document_updates')
 			.on('postgres_changes', 
@@ -125,25 +128,54 @@
 					filter: `session_id=eq.${sessionId}`
 				}, 
 				(payload) => {
-					console.log('New document generated:', payload.new);
+					console.log('[Realtime] Document event received:', payload);
+					console.log('[Realtime] Current generation_id:', generationId, 'Payload generation_id:', payload.new.generation_id);
+					const docType = payload.new.document_type;
 					if (generationId && payload.new.generation_id === generationId) {
-						const docType = payload.new.document_type;
-						console.log('Processing document type:', docType);
 						if (docType in documentsFound && !documentsFound[docType]) {
 							documentsFound[docType] = true;
 							totalDocuments++;
-							console.log('Document completed:', docType, 'Total:', totalDocuments);
+							console.log('[Realtime] Document completed:', docType, 'Total:', totalDocuments);
 							documentsFound = { ...documentsFound };
 							checkAndRedirect();
 						}
 					} else {
-						console.log('Document ignored - wrong generation_id or not in target types');
+						console.log('[Realtime] Document ignored - wrong generation_id or not in target types');
 					}
 				}
 			)
 			.subscribe((status) => {
-				console.log('Subscription status:', status);
+				console.log('[Realtime] Subscription status:', status);
 			});
+	}
+
+	async function pollGenerationId() {
+		try {
+			const { data: sessionData, error } = await supabase
+				.from('questionnaire_sessions')
+				.select('generation_id')
+				.eq('id', sessionId)
+				.single();
+			if (sessionData && sessionData.generation_id !== generationId) {
+				console.log('[Polling] Detected new generation_id:', sessionData.generation_id, 'Old:', generationId);
+				generationId = sessionData.generation_id;
+				// Reset progress state
+				documentsFound = {
+					reflection_letter: false,
+					career_themes: false,
+					ideal_companies: false
+				};
+				totalDocuments = 0;
+				if (subscription) {
+					console.log('[Polling] Unsubscribing from old subscription');
+					subscription.unsubscribe();
+				}
+				await checkExistingDocuments();
+				setupRealtimeSubscription();
+			}
+		} catch (err) {
+			console.error('[Polling] Error polling generation_id:', err);
+		}
 	}
 
 	onMount(async () => {
@@ -151,11 +183,13 @@
 		await getGenerationId();
 		await checkExistingDocuments();
 		setupRealtimeSubscription();
+		pollInterval = setInterval(pollGenerationId, 3000); // poll every 3 seconds
 	});
 
 	onDestroy(() => {
 		if (timer) clearInterval(timer);
 		if (subscription) subscription.unsubscribe();
+		if (pollInterval) clearInterval(pollInterval);
 	});
 </script>
 

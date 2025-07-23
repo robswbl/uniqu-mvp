@@ -47,6 +47,7 @@
 	},
 	"dependencies": {
 		"@supabase/supabase-js": "^2.51.0",
+		"@vitalets/google-translate-api": "^9.2.1",
 		"svelte-i18n": "^4.0.1"
 	}
 }

@@ -28,19 +28,19 @@
 	function handleInput() {
 		if (saveTimeout) clearTimeout(saveTimeout);
 		isSaving = true;
-		saveStatus = 'Saving...';
-		saveTimeout = setTimeout(savePersonality, 600);
+		saveStatus = $t('step1.personality_values.saving');
+		saveTimeout = setTimeout(savePersonalityValues, 600);
 	}
 
-	async function savePersonality() {
+	async function savePersonalityValues() {
 		const { error } = await supabase
 			.from('questionnaire_sessions')
 			.update({ personality_values: personalityValues })
 			.eq('id', sessionId);
 		if (error) {
-			saveStatus = 'Error saving';
+			saveStatus = $t('step1.personality_values.error_saving');
 		} else {
-			saveStatus = 'Saved ✓';
+			saveStatus = $t('step1.personality_values.saved');
 		}
 		isSaving = false;
 		setTimeout(() => saveStatus = '', 1200);

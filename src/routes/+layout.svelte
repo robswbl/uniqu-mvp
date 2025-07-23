@@ -6,49 +6,75 @@
 
 <script lang="ts">
 import '../app.css';
-  import { onMount } from 'svelte';
-  import { locale, waitLocale } from '$lib/i18n';
-  import { t } from 'svelte-i18n';
+import { onMount } from 'svelte';
+import { locale, waitLocale } from '$lib/i18n';
+import { t } from 'svelte-i18n';
+import { supabase } from '$lib/supabaseClient';
 
-  let userLang = '';
-  let localeReady = false;
+let userLang = '';
+let localeReady = false;
+let userId = '';
 
-  // SSR-safe: check if window is defined before accessing localStorage
-  if (typeof window !== 'undefined') {
+// SSR-safe: check if window is defined before accessing localStorage
+if (typeof window !== 'undefined') {
+  userLang = localStorage.getItem('userLang') || '';
+  // Try to get userId from localStorage/sessionStorage or URL if available
+  userId = localStorage.getItem('userId') || '';
+}
+
+let availableLangs = [
+  { code: 'en', label: 'English' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'fr', label: 'Français' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'es', label: 'Español' }
+];
+
+async function fetchUserLanguage() {
+  if (userId) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('user_language')
+      .eq('user_uuid', userId)
+      .single();
+    if (data && data.user_language) {
+      userLang = data.user_language;
+      locale.set(userLang);
+      localStorage.setItem('userLang', userLang);
+    }
+  }
+}
+
+waitLocale().then(() => {
+  localeReady = true;
+});
+
+onMount(async () => {
+  // If userId is available, fetch language from DB
+  if (userId) {
+    await fetchUserLanguage();
+  } else if (typeof window !== 'undefined') {
     userLang = localStorage.getItem('userLang') || '';
-  }
-
-  // Always call setupI18n synchronously with a fallback
-  // setupI18n(userLang || 'en'); // This line is now handled by the module script
-
-  let availableLangs = [
-    { code: 'en', label: 'English' },
-    { code: 'de', label: 'Deutsch' },
-    { code: 'fr', label: 'Français' },
-    { code: 'it', label: 'Italiano' },
-    { code: 'es', label: 'Español' }
-  ];
-
-  waitLocale().then(() => {
-    localeReady = true;
-  });
-
-  onMount(() => {
-    if (typeof window !== 'undefined') {
-      userLang = localStorage.getItem('userLang') || '';
-      if (userLang) {
-        locale.set(userLang);
-        waitLocale();
-      }
-    }
-  });
-
-  function changeLang(lang: string) {
-    locale.set(lang);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('userLang', lang);
+    if (userLang) {
+      locale.set(userLang);
+      waitLocale();
     }
   }
+});
+
+async function changeLang(lang: string) {
+  locale.set(lang);
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('userLang', lang);
+  }
+  // If userId is available, update in DB
+  if (userId) {
+    await supabase
+      .from('users')
+      .update({ user_language: lang })
+      .eq('user_uuid', userId);
+  }
+}
 </script>
 
 {#if localeReady}

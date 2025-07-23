@@ -34,25 +34,37 @@ async function translateText(text, to) {
 }
 
 // Recursively translate missing values
-async function translateKeys(base, target, to, pathArr = []) {
+async function translateKeys(base, target, to, pathArr = [], file, fullTarget) {
   if (typeof base !== 'object' || base === null) return base;
   const result = Array.isArray(base) ? [] : {};
   for (const key in base) {
     const currentPath = [...pathArr, key];
     if (typeof base[key] === 'object' && base[key] !== null) {
-      result[key] = await translateKeys(base[key], (target && target[key]) || {}, to, currentPath);
+      result[key] = await translateKeys(base[key], (target && target[key]) || {}, to, currentPath, file, fullTarget);
     } else {
-      // Only translate if missing or identical to English
       if (!target || !(key in target) || target[key] === base[key]) {
         console.log(`[${to}] Translating: ${currentPath.join('.')} ...`);
         result[key] = await translateText(base[key], to);
-        await sleep(2000); // 2 second delay
+        // Save after each key
+        setDeepValue(fullTarget, currentPath, result[key]);
+        writeJson(file, fullTarget);
+        await sleep(2000);
       } else {
         result[key] = target[key];
       }
     }
   }
   return result;
+}
+
+// Helper to set a deep value in an object by path
+function setDeepValue(obj, pathArr, value) {
+  let curr = obj;
+  for (let i = 0; i < pathArr.length - 1; i++) {
+    if (!curr[pathArr[i]]) curr[pathArr[i]] = {};
+    curr = curr[pathArr[i]];
+  }
+  curr[pathArr[pathArr.length - 1]] = value;
 }
 
 async function main() {
@@ -63,11 +75,11 @@ async function main() {
     if (fs.existsSync(file)) {
       target = readJson(file);
     }
-    const translated = await translateKeys(en, target, lang.code);
-    writeJson(file, translated);
-    console.log(`Auto-translated: ${lang.code}.json`);
+    // Pass the target as fullTarget for incremental saving
+    await translateKeys(en, target, lang.code, [], file, target);
+    console.log(`Auto-translation (with incremental saving) attempted for: ${lang.code}.json`);
   }
-  console.log('All language files are now auto-translated (where needed).');
+  console.log('All language files are now auto-translated (where needed, with incremental saving).');
 }
 
 main(); 

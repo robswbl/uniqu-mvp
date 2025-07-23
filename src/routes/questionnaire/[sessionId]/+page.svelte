@@ -304,7 +304,7 @@
 		{#if userEmail}
 		  <div class="text-center mt-4">
 			<p class="text-xs text-gray-400">
-			  {$t('questionnaire.session_for', { email: userEmail })}
+			  {$t('questionnaire.session_for', { email: userEmail } as any)}
 			</p>
 		  </div>
 		{/if}

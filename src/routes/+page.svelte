@@ -33,6 +33,10 @@
           alert($t('landing.user_not_found'));
           throw new Error($t('landing.user_not_found_generic'));
         }
+        // Save userId for language persistence
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userId', userData.user_uuid);
+        }
   
         // 2. Find their session
         const { data: sessionData, error: sessionError } = await supabase

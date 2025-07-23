@@ -27,7 +27,7 @@
 	function handleInput() {
 		if (saveTimeout) clearTimeout(saveTimeout);
 		isSaving = true;
-		saveStatus = 'Saving...';
+		saveStatus = $t('step1.goals.saving');
 		saveTimeout = setTimeout(saveGoals, 600);
 	}
 
@@ -37,9 +37,9 @@
 			.update({ goals })
 			.eq('id', sessionId);
 		if (error) {
-			saveStatus = 'Error saving';
+			saveStatus = $t('step1.goals.error_saving');
 		} else {
-			saveStatus = 'Saved ✓';
+			saveStatus = $t('step1.goals.saved');
 		}
 		isSaving = false;
 		setTimeout(() => saveStatus = '', 1200);
@@ -142,10 +142,14 @@
 				></textarea>
 			</div>
 			<div class="flex justify-between mt-8">
-				<button on:click={goToBack} class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors" type="button">
+				<button on:click={goToBack} class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
 					{$t('buttons.back')}
 				</button>
-				<button on:click={goToNext} class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors" disabled={isSaving}>
+				<button
+					on:click={goToNext}
+					class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-colors text-lg"
+					disabled={isSaving}
+				>
 					{$t('buttons.next')}
 				</button>
 			</div>

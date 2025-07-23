@@ -28,27 +28,25 @@
   function handleInput() {
     if (saveTimeout) clearTimeout(saveTimeout);
     isSaving = true;
-    saveStatus = 'Saving...';
+    saveStatus = $t('step1.life_context.saving');
     saveTimeout = setTimeout(saveLifeContext, 600);
   }
 
   async function saveLifeContext() {
-    console.log('Updating session:', sessionId, 'life_context:', lifeContext);
     const { error } = await supabase
       .from('questionnaire_sessions')
       .update({ life_context: lifeContext })
       .eq('id', sessionId);
     if (error) {
-      saveStatus = 'Error saving';
+      saveStatus = $t('step1.life_context.error_saving');
     } else {
-      saveStatus = 'Saved ✓';
+      saveStatus = $t('step1.life_context.saved');
     }
     isSaving = false;
     setTimeout(() => saveStatus = '', 1200);
   }
 
   async function goToNext() {
-    // Fetch the order from the DB
     const { data, error } = await supabase
       .from('question_order')
       .select('order')
@@ -67,7 +65,6 @@
           : `/questionnaire/${sessionId}/step1/${nextQuestion}`;
         goto(nextUrl);
       } else {
-        // If last question, go to step2
         const step2Url = fromOnboarding
           ? `/questionnaire/${sessionId}/step2?from=onboarding`
           : `/questionnaire/${sessionId}/step2`;

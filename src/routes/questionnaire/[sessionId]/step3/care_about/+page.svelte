@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import QuestionCard from '$lib/QuestionCard.svelte';
   import { get } from 'svelte/store';
+  import { t } from 'svelte-i18n';
 
   const sessionId = $page.params.sessionId;
   let ikigaiCareAbout = '';
@@ -49,16 +50,16 @@
     const urlParams = get(page).url.searchParams;
     const fromOnboarding = urlParams.get('from') === 'onboarding';
     const nextUrl = fromOnboarding
-      ? `/questionnaire/${sessionId}/step3/inspires?from=onboarding`
-      : `/questionnaire/${sessionId}/step3/inspires`;
+      ? `/questionnaire/${sessionId}/step3/good_at?from=onboarding`
+      : `/questionnaire/${sessionId}/step3/good_at`;
     goto(nextUrl);
   }
   function goToBack() {
     const urlParams = get(page).url.searchParams;
     const fromOnboarding = urlParams.get('from') === 'onboarding';
     const backUrl = fromOnboarding
-      ? `/questionnaire/${sessionId}/step3/good_at?from=onboarding`
-      : `/questionnaire/${sessionId}/step3/good_at`;
+      ? `/questionnaire/${sessionId}/step3/want_to_be?from=onboarding`
+      : `/questionnaire/${sessionId}/step3/want_to_be`;
     goto(backUrl);
   }
 </script>
@@ -68,29 +69,29 @@
 </svelte:head>
 
 <QuestionCard
-  stepHeading="Step 3: Discover Your Ikigai"
-  title="What do you care about?"
+  stepHeading={$t('step3.care_about.step_heading')}
+  title={$t('step3.care_about.title')}
   emoji="🌍"
-  explainer="💡 Need inspiration?"
+  explainer={$t('step3.care_about.explainer')}
   explainerColor="green"
-  textareaPlaceholder="What causes or issues deeply matter to you?"
+  textareaPlaceholder={$t('step3.care_about.textarea_placeholder')}
   bind:textareaValue={ikigaiCareAbout}
   saveStatus={saveStatus}
   onInput={handleInput}
   onNext={goToNext}
   onBack={goToBack}
-  nextLabel="Next"
-  backLabel="Back"
+  nextLabel={$t('buttons.next')}
+  backLabel={$t('buttons.back')}
   disabled={isSaving}
 >
   <div class="mb-4">
     <button type="button" class="text-sm text-green-700 underline" on:click={() => showInspiration = !showInspiration}>
-      {showInspiration ? 'Hide inspiration' : 'Show inspiration'}
+      {showInspiration ? $t('step3.care_about.hide_inspiration') : $t('step3.care_about.show_inspiration')}
     </button>
     {#if showInspiration}
       <div class="p-4 bg-green-50 rounded-lg border border-green-200 space-y-3 mt-2">
-        <p class="text-gray-600 text-sm">What societal, environmental, or humanitarian issues ignite your passion? What problems do you see that you want to help fix?</p>
-        <p class="text-gray-500 text-xs italic">Examples: Better access to education in developing countries. Building a circular economy. Diversity and inclusion.</p>
+        <p class="text-gray-600 text-sm">{$t('step3.care_about.inspiration_text')}</p>
+        <p class="text-gray-500 text-xs italic">{$t('step3.care_about.inspiration_examples')}</p>
       </div>
     {/if}
   </div>

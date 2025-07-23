@@ -68,7 +68,7 @@
 	}
 
 	async function goToNext() {
-		goto(`/questionnaire/${sessionId}/final`);
+		goto(`/questionnaire/${sessionId}/step3/generate`);
 	}
 
 	function goToBack() {

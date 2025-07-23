@@ -50,16 +50,16 @@
     const urlParams = get(page).url.searchParams;
     const fromOnboarding = urlParams.get('from') === 'onboarding';
     const nextUrl = fromOnboarding
-      ? `/questionnaire/${sessionId}/step3/care_about?from=onboarding`
-      : `/questionnaire/${sessionId}/step3/care_about`;
+      ? `/questionnaire/${sessionId}/step3/inspires?from=onboarding`
+      : `/questionnaire/${sessionId}/step3/inspires`;
     goto(nextUrl);
   }
   function goToBack() {
     const urlParams = get(page).url.searchParams;
     const fromOnboarding = urlParams.get('from') === 'onboarding';
     const backUrl = fromOnboarding
-      ? `/questionnaire/${sessionId}/step3/love?from=onboarding`
-      : `/questionnaire/${sessionId}/step3/love`;
+      ? `/questionnaire/${sessionId}/step3/care_about?from=onboarding`
+      : `/questionnaire/${sessionId}/step3/care_about`;
     goto(backUrl);
   }
 </script>

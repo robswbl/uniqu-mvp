@@ -14,6 +14,7 @@ import { supabase } from '$lib/supabaseClient';
 let userLang = '';
 let localeReady = false;
 let userId = '';
+let errorMsg = '';
 
 // SSR-safe: check if window is defined before accessing localStorage
 if (typeof window !== 'undefined') {
@@ -69,10 +70,27 @@ async function changeLang(lang: string) {
   }
   // If userId is available, update in DB
   if (userId) {
-    await supabase
+    // Debug: log userId and session
+    if (import.meta.env && import.meta.env.DEV) {
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('[LANG PATCH DEBUG] userId:', userId);
+      console.log('[LANG PATCH DEBUG] session:', session);
+    }
+    const { error, data, status } = await supabase
       .from('users')
       .update({ user_language: lang })
       .eq('user_uuid', userId);
+    // Debug: log full response
+    if (import.meta.env && import.meta.env.DEV) {
+      console.log('[LANG PATCH DEBUG] PATCH response:', { error, data, status });
+    }
+    if (error) {
+      errorMsg = 'Failed to update language in your profile. Please try again.';
+    } else {
+      errorMsg = '';
+    }
+  } else {
+    errorMsg = 'You must be logged in to save your language preference.';
   }
 }
 </script>
@@ -84,7 +102,7 @@ async function changeLang(lang: string) {
     <div>
       <select
         class="p-2 border rounded"
-        bind:value={userLang}
+        bind:value={$locale}
         on:change={(e) => changeLang((e.target as HTMLSelectElement).value)}
         aria-label="Select language"
       >
@@ -92,6 +110,9 @@ async function changeLang(lang: string) {
           <option value={lang.code}>{lang.label}</option>
         {/each}
       </select>
+      {#if errorMsg}
+        <div class="text-red-600 text-xs mt-1">{errorMsg}</div>
+      {/if}
     </div>
   </header>
   <main class="flex-1">

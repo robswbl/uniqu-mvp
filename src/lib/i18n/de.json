@@ -116,7 +116,14 @@
     "generating": "Wird generiert...",
     "created_at": "Erstellt",
     "updated_at": "Aktualisiert",
-    "status_label": "Status",
+    "status": {
+      "draft": "Entwurf",
+      "sent": "Gesendet",
+      "responded": "Antwort erhalten",
+      "interview": "Vorstellungsgespräch geplant",
+      "rejected": "Abgelehnt",
+      "accepted": "Angebot erhalten"
+    },
     "sent": "Gesendet",
     "response": "Antwort",
     "test": "Test",
@@ -137,15 +144,7 @@
     "modal_title": "Bewerbungsschreiben",
     "copy": "Kopieren",
     "download_pdf": "Als PDF herunterladen",
-    "close_modal": "Schließen",
-    "status": {
-      "draft": "Entwurf",
-      "sent": "Gesendet",
-      "responded": "Antwort erhalten",
-      "interview": "Vorstellungsgespräch geplant",
-      "rejected": "Abgelehnt",
-      "accepted": "Angebot erhalten"
-    }
+    "close_modal": "Schließen"
   },
   "all_documents": {
     "title": "Alle generierten Dokumente",
@@ -271,8 +270,7 @@
       "emotional_bullet2": "Es ist normal, gemischte Gefühle während Übergängen zu haben.",
       "emotional_bullet3": "Deine Gefühle zu benennen kann dir helfen, mit Klarheit voranzuschreiten.",
       "emotional_placeholder": "Aufgeregt, unsicher, bereit für Veränderung? Teile deine aktuelle emotionale Verfassung mit...",
-      "continue_to_step2": "Weiter zu Schritt 2",
-      "continue_to_step3": "Step 3"
+      "continue_to_step2": "Weiter zu Schritt 2"
     },
     "goals": {
       "title": "Deine Karriereziele",
@@ -309,103 +307,89 @@
       "saving": "Wird gespeichert...",
       "saved": "Gespeichert ✓",
       "error_saving": "Fehler beim Speichern"
-    },
-    "doubts_barriers": {
-      "title": "Doubts & Barriers",
-      "explainer": "Be honest about your concerns:",
-      "textarea_placeholder": "What concerns or obstacles are you thinking about regarding your career path?"
-    },
-    "emotional_landscape": {
-      "title": "How are you feeling about your journey?",
-      "explainer": "Check in with yourself:",
-      "textarea_placeholder": "Excited, uncertain, ready for change? Share your current emotional state...",
-      "continue_to_step2": "Continue to Step 2"
     }
   },
   "step2": {
     "title": "Schritt 2: Deine Erfahrung",
     "heading": "Teile deine berufliche Geschichte",
+    "default_name": "Benutzer",
     "intro": "Lass uns mit deinem Lebenslauf fortfahren. Dies hilft uns, deinen Hintergrund und deine Erfahrung zu verstehen.",
-    "method_heading": "How would you like to provide your CV?",
-    "paste_text": "Paste Text",
-    "paste_text_desc": "Paste your CV or resume content directly into the box.",
-    "paste_text_label": "Paste your CV content here",
-    "paste_text_placeholder": "Paste your CV or resume content here... Include your work experience, education, skills, and any other relevant information.",
-    "upload_file": "Upload File",
-    "upload_file_desc": "Upload a PDF version of your CV or resume.",
-    "upload_file_label": "Upload your CV file",
-    "choose_file": "Choose File",
-    "drag_drop_hint": "Drag and drop your PDF here, or click to select a file.",
-    "uploading": "Uploading...",
-    "upload_complete": "Upload complete!",
-    "upload_failed": "Upload failed.",
-    "processing_cv": "Processing your CV...",
-    "cv_processed": "CV processed!",
-    "content_editable": "Edit Extracted Content",
-    "content_editable_desc": "You can review and edit the extracted text below.",
-    "content_editable_placeholder": "Edit your CV content here...",
-    "content_ready": "Content ready!",
-    "clear_content": "Clear content",
+    "textarea_label": "Füge hier deinen Lebenslauf-Inhalt ein",
+    "textarea_placeholder": "Füge hier deinen Lebenslauf-Inhalt ein... Füge deine Berufserfahrung, Ausbildung, Fähigkeiten und alle anderen relevanten Informationen hinzu.",
     "saving": "Wird gespeichert...",
     "saved": "Gespeichert ✓",
     "error_saving": "Fehler beim Speichern",
-    "loaded_existing_data": "Vorhandene Daten geladen.",
-    "go_to_ikigai": "Continue to Ikigai"
+    "loaded_existing_data": "Vorhandene Daten geladen."
   },
   "step3": {
     "title": "Schritt 3: Entdecke dein Ikigai",
     "heading": "Entdecke dein Ikigai",
     "intro": "Diese fünf Fragen helfen uns zu verstehen, was dich antreibt, wofür du dich begeisterst und was deinem Leben Bedeutung verleiht.",
+    "overview_explainer": "Reflektiere über diese Fragen, um dein Ikigai zu entdecken:",
+    "overview_bullet1": "Was machst du gerne?",
+    "overview_bullet2": "Worin bist du großartig?",
+    "overview_bullet3": "Was liegt dir am Herzen?",
     "saving": "Wird gespeichert...",
     "saved": "Gespeichert ✓",
     "error_saving": "Fehler beim Speichern",
     "loaded_existing_data": "Vorhandene Daten geladen.",
     "love": {
       "title": "Was machst du gerne?",
+      "step_heading": "Schritt 3: Entdecke dein Ikigai",
+      "explainer": "💡 Brauchst du Inspiration?",
+      "textarea_placeholder": "Welche Aktivitäten lassen dich wirklich lebendig und energiegeladen fühlen?",
       "show_inspiration": "Inspiration zeigen",
       "hide_inspiration": "Inspiration verbergen",
       "inspiration_text": "Du kennst diese Hobbys, von denen du einfach nicht genug bekommen kannst? Die Aktivitäten, auf die du dich die ganze Woche freust? Denk daran, was du tust, wenn du die Zeit vergisst, wenn die Außenwelt einfach zu verschwinden scheint.",
-      "inspiration_examples": "Beispiele: Ich koche gerne – Mahlzeiten planen, Zutaten schneiden... Meinen eigenen Computer bauen. Bei Hockeyturnieren spielen.",
-      "textarea_placeholder": "Welche Aktivitäten lassen dich wirklich lebendig und energiegeladen fühlen?"
+      "inspiration_examples": "Beispiele: Ich koche gerne – Mahlzeiten planen, Zutaten schneiden... Meinen eigenen Computer bauen. Bei Hockeyturnieren spielen."
     },
     "good_at": {
       "title": "Worin bist du großartig?",
+      "step_heading": "Schritt 3: Entdecke dein Ikigai",
+      "explainer": "💡 Brauchst du Inspiration?",
+      "textarea_placeholder": "Was sind deine natürlichen Talente und entwickelten Fähigkeiten?",
       "show_inspiration": "Inspiration zeigen",
       "hide_inspiration": "Inspiration verbergen",
       "inspiration_text": "Welche Aktivitäten fließen natürlich? Welche Fähigkeiten hast du entwickelt? Wann wenden sich Menschen an dich um Hilfe oder Rat? Denk an Aufgaben, für die du gelobt oder anerkannt wurdest.",
-      "inspiration_examples": "Beispiele: Menschen fragen mich um Rat bei Technik... Ich bin bekannt dafür, Zimmerpflanzen gesund zu halten. Freunde kommen zu mir für Beziehungsberatung.",
-      "textarea_placeholder": "Was sind deine natürlichen Talente und entwickelten Fähigkeiten?"
+      "inspiration_examples": "Beispiele: Menschen fragen mich um Rat bei Technik... Ich bin bekannt dafür, Zimmerpflanzen gesund zu halten. Freunde kommen zu mir für Beziehungsberatung."
     },
     "care_about": {
       "title": "Was liegt dir am Herzen?",
+      "step_heading": "Schritt 3: Entdecke dein Ikigai",
+      "explainer": "💡 Brauchst du Inspiration?",
+      "textarea_placeholder": "Welche Ursachen oder Themen sind dir wichtig?",
       "show_inspiration": "Inspiration zeigen",
       "hide_inspiration": "Inspiration verbergen",
       "inspiration_text": "Welche gesellschaftlichen, umweltbezogenen oder humanitären Themen entfachen deine Leidenschaft? Welche Probleme siehst du, bei denen du helfen möchtest?",
-      "inspiration_examples": "Beispiele: Besserer Zugang zu Bildung in Entwicklungsländern. Aufbau einer Kreislaufwirtschaft. Vielfalt und Inklusion.",
-      "textarea_placeholder": "Welche Ursachen oder Themen sind dir wichtig?"
+      "inspiration_examples": "Beispiele: Besserer Zugang zu Bildung in Entwicklungsländern. Aufbau einer Kreislaufwirtschaft. Vielfalt und Inklusion."
     },
     "inspires": {
       "title": "Was inspiriert dich?",
+      "step_heading": "Schritt 3: Entdecke dein Ikigai",
+      "explainer": "💡 Brauchst du Inspiration?",
+      "textarea_placeholder": "Welche Branchen, Bereiche oder Menschen inspirieren dich?",
       "show_inspiration": "Inspiration zeigen",
       "hide_inspiration": "Inspiration verbergen",
       "inspiration_text": "Welche Branchen oder Bereiche fesseln deine Vorstellungskraft? Was zieht dich zu ihnen hin - Innovation, Menschen helfen, Kreativität oder etwas anderes?",
-      "inspiration_examples": "Beispiele: Software, weil ich gerne Dinge erschaffe, die Menschen nutzen. Tierschutz, weil ich ihnen helfen möchte. Recruiting, weil ich interessante Menschen treffe.",
-      "textarea_placeholder": "Welche Branchen, Bereiche oder Menschen inspirieren dich?"
+      "inspiration_examples": "Beispiele: Software, weil ich gerne Dinge erschaffe, die Menschen nutzen. Tierschutz, weil ich ihnen helfen möchte. Recruiting, weil ich interessante Menschen treffe."
     },
     "want_to_be": {
       "title": "Wer möchtest du werden?",
+      "step_heading": "Schritt 3: Entdecke dein Ikigai",
+      "explainer": "Beschreibe die Person, die du zu werden anstrebst, und den Einfluss, den du haben möchtest.",
+      "textarea_placeholder": "Wer möchtest du werden? Welchen Einfluss möchtest du haben?",
+      "finish": "Abschließen",
       "show_inspiration": "Inspiration zeigen",
       "hide_inspiration": "Inspiration verbergen",
       "inspiration_text": "Denk an die Qualitäten, die du an anderen bewunderst, das Vermächtnis, das du hinterlassen möchtest, oder die Art von Einfluss, den du auf deine Gemeinschaft oder die Welt haben möchtest.",
-      "inspiration_examples": "Beispiele: Ich möchte als jemand bekannt sein, der andere aufbaut. Ich hoffe, meine Kinder zu inspirieren, ihren Träumen zu folgen. Ich möchte eine Führungskraft sein, die das Beste in meinem Team hervorbringt.",
-      "textarea_placeholder": "Wer möchtest du werden? Welchen Einfluss möchtest du haben?",
-      "finish": "Abschließen"
+      "inspiration_examples": "Beispiele: Ich möchte als jemand bekannt sein, der andere aufbaut. Ich hoffe, meine Kinder zu inspirieren, ihren Träumen zu folgen. Ich möchte eine Führungskraft sein, die das Beste in meinem Team hervorbringt."
     },
     "generate": {
       "title": "Glückwunsch! Bereit, deine Ergebnisse zu generieren?",
       "congrats_heading": "Glückwunsch zum Abschluss der Fragen!",
       "congrats_text": "Du hast unglaubliche Hingabe und Selbstreflexion gezeigt. Das ist es, was erfolgreiche Menschen auszeichnet. Wenn du auf <strong>Generieren</strong> klickst, erhältst du eine personalisierte Analyse—eine große Enthüllung über dich selbst, die deine zukünftige Richtung verändern könnte.",
       "next_chapter": "Atme tief durch und mach dich bereit für dein nächstes Kapitel. Wir freuen uns darauf, dir zu zeigen, was du entdeckt hast!",
+      "generating": "Wird generiert...",
       "generate_now": "Jetzt generieren"
     }
   },
@@ -475,19 +459,6 @@
     "time_and_privacy": "Dieser Prozess dauert etwa 10-15 Minuten. Deine Daten sind sicher und vertraulich.",
     "session_for": "Sitzung für {email}",
     "session_not_found": "Sitzung nicht gefunden.",
-    "go_back_home": "Zurück zur Startseite",
-    "back_to_dashboard": "Zurück zum Dashboard",
-    "unsaved_changes": "Du hast ungespeicherte Änderungen",
-    "loading_session": "Deine Sitzung wird geladen...",
-    "life_context": "Dein Lebenskontext",
-    "professional_experience": "Deine Berufserfahrung",
-    "professional_experience_intro": "Erzähle uns von deiner Erfahrung und deinem Hintergrund.",
-    "professional_experience_desc": "Beginne mit den Angaben zu deinem Lebenslauf.",
-    "ikigai": "Dein Ikigai",
-    "ikigai_intro": "Entdecke, was dich motiviert und inspiriert.",
-    "ikigai_desc": "Reflektiere über deine Leidenschaften und Stärken.",
-    "life_context_intro": "Beginne damit, deinen Lebenskontext, deine Werte und Ziele zu definieren.",
-    "life_context_desc": "Definiere deinen Hintergrund, deine Werte und Ziele.",
-    "edit_life_context": "Lebenskontext bearbeiten"
+    "go_back_home": "Zurück zur Startseite"
   }
 }

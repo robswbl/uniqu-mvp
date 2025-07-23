@@ -27,7 +27,7 @@
 	  },
 	  {
 		id: 'step2',
-		name: 'Step 2: Your Experience',
+		name: 'Step 2: Your Professional Experience',
 		questions: ['cv']
 	  },
 	  {
@@ -110,7 +110,7 @@
 		  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
 		  </svg>
-		  <span>Back to Dashboard</span>
+		  <span>{$t('questionnaire.back_to_dashboard')}</span>
 		</button>
 		
 		{#if hasUnsavedChanges}
@@ -118,7 +118,7 @@
 			<svg class="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
 			  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
 			</svg>
-			<span class="text-yellow-800 text-sm">You have unsaved changes</span>
+			<span class="text-yellow-800 text-sm">{$t('questionnaire.unsaved_changes')}</span>
 		  </div>
 		{/if}
 	  </div>
@@ -126,7 +126,7 @@
 	  {#if isLoading}
 		<div class="bg-white rounded-2xl shadow-xl p-8 text-center">
 		  <div class="animate-spin w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-		  <p class="text-gray-600">Loading your session...</p>
+		  <p class="text-gray-600">{$t('questionnaire.loading_session')}</p>
 		</div>
 	  {:else if sessionData}
 		<!-- Welcome Header -->
@@ -142,45 +142,8 @@
 		<!-- Progress Overview -->
 		<div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
 		  <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">{$t('questionnaire.progress_title')}</h2>
-		  
-		  <div class="flex justify-between items-center mb-8">
+		  <div class="flex justify-center items-center mb-8">
 			<!-- Step 1 -->
-			<div class="flex flex-col items-center flex-1">
-			  <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
-				{sessionData.cv_text ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}">
-				{#if sessionData.cv_text}
-				  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-				  </svg>
-				{:else}
-				  <span class="font-semibold">1</span>
-				{/if}
-			  </div>
-			  <span class="text-sm font-medium text-gray-600">{$t('questionnaire.progress_step1')}</span>
-			</div>
-			
-			<!-- Connection Line -->
-			<div class="flex-1 h-0.5 mx-4 {sessionData.cv_text ? 'bg-green-500' : 'bg-gray-200'}"></div>
-			
-			<!-- Step 2 -->
-			<div class="flex flex-col items-center flex-1">
-			  <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
-				{sessionData.ikigai_love ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}">
-				{#if sessionData.ikigai_love}
-				  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-				  </svg>
-				{:else}
-				  <span class="font-semibold">2</span>
-				{/if}
-			  </div>
-			  <span class="text-sm font-medium text-gray-600">{$t('questionnaire.progress_step2')}</span>
-			</div>
-			
-			<!-- Connection Line -->
-			<div class="flex-1 h-0.5 mx-4 {sessionData.ikigai_love ? 'bg-green-500' : 'bg-gray-200'}"></div>
-			
-			<!-- Step 3 -->
 			<div class="flex flex-col items-center flex-1">
 			  <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
 				{sessionData.goals ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}">
@@ -189,10 +152,40 @@
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
 				  </svg>
 				{:else}
+				  <span class="font-semibold">1</span>
+				{/if}
+			  </div>
+			  <span class="text-sm font-medium text-gray-600">{$t('questionnaire.life_context')}</span>
+			</div>
+			<div class="flex-1 h-0.5 mx-4 {sessionData.goals ? 'bg-green-500' : 'bg-gray-200'}"></div>
+			<!-- Step 2 -->
+			<div class="flex flex-col items-center flex-1">
+			  <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+				{sessionData.cv_text ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}">
+				{#if sessionData.cv_text}
+				  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+				  </svg>
+				{:else}
+				  <span class="font-semibold">2</span>
+				{/if}
+			  </div>
+			  <span class="text-sm font-medium text-gray-600">{$t('questionnaire.professional_experience')}</span>
+			</div>
+			<div class="flex-1 h-0.5 mx-4 {sessionData.cv_text ? 'bg-green-500' : 'bg-gray-200'}"></div>
+			<!-- Step 3 -->
+			<div class="flex flex-col items-center flex-1">
+			  <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+				{sessionData.ikigai_love ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}">
+				{#if sessionData.ikigai_love}
+				  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+				  </svg>
+				{:else}
 				  <span class="font-semibold">3</span>
 				{/if}
 			  </div>
-			  <span class="text-sm font-medium text-gray-600">{$t('questionnaire.progress_step3')}</span>
+			  <span class="text-sm font-medium text-gray-600">{$t('questionnaire.ikigai')}</span>
 			</div>
 		  </div>
 		</div>
@@ -200,27 +193,55 @@
 		<!-- Step Cards -->
 		<div class="grid md:grid-cols-3 gap-6 mb-8">
 		  
-		  <!-- Step 1: CV -->
+		  <!-- Step 1: Life Context -->
 		  <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
-			<div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
+			<div class="bg-gradient-to-r from-purple-500 to-pink-600 p-6">
 			  <div class="text-white">
 				<div class="flex items-center justify-between mb-2">
-				  <h3 class="text-lg font-semibold">{$t('questionnaire.step1_title')}</h3>
+				  <h3 class="text-lg font-semibold">{$t('questionnaire.life_context')}</h3>
+				  {#if sessionData.goals}
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+					</svg>
+				  {/if}
+				</div>
+				<p class="text-purple-100 text-sm">{$t('questionnaire.life_context_intro')}</p>
+			  </div>
+			</div>
+			<div class="p-6">
+			  <p class="text-gray-600 mb-4">
+				{$t('questionnaire.life_context_desc')}
+			  </p>
+			  <button 
+				on:click={() => goToStep('step1')}
+				class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
+			  >
+				{sessionData.goals ? $t('questionnaire.edit_life_context') : $t('questionnaire.start_here')}
+			  </button>
+			</div>
+		  </div>
+  
+		  <!-- Step 2: Professional Experience -->
+		  <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
+			<div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6">
+			  <div class="text-white">
+				<div class="flex items-center justify-between mb-2">
+				  <h3 class="text-lg font-semibold">{$t('questionnaire.professional_experience')}</h3>
 				  {#if sessionData.cv_text}
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
 					</svg>
 				  {/if}
 				</div>
-				<p class="text-blue-100 text-sm">{$t('questionnaire.step1_desc')}</p>
+				<p class="text-blue-100 text-sm">{$t('questionnaire.professional_experience_intro')}</p>
 			  </div>
 			</div>
 			<div class="p-6">
 			  <p class="text-gray-600 mb-4">
-				{$t('questionnaire.step1_instructions')}
+				{$t('questionnaire.professional_experience_desc')}
 			  </p>
 			  <button 
-				on:click={() => goToStep('step1')}
+				on:click={() => goToStep('step2')}
 				class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
 			  >
 				{sessionData.cv_text ? $t('questionnaire.edit_experience') : $t('questionnaire.start_here')}
@@ -228,62 +249,30 @@
 			</div>
 		  </div>
   
-		  <!-- Step 2: Ikigai -->
+		  <!-- Step 3: Ikigai -->
 		  <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
 			<div class="bg-gradient-to-r from-green-500 to-teal-600 p-6">
 			  <div class="text-white">
 				<div class="flex items-center justify-between mb-2">
-				  <h3 class="text-lg font-semibold">{$t('questionnaire.step2_title')}</h3>
+				  <h3 class="text-lg font-semibold">{$t('questionnaire.ikigai')}</h3>
 				  {#if sessionData.ikigai_love}
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
 					</svg>
 				  {/if}
 				</div>
-				<p class="text-green-100 text-sm">{$t('questionnaire.step2_desc')}</p>
+				<p class="text-green-100 text-sm">{$t('questionnaire.ikigai_intro')}</p>
 			  </div>
 			</div>
 			<div class="p-6">
 			  <p class="text-gray-600 mb-4">
-				{$t('questionnaire.step2_instructions')}
-			  </p>
-			  <button 
-				on:click={() => goToStep('step2')}
-				class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors {isStep1Started() ? '' : 'opacity-50 pointer-events-none cursor-not-allowed'}"
-				disabled={!isStep1Started()}
-				title={!isStep1Started() ? 'Complete Step 1 first.' : ''}
-			  >
-				{sessionData.ikigai_love ? $t('questionnaire.edit_ikigai') : isStep1Started() ? $t('questionnaire.continue') : $t('questionnaire.complete_step1_first')}
-			  </button>
-			</div>
-		  </div>
-  
-		  <!-- Step 3: Goals -->
-		  <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow">
-			<div class="bg-gradient-to-r from-purple-500 to-pink-600 p-6">
-			  <div class="text-white">
-				<div class="flex items-center justify-between mb-2">
-				  <h3 class="text-lg font-semibold">{$t('questionnaire.step3_title')}</h3>
-				  {#if sessionData.goals}
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-					</svg>
-				  {/if}
-				</div>
-				<p class="text-purple-100 text-sm">{$t('questionnaire.step3_desc')}</p>
-			  </div>
-			</div>
-			<div class="p-6">
-			  <p class="text-gray-600 mb-4">
-				{$t('questionnaire.step3_instructions')}
+				{$t('questionnaire.ikigai_desc')}
 			  </p>
 			  <button 
 				on:click={() => goToStep('step3')}
-				class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors {isStep2Started() ? '' : 'opacity-50 pointer-events-none cursor-not-allowed'}"
-				disabled={!isStep2Started()}
-				title={!isStep2Started() ? 'Complete Step 2 first.' : ''}
+				class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
 			  >
-				{sessionData.goals ? $t('questionnaire.edit_goals') : isStep2Started() ? $t('questionnaire.continue') : $t('questionnaire.complete_step2_first')}
+				{sessionData.ikigai_love ? $t('questionnaire.edit_ikigai') : $t('questionnaire.start_here')}
 			  </button>
 			</div>
 		  </div>

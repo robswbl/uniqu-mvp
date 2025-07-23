@@ -475,6 +475,19 @@
     "time_and_privacy": "This process takes about 10-15 minutes. Your data is secure and confidential.",
     "session_for": "Session for {email}",
     "session_not_found": "Session not found.",
-    "go_back_home": "Go Back Home"
+    "go_back_home": "Go Back Home",
+    "back_to_dashboard": "Back to Dashboard",
+    "unsaved_changes": "You have unsaved changes",
+    "loading_session": "Loading your session...",
+    "life_context": "Your Life Context",
+    "professional_experience": "Your Professional Experience",
+    "professional_experience_intro": "Tell us about your experience and background.",
+    "professional_experience_desc": "Start by entering your CV details.",
+    "ikigai": "Your Ikigai",
+    "ikigai_intro": "Discover what motivates and inspires you.",
+    "ikigai_desc": "Reflect on your passions and strengths.",
+    "life_context_intro": "Start by defining your life context, values, and goals.",
+    "life_context_desc": "Define your background, values, and aspirations.",
+    "edit_life_context": "Edit Life Context"
   }
 } 

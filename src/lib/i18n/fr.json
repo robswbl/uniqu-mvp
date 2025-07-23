@@ -271,7 +271,8 @@
       "emotional_bullet2": "It's normal to have mixed emotions during transitions.",
       "emotional_bullet3": "Naming your feelings can help you move forward with clarity.",
       "emotional_placeholder": "Excited, uncertain, ready for change? Share your current emotional state...",
-      "continue_to_step2": "Continue to Step 2"
+      "continue_to_step2": "Continue to Step 2",
+      "continue_to_step3": "Step 3"
     },
     "goals": {
       "title": "Your Career Goals",
@@ -308,6 +309,17 @@
       "saving": "Saving...",
       "saved": "Saved ✓",
       "error_saving": "Error saving"
+    },
+    "doubts_barriers": {
+      "title": "Doubts & Barriers",
+      "explainer": "Be honest about your concerns:",
+      "textarea_placeholder": "What concerns or obstacles are you thinking about regarding your career path?"
+    },
+    "emotional_landscape": {
+      "title": "How are you feeling about your journey?",
+      "explainer": "Check in with yourself:",
+      "textarea_placeholder": "Excited, uncertain, ready for change? Share your current emotional state...",
+      "continue_to_step2": "Continue to Step 2"
     }
   },
   "step2": {
@@ -388,6 +400,13 @@
       "inspiration_examples": "Examples: I want to be known as someone who lifts others up. I hope to inspire my children to follow their dreams. I want to be a leader who brings out the best in my team.",
       "textarea_placeholder": "Who do you want to become? What impact do you want to have?",
       "finish": "Finish"
+    },
+    "generate": {
+      "title": "Congratulations!",
+      "congrats_heading": "You’ve completed Step 3!",
+      "congrats_text": "You’ve finished the Ikigai reflection. You’re ready to generate your personalized career documents.",
+      "next_chapter": "Ready for the next chapter?",
+      "generate_now": "Generate Now"
     }
   },
   "dashboard": {
@@ -429,33 +448,26 @@
     "go_back_home": "Go Back Home"
   },
   "questionnaire": {
-    "welcome_heading": "Welcome to your questionnaire!",
-    "welcome_subheading": "Let's get started on your personalized career journey.",
-    "progress_title": "Your Progress",
-    "progress_step1": "Step 1: CV",
-    "progress_step2": "Step 2: Ikigai",
-    "progress_step3": "Step 3: Goals",
-    "step1_title": "Step 1: CV",
-    "step1_desc": "Tell us about your experience and background.",
-    "step1_instructions": "Start by entering your CV details.",
-    "edit_experience": "Edit Experience",
-    "start_here": "Start Here",
-    "step2_title": "Step 2: Ikigai",
-    "step2_desc": "Discover what motivates and inspires you.",
-    "step2_instructions": "Reflect on your passions and strengths.",
-    "edit_ikigai": "Edit Ikigai",
-    "continue": "Continue",
-    "complete_step1_first": "Complete Step 1 first.",
-    "step3_title": "Step 3: Goals",
-    "step3_desc": "Set your career goals and aspirations.",
-    "step3_instructions": "Define your next steps.",
-    "edit_goals": "Edit Goals",
-    "complete_step2_first": "Complete Step 2 first.",
-    "how_it_works": "How it works",
-    "how_it_works_desc": "Answer each section honestly. Your answers are private and help us generate the best results for you.",
-    "time_and_privacy": "This process takes about 10-15 minutes. Your data is secure and confidential.",
-    "session_for": "Session for {email}",
-    "session_not_found": "Session not found.",
-    "go_back_home": "Go Back Home"
+    "back_to_dashboard": "Retour au tableau de bord",
+    "unsaved_changes": "Vous avez des modifications non enregistrées",
+    "loading_session": "Chargement de votre session...",
+    "life_context": "Votre contexte de vie",
+    "professional_experience": "Votre expérience professionnelle",
+    "ikigai": "Votre Ikigai",
+    "life_context_intro": "Commencez par définir votre contexte de vie, vos valeurs et vos objectifs.",
+    "life_context_desc": "Définissez votre parcours, vos valeurs et vos aspirations.",
+    "edit_life_context": "Modifier le contexte de vie",
+    "start_here": "Commencer ici",
+    "professional_experience_intro": "Parlez-nous de votre expérience et de votre parcours.",
+    "professional_experience_desc": "Commencez par saisir les détails de votre CV.",
+    "edit_experience": "Modifier l'expérience",
+    "ikigai_intro": "Découvrez ce qui vous motive et vous inspire.",
+    "ikigai_desc": "Réfléchissez à vos passions et à vos forces.",
+    "edit_ikigai": "Modifier Ikigai",
+    "how_it_works": "Comment ça marche",
+    "how_it_works_desc": "Voici comment cela fonctionne...",
+    "session_for": "Votre session est pour {email}",
+    "session_not_found": "Session non trouvée.",
+    "go_back_home": "Retour à l'accueil"
   }
 }

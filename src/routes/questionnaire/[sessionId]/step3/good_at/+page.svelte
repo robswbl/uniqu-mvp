@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import QuestionCard from '$lib/QuestionCard.svelte';
   import { get } from 'svelte/store';
+  import { t } from 'svelte-i18n';
 
   const sessionId = $page.params.sessionId;
   let ikigaiGoodAt = '';
@@ -64,33 +65,33 @@
 </script>
 
 <svelte:head>
-  <title>Step 3: What are you great at? - Ikigai</title>
+  <title>{$t('step3.good_at.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <QuestionCard
-  stepHeading="Step 3: Discover Your Ikigai"
-  title="What are you great at?"
+  stepHeading={$t('step3.good_at.step_heading')}
+  title={$t('step3.good_at.title')}
   emoji="⭐"
-  explainer="💡 Need inspiration?"
+  explainer={$t('step3.good_at.explainer')}
   explainerColor="blue"
-  textareaPlaceholder="What are your natural talents and developed skills?"
+  textareaPlaceholder={$t('step3.good_at.textarea_placeholder')}
   bind:textareaValue={ikigaiGoodAt}
   saveStatus={saveStatus}
   onInput={handleInput}
   onNext={goToNext}
   onBack={goToBack}
-  nextLabel="Next"
-  backLabel="Back"
+  nextLabel={$t('buttons.next')}
+  backLabel={$t('buttons.back')}
   disabled={isSaving}
 >
   <div class="mb-4">
     <button type="button" class="text-sm text-blue-700 underline" on:click={() => showInspiration = !showInspiration}>
-      {showInspiration ? 'Hide inspiration' : 'Show inspiration'}
+      {showInspiration ? $t('step3.good_at.hide_inspiration') : $t('step3.good_at.show_inspiration')}
     </button>
     {#if showInspiration}
       <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 space-y-3 mt-2">
-        <p class="text-gray-600 text-sm">What activities flow naturally? What skills have you developed? When do people turn to you for help or advice? Think about tasks where you've been complimented or recognized.</p>
-        <p class="text-gray-500 text-xs italic">Examples: People ask me for guidance on tech... I'm known for keeping houseplants healthy. Friends come to me for relationship advice.</p>
+        <p class="text-gray-600 text-sm">{$t('step3.good_at.inspiration_text')}</p>
+        <p class="text-gray-500 text-xs italic">{$t('step3.good_at.inspiration_examples')}</p>
       </div>
     {/if}
   </div>

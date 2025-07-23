@@ -5,6 +5,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/supabaseClient.js';
+	import { t } from 'svelte-i18n';
 
 	let sessionId = $page.params.sessionId;
 	let documents = [];
@@ -18,22 +19,22 @@
 	const documentOrder = [
 		{
 			type: 'reflection_letter',
-			title: 'REFLECTION LETTER',
-			description: 'Your personalized reflection and motivation letter based on your career assessment.',
+			title: $t('results.reflection_letter_title'),
+			description: $t('results.reflection_letter_desc'),
 			icon: '📝',
 			color: 'from-purple-500 to-pink-500'
 		},
 		{
 			type: 'career_themes',
-			title: 'Career Themes',
-			description: 'Key themes and insights about your ideal career path and working style.',
+			title: $t('results.career_themes_title'),
+			description: $t('results.career_themes_desc'),
 			icon: '🎯',
 			color: 'from-blue-500 to-indigo-500'
 		},
 		{
 			type: 'ideal_companies',
-			title: 'IDEAL COMPANIES',
-			description: 'View this generated document based on your career assessment.',
+			title: $t('results.ideal_companies_title'),
+			description: $t('results.ideal_companies_desc'),
 			icon: '🏢',
 			color: 'from-green-500 to-emerald-500'
 		}
@@ -130,14 +131,14 @@
 		if (doc) {
 			return {
 				ready: true,
-				status: 'Ready',
+				status: $t('results.status_ready'),
 				statusColor: 'text-green-600',
 				document: doc
 			};
 		} else {
 			return {
 				ready: false,
-				status: 'Generating...',
+				status: $t('results.status_generating'),
 				statusColor: 'text-blue-600',
 				document: null
 			};
@@ -225,7 +226,7 @@
 </script>
 
 <svelte:head>
-	<title>Your Career Analysis Results - UniqU</title>
+	<title>{$t('results.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
@@ -242,13 +243,13 @@
 				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
 				</svg>
-				Back to Dashboard
+				{$t('results.back_to_dashboard')}
 			</button>
 			
 			<h1 class="text-3xl font-bold text-gray-900 mb-2">
-				{userFirstName ? `${userFirstName}, here are your Career Analysis Results` : 'Your Career Analysis Results'}
+				{userFirstName ? `${userFirstName}, ${$t('results.heading_with_name')}` : $t('results.heading')}
 			</h1>
-			<p class="text-gray-600">View and download your personalized career guidance documents</p>
+			<p class="text-gray-600">{$t('results.subheading')}</p>
 		</div>
 
 		{#if loading}
@@ -257,7 +258,7 @@
 			</div>
 		{:else if error}
 			<div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-				<h3 class="text-lg font-semibold text-red-800 mb-2">Error Loading Results</h3>
+				<h3 class="text-lg font-semibold text-red-800 mb-2">{$t('results.error_loading')}</h3>
 				<p class="text-red-600">{error}</p>
 				<button 
 					on:click={fetchDocuments}
@@ -265,7 +266,7 @@
 					type="button"
 					aria-label="Try Again"
 				>
-					Try Again
+					{$t('results.try_again')}
 				</button>
 			</div>
 		{:else}
@@ -276,8 +277,8 @@
 					<div class="flex items-center space-x-3">
 						<div class="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
 						<div>
-							<h3 class="text-blue-900 font-medium">Analysis in Progress</h3>
-							<p class="text-blue-800 text-sm">Some documents are still being generated. This page will auto-refresh.</p>
+							<h3 class="text-blue-900 font-medium">{$t('results.analysis_in_progress')}</h3>
+							<p class="text-blue-800 text-sm">{$t('results.analysis_in_progress_desc')}</p>
 						</div>
 					</div>
 				</div>
@@ -299,13 +300,13 @@
 								
 								{#if docStatus.ready}
 									<span class="bg-white bg-opacity-90 text-gray-800 text-xs px-3 py-1 rounded-full font-medium">
-										Ready
+										{$t('results.status_ready')}
 									</span>
 								{:else}
 									<div class="flex items-center space-x-2">
 										<div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
 										<span class="bg-white bg-opacity-90 text-gray-800 text-xs px-3 py-1 rounded-full font-medium">
-											Generating...
+											{$t('results.status_generating')}
 										</span>
 									</div>
 								{/if}
@@ -317,7 +318,7 @@
 							{#if docStatus.ready}
 								<p class="text-gray-600 text-sm mb-4">{docInfo.description}</p>
 								<p class="text-xs text-gray-500 mb-4">
-									Generated {new Date(docStatus.document.created_at).toLocaleString()}
+									{$t('results.generated_at')} {new Date(docStatus.document.created_at).toLocaleString()}
 								</p>
 								
 								<button 
@@ -326,7 +327,7 @@
 									type="button"
 									aria-label="View {docInfo.title}"
 								>
-									<span>View Document</span>
+									<span>{$t('results.view_document')}</span>
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
 									</svg>
@@ -336,9 +337,9 @@
 								<div class="bg-blue-50 rounded-lg p-4">
 									<div class="flex items-center space-x-2 mb-2">
 										<div class="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-										<span class="text-blue-800 text-sm font-medium">AI is generating this document...</span>
+										<span class="text-blue-800 text-sm font-medium">{$t('results.ai_generating')}</span>
 									</div>
-									<p class="text-blue-700 text-xs">This typically takes 30-60 seconds to complete.</p>
+									<p class="text-blue-700 text-xs">{$t('results.ai_generating_time')}</p>
 								</div>
 							{/if}
 						</div>
@@ -353,8 +354,8 @@
 						<div class="flex items-center space-x-3">
 							<span class="text-2xl">💌</span>
 							<div>
-								<h3 class="text-xl font-semibold text-gray-900">Application Letters</h3>
-								<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">New</span>
+								<h3 class="text-xl font-semibold text-gray-900">{$t('results.application_letters_title')}</h3>
+								<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">{$t('results.new')}</span>
 							</div>
 						</div>
 						
@@ -364,7 +365,7 @@
 							type="button"
 							aria-label="Manage and Generate Application Letters"
 						>
-							<span>Manage & Generate Letters</span>
+							<span>{$t('results.manage_generate_letters')}</span>
 							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
 							</svg>
@@ -372,15 +373,15 @@
 					</div>
 					
 					<p class="text-gray-600 text-sm mb-4">
-						Generate personalized application letters for companies that match your profile.
+						{$t('results.application_letters_desc')}
 					</p>
 					
 					<div class="bg-indigo-50 rounded-lg p-4">
-						<h4 class="text-indigo-900 font-medium text-sm mb-2">✨ What you can do:</h4>
+						<h4 class="text-indigo-900 font-medium text-sm mb-2">{$t('results.what_you_can_do')}</h4>
 						<ul class="text-indigo-800 text-sm space-y-1">
-							<li>• Create custom letters for specific companies</li>
-							<li>• Track application status and follow-ups</li>
-							<li>• Use AI to tailor letters to company needs</li>
+							<li>• {$t('results.create_custom_letters')}</li>
+							<li>• {$t('results.track_status')}</li>
+							<li>• {$t('results.use_ai')}</li>
 						</ul>
 					</div>
 				</div>
@@ -390,14 +391,14 @@
 					<div class="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
 						<span class="text-2xl opacity-50">💌</span>
 					</div>
-					<h3 class="text-lg font-semibold text-gray-500 mb-2">Application Letters</h3>
+					<h3 class="text-lg font-semibold text-gray-500 mb-2">{$t('results.application_letters_title')}</h3>
 					<p class="text-gray-400 text-sm">
-						Available after your career analysis documents are complete
+						{$t('results.application_letters_available_after')}
 					</p>
 					<div class="mt-4">
 						<div class="inline-flex items-center space-x-2 text-gray-400 text-xs">
 							<div class="animate-spin rounded-full h-3 w-3 border border-gray-400 border-t-transparent"></div>
-							<span>Waiting for main documents...</span>
+							<span>{$t('results.waiting_for_main_documents')}</span>
 						</div>
 					</div>
 				</div>
@@ -412,7 +413,7 @@
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
 							</svg>
 						</div>
-						<h3 class="text-xl font-semibold text-gray-900">Additional Actions</h3>
+						<h3 class="text-xl font-semibold text-gray-900">{$t('results.additional_actions')}</h3>
 					</div>
 				</div>
 				
@@ -432,8 +433,8 @@
 							</svg>
 						</div>
 						<div class="text-left">
-							<div class="font-medium text-gray-900">Dashboard</div>
-							<div class="text-xs text-gray-700">View profile summary</div>
+							<div class="font-medium text-gray-900">{$t('results.dashboard')}</div>
+							<div class="text-xs text-gray-700">{$t('results.dashboard_desc')}</div>
 						</div>
 					</button>
 
@@ -450,8 +451,8 @@
 							</svg>
 						</div>
 						<div class="text-left">
-							<div class="font-medium text-orange-900">Update Profile</div>
-							<div class="text-xs text-orange-700">Edit responses & regenerate</div>
+							<div class="font-medium text-orange-900">{$t('results.update_profile')}</div>
+							<div class="text-xs text-orange-700">{$t('results.update_profile_desc')}</div>
 						</div>
 					</button>
 
@@ -468,15 +469,15 @@
 							</svg>
 						</div>
 						<div class="text-left">
-							<div class="font-medium text-blue-900">Refresh</div>
-							<div class="text-xs text-blue-700">Check for new documents</div>
+							<div class="font-medium text-blue-900">{$t('results.refresh')}</div>
+							<div class="text-xs text-blue-700">{$t('results.refresh_desc')}</div>
 						</div>
 					</button>
 				</div>
 
 				<!-- Bottom Row: Coming Soon Features -->
 				<div class="mt-4 pt-4 border-t border-gray-200">
-					<h4 class="text-sm font-medium text-gray-500 mb-3">Coming Soon</h4>
+					<h4 class="text-sm font-medium text-gray-500 mb-3">{$t('results.coming_soon')}</h4>
 					<div class="grid md:grid-cols-3 gap-4">
 						<!-- Download All (Coming Soon) -->
 						<button 
@@ -491,9 +492,9 @@
 								</svg>
 							</div>
 							<div class="text-left">
-								<div class="font-medium text-gray-600">Download All</div>
-								<div class="text-xs text-gray-500">Save all documents</div>
-								<div class="text-xs text-blue-600 font-medium mt-1">Coming Soon</div>
+								<div class="font-medium text-gray-600">{$t('results.download_all')}</div>
+								<div class="text-xs text-gray-500">{$t('results.download_all_desc')}</div>
+								<div class="text-xs text-blue-600 font-medium mt-1">{$t('results.coming_soon_label')}</div>
 							</div>
 						</button>
 
@@ -510,9 +511,9 @@
 								</svg>
 							</div>
 							<div class="text-left">
-								<div class="font-medium text-gray-600">Share Results</div>
-								<div class="text-xs text-gray-500">Share with others</div>
-								<div class="text-xs text-blue-600 font-medium mt-1">Coming Soon</div>
+								<div class="font-medium text-gray-600">{$t('results.share_results')}</div>
+								<div class="text-xs text-gray-500">{$t('results.share_results_desc')}</div>
+								<div class="text-xs text-blue-600 font-medium mt-1">{$t('results.coming_soon_label')}</div>
 							</div>
 						</button>
 
@@ -529,9 +530,9 @@
 								</svg>
 							</div>
 							<div class="text-left">
-								<div class="font-medium text-gray-600">Help</div>
-								<div class="text-xs text-gray-500">Get support</div>
-								<div class="text-xs text-blue-600 font-medium mt-1">Coming Soon</div>
+								<div class="font-medium text-gray-600">{$t('results.help')}</div>
+								<div class="text-xs text-gray-500">{$t('results.help_desc')}</div>
+								<div class="text-xs text-blue-600 font-medium mt-1">{$t('results.coming_soon_label')}</div>
 							</div>
 						</button>
 					</div>

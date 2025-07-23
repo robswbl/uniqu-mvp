@@ -5,6 +5,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/supabaseClient.js';
+	import { t } from 'svelte-i18n';
 
 	let sessionId = $page.params.sessionId;
 	let timeElapsed = 0;
@@ -159,7 +160,7 @@
 </script>
 
 <svelte:head>
-	<title>Generating Your Career Analysis - UniqU</title>
+	<title>{$t('generating.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -175,11 +176,11 @@
 
 		<!-- Heading -->
 		<h1 class="text-4xl font-bold text-gray-900 mb-4">
-			🚀 Generating Your Career Analysis
+			🚀 {$t('generating.heading')}
 		</h1>
 		
 		<p class="text-xl text-gray-600 mb-8">
-			Our AI is analyzing your responses and creating personalized career guidance documents...
+			{$t('generating.description')}
 		</p>
 
 		<!-- Timer -->
@@ -191,19 +192,19 @@
 				<span class="text-2xl font-mono font-bold text-gray-900">{formatTime(timeElapsed)}</span>
 			</div>
 			<p class="text-sm text-gray-600">
-				Analysis typically takes one to two minutes to complete
+				{$t('generating.analysis_time')}
 			</p>
 		</div>
 
 		<!-- Progress Indicator -->
 		<div class="bg-white rounded-xl shadow-lg p-6 mb-8">
-			<h3 class="text-lg font-semibold text-gray-900 mb-4">Documents Being Generated</h3>
+			<h3 class="text-lg font-semibold text-gray-900 mb-4">{$t('generating.documents_being_generated')}</h3>
 			
 			<!-- Early Reading Message -->
 			{#if totalDocuments > 0 && totalDocuments < 3}
 				<div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
 					<p class="text-sm text-blue-800">
-						💡 <strong>Don't want to wait?</strong> You can start reading the completed documents below while the others finish generating!
+						💡 <strong>{$t('generating.early_reading_strong')}</strong> {$t('generating.early_reading_message')}
 					</p>
 				</div>
 			{/if}
@@ -218,11 +219,11 @@
 							</svg>
 						</div>
 						<a href="/results/{sessionId}/reflection_letter" class="text-green-700 font-medium hover:text-green-800 transition-colors cursor-pointer">
-							📝 Reflection Letter - Complete! (Click to read)
+							📝 {$t('document.reflection_letter')} - {$t('generating.complete_click_to_read')}
 						</a>
 					{:else}
 						<div class="w-6 h-6 border-2 border-gray-300 rounded-full animate-pulse"></div>
-						<span class="text-gray-600">📝 Reflection Letter - Generating...</span>
+						<span class="text-gray-600">📝 {$t('document.reflection_letter')} - {$t('generating.generating')}</span>
 					{/if}
 				</div>
 
@@ -235,11 +236,11 @@
 							</svg>
 						</div>
 						<a href="/results/{sessionId}/career_themes" class="text-green-700 font-medium hover:text-green-800 transition-colors cursor-pointer">
-							🎯 Career Themes - Complete! (Click to read)
+							🎯 {$t('document.career_themes')} - {$t('generating.complete_click_to_read')}
 						</a>
 					{:else}
 						<div class="w-6 h-6 border-2 border-gray-300 rounded-full animate-pulse"></div>
-						<span class="text-gray-600">🎯 Career Themes - Generating...</span>
+						<span class="text-gray-600">🎯 {$t('document.career_themes')} - {$t('generating.generating')}</span>
 					{/if}
 				</div>
 
@@ -252,11 +253,11 @@
 							</svg>
 						</div>
 						<a href="/results/{sessionId}/ideal_companies" class="text-green-700 font-medium hover:text-green-800 transition-colors cursor-pointer">
-							🏢 Ideal Companies - Complete! (Click to read)
+							🏢 {$t('document.ideal_companies')} - {$t('generating.complete_click_to_read')}
 						</a>
 					{:else}
 						<div class="w-6 h-6 border-2 border-gray-300 rounded-full animate-pulse"></div>
-						<span class="text-gray-600">🏢 Ideal Companies - Generating...</span>
+						<span class="text-gray-600">🏢 {$t('document.ideal_companies')} - {$t('generating.generating')}</span>
 					{/if}
 				</div>
 			</div>
@@ -264,8 +265,8 @@
 			<!-- Progress Bar -->
 			<div class="mt-6">
 				<div class="flex justify-between text-sm text-gray-600 mb-2">
-					<span>Progress</span>
-					<span>{totalDocuments}/3 documents complete</span>
+					<span>{$t('generating.progress')}</span>
+					<span>{totalDocuments}/3 {$t('generating.documents_complete')}</span>
 				</div>
 				<div class="w-full bg-gray-200 rounded-full h-2">
 					<div 
@@ -278,11 +279,11 @@
 
 		<!-- What Happens Next -->
 		<div class="bg-indigo-50 rounded-xl p-6">
-			<h3 class="text-lg font-semibold text-indigo-900 mb-3">What happens next?</h3>
+			<h3 class="text-lg font-semibold text-indigo-900 mb-3">{$t('generating.what_happens_next')}</h3>
 			<div class="text-sm text-indigo-800 space-y-2">
-				<p>✨ Once all <strong>3 documents</strong> are ready, you'll be automatically redirected to view your complete analysis</p>
-				<p>📊 Documents are generated in parallel, so they may complete in any order</p>
-				<p>💌 You can then create personalized application letters for specific companies</p>
+				<p>✨ {$t('generating.auto_redirect')}</p>
+				<p>📊 {$t('generating.parallel_generation')}</p>
+				<p>💌 {$t('generating.create_application_letters')}</p>
 			</div>
 		</div>
 
@@ -293,7 +294,7 @@
 				class="text-indigo-600 hover:text-indigo-800 text-sm transition-colors"
 				type="button"
 			>
-				Having issues? Skip to results →
+				{$t('generating.skip_to_results')}
 			</button>
 		</div>
 	</div>

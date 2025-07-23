@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import QuestionCard from '$lib/QuestionCard.svelte';
   import { get } from 'svelte/store';
+  import { t } from 'svelte-i18n';
 
   const sessionId = $page.params.sessionId;
 
@@ -81,23 +82,23 @@
 </script>
 
 <svelte:head>
-  <title>Step 1: Your Life Context - UniqU</title>
+  <title>{$t('step1.life_context.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <QuestionCard
-  stepHeading="Step 1: Your Current Situation"
-  title="Your Life Context"
+  stepHeading={$t('step1.life_context.step_heading')}
+  title={$t('step1.life_context.title')}
   emoji="🌟"
-  explainer="Share any relevant context:"
+  explainer={$t('step1.life_context.explainer')}
   explainerColor="green"
-  explainerBullets={["Current life stage and priorities", "Geographic preferences or constraints", "Family considerations or other commitments"]}
-  textareaPlaceholder="Tell us about your current life situation and any important context..."
+  explainerBullets={[$t('step1.life_context.bullet1'), $t('step1.life_context.bullet2'), $t('step1.life_context.bullet3')]}
+  textareaPlaceholder={$t('step1.life_context.textarea_placeholder')}
   bind:textareaValue={lifeContext}
   saveStatus={saveStatus}
   onInput={handleInput}
   onNext={goToNext}
   onBack={goToBack}
-  nextLabel="Next"
-  backLabel="Back"
+  nextLabel={$t('buttons.next')}
+  backLabel={$t('buttons.back')}
   disabled={isSaving}
 /> 

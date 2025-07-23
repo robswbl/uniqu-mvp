@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import QuestionCard from '$lib/QuestionCard.svelte';
 	import { get } from 'svelte/store';
+	import { t } from 'svelte-i18n';
 
 	const sessionId = $page.params.sessionId;
 
@@ -80,23 +81,23 @@
 </script>
 
 <svelte:head>
-	<title>Step 1: Your Personality & Values - UniqU</title>
+	<title>{$t('step1.personality_values.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <QuestionCard
-	stepHeading="Step 1: Your Current Situation"
-	title="Your Personality & Values"
+	stepHeading={$t('step1.personality_values.step_heading')}
+	title={$t('step1.personality_values.title')}
 	emoji="💎"
-	explainer="Consider:"
+	explainer={$t('step1.personality_values.explainer')}
 	explainerColor="blue"
-	explainerBullets={["How do you prefer to work? (independently, in teams, etc.)", "What values are most important to you?", "What kind of work environment brings out your best?"]}
-	textareaPlaceholder="Tell us about your personality, work style, and core values..."
+	explainerBullets={[$t('step1.personality_values.bullet1'), $t('step1.personality_values.bullet2'), $t('step1.personality_values.bullet3')]}
+	textareaPlaceholder={$t('step1.personality_values.textarea_placeholder')}
 	bind:textareaValue={personalityValues}
 	saveStatus={saveStatus}
 	onInput={handleInput}
 	onNext={goToNext}
-	nextLabel="Next"
-	backLabel="Back"
+	nextLabel={$t('buttons.next')}
+	backLabel={$t('buttons.back')}
 	onBack={goToBack}
 	disabled={isSaving}
 /> 

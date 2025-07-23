@@ -1,0 +1,24 @@
+{
+  "app": {
+    "title": "UniqU",
+    "subtitle": "Tu viaje profesional personalizado comienza aquí."
+  },
+  "onboarding": {
+    "welcome": "¡Bienvenido a UniqU, {name}!",
+    "question": "¿Dónde te encuentras ahora?",
+    "option_laid_off": "Me acaban de despedir",
+    "option_quit": "Renuncié a mi trabajo",
+    "option_career_change": "Quiero cambiar de carrera",
+    "option_retirement": "Estoy cerca de la jubilación",
+    "option_burnout": "Me siento agotado y necesito dirección",
+    "option_other": "Otra cosa"
+  },
+  "buttons": {
+    "next": "Siguiente",
+    "back": "Atrás",
+    "generate": "Generar",
+    "download": "Descargar",
+    "open": "Abrir",
+    "delete": "Eliminar"
+  }
+} 

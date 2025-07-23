@@ -6,6 +6,7 @@
   import { goto } from '$app/navigation';
   import './document-content.css';
   import { get } from 'svelte/store';
+  import { t } from 'svelte-i18n';
 
   const sessionId = $page.params.sessionId;
   const documentType = $page.params.documentType;
@@ -46,23 +47,23 @@
 
   function getDocumentTitle(type: string): string {
     switch(type) {
-      case 'reflection_letter': return 'Personal Reflection';
-      case 'career_themes': return 'Career Themes';
-      case 'ideal_companies': return 'Ideal Companies';
-      case 'matching_companies': return 'Matching Companies';
-      case 'application_letter': return 'Application Letter';
+      case 'reflection_letter': return $t('document.reflection_letter');
+      case 'career_themes': return $t('document.career_themes');
+      case 'ideal_companies': return $t('document.ideal_companies');
+      case 'matching_companies': return $t('document.matching_companies');
+      case 'application_letter': return $t('document.application_letter');
       default: return type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
   }
 
   function getDocumentDescription(type: string): string {
     switch(type) {
-      case 'reflection_letter': return 'Your personalized career reflection and insights';
-      case 'career_themes': return 'Key themes and patterns identified in your career path';
-      case 'ideal_companies': return 'Companies that align with your values and goals';
-      case 'matching_companies': return 'Companies that match your profile and interests';
-      case 'application_letter': return 'Your personalized application letter';
-      default: return 'Career analysis document';
+      case 'reflection_letter': return $t('document.reflection_letter_desc');
+      case 'career_themes': return $t('document.career_themes_desc');
+      case 'ideal_companies': return $t('document.ideal_companies_desc');
+      case 'matching_companies': return $t('document.matching_companies_desc');
+      case 'application_letter': return $t('document.application_letter_desc');
+      default: return $t('document.default_desc');
     }
   }
 
@@ -112,7 +113,7 @@
 </script>
 
 <svelte:head>
-  <title>{getDocumentTitle(documentType)} - UniqU</title>
+  <title>{getDocumentTitle(documentType)} - {$t('app.title')}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
@@ -128,7 +129,7 @@
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
-        Back to Results
+        {$t('document.back_to_results')}
       </button>
       <div class="flex items-center justify-between">
         <div>
@@ -181,7 +182,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-4-4m4 4l4-4m-6 4h8a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2h8"/>
             </svg>
-            <span>Download</span>
+            <span>{$t('buttons.download')}</span>
           </button>
         </div>
       </div>
@@ -189,29 +190,29 @@
       <!-- Explore More Section -->
       {#if !fromOnboarding}
       <div class="mt-6 bg-white rounded-xl shadow-lg p-6 text-center">
-        <h3 class="text-lg font-semibold text-gray-800 mb-2">✨ Explore More</h3>
-        <p class="text-gray-600 mb-4 text-sm">Check out your other career insights or update your profile for fresh perspectives.</p>
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">✨ {$t('document.explore_more')}</h3>
+        <p class="text-gray-600 mb-4 text-sm">{$t('document.explore_more_desc')}</p>
         <div class="flex justify-center space-x-3 flex-wrap gap-y-2">
           <button 
             on:click={() => goto(`/results/${sessionId}`)}
             class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm"
             type="button"
           >
-            View All Results
+            {$t('document.view_all_results')}
           </button>
           <button 
             on:click={() => goto(`/questionnaire/${sessionId}`)}
             class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm"
             type="button"
           >
-            Update Profile
+            {$t('document.update_profile')}
           </button>
           <button 
             on:click={() => goto(`/dashboard/${sessionId}`)}
             class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors font-medium text-sm"
             type="button"
           >
-            Dashboard
+            {$t('document.dashboard')}
           </button>
         </div>
       </div>
@@ -219,15 +220,15 @@
       <div class="mt-8 flex justify-center">
         {#if documentType === 'reflection_letter'}
           <button on:click={() => goto(`/results/${sessionId}/career_themes${fromOnboarding ? '?from=onboarding' : ''}`)} class="px-8 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:from-pink-600 hover:to-orange-600 transition-colors text-lg">
-            Reveal Next Insight
+            {$t('document.reveal_next_insight')}
           </button>
         {:else if documentType === 'career_themes'}
           <button on:click={() => goto(`/results/${sessionId}/ideal_companies${fromOnboarding ? '?from=onboarding' : ''}`)} class="px-8 py-3 bg-gradient-to-r from-pink-500 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:from-pink-600 hover:to-orange-600 transition-colors text-lg">
-            Reveal Final Suggestion
+            {$t('document.reveal_final_suggestion')}
           </button>
         {:else if documentType === 'ideal_companies'}
           <button on:click={() => goto(`/results/${sessionId}/next-steps${fromOnboarding ? '?from=onboarding' : ''}`)} class="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-600 hover:to-purple-600 transition-colors text-lg">
-            See What Happens Next
+            {$t('document.see_what_happens_next')}
           </button>
         {/if}
       </div>
@@ -238,9 +239,9 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
           </svg>
         </div>
-        <h2 class="text-xl font-semibold text-gray-800 mb-2">Document Not Found</h2>
+        <h2 class="text-xl font-semibold text-gray-800 mb-2">{$t('document.not_found')}</h2>
         <p class="text-red-500 text-lg mb-4">
-          The requested document could not be found. It may still be processing or there was an error generating it.
+          {$t('document.not_found_desc')}
         </p>
         <div class="flex justify-center space-x-4">
           <button 
@@ -248,14 +249,14 @@
             class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold"
             type="button"
           >
-            Back to Results
+            {$t('document.back_to_results')}
           </button>
           <button 
             on:click={() => goto(`/dashboard/${sessionId}`)}
             class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold"
             type="button"
           >
-            Dashboard
+            {$t('document.dashboard')}
           </button>
         </div>
       </div>

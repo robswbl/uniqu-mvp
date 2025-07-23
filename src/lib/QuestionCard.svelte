@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from 'svelte-i18n';
   export let stepHeading: string = '';
   export let title: string;
   export let emoji: string;
@@ -11,8 +12,8 @@
   export let onInput: (e: Event) => void;
   export let onNext: () => void;
   export let onBack: () => void;
-  export let nextLabel: string = 'Next';
-  export let backLabel: string = 'Back';
+  export let nextLabel: string = $t('buttons.next');
+  export let backLabel: string = $t('buttons.back');
   export let disabled: boolean = false;
 </script>
 

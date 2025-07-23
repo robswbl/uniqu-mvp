@@ -3,6 +3,7 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { t } from 'svelte-i18n';
   
 	const sessionId = $page.params.sessionId;
 	let sessionData: any = null;
@@ -131,17 +132,16 @@
 		<!-- Welcome Header -->
 		<div class="text-center mb-12">
 		  <h1 class="text-4xl font-bold text-gray-800 mb-4">
-			{userFirstName ? `${userFirstName}, Welcome to Your UniqU Journey! 🌟` : 'Welcome to Your UniqU Journey! 🌟'}
+			{userFirstName ? `${userFirstName}, ${$t('questionnaire.welcome_heading')}` : $t('questionnaire.welcome_heading')}
 		  </h1>
 		  <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-			Let's discover your unique career path through a thoughtful 3-step process. 
-			Each step builds on the previous one to create your personalized profile.
+			{$t('questionnaire.welcome_subheading')}
 		  </p>
 		</div>
   
 		<!-- Progress Overview -->
 		<div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
-		  <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Your Progress</h2>
+		  <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">{$t('questionnaire.progress_title')}</h2>
 		  
 		  <div class="flex justify-between items-center mb-8">
 			<!-- Step 1 -->
@@ -156,7 +156,7 @@
 				  <span class="font-semibold">1</span>
 				{/if}
 			  </div>
-			  <span class="text-sm font-medium text-gray-600">CV & Experience</span>
+			  <span class="text-sm font-medium text-gray-600">{$t('questionnaire.progress_step1')}</span>
 			</div>
 			
 			<!-- Connection Line -->
@@ -174,7 +174,7 @@
 				  <span class="font-semibold">2</span>
 				{/if}
 			  </div>
-			  <span class="text-sm font-medium text-gray-600">Ikigai Discovery</span>
+			  <span class="text-sm font-medium text-gray-600">{$t('questionnaire.progress_step2')}</span>
 			</div>
 			
 			<!-- Connection Line -->
@@ -192,7 +192,7 @@
 				  <span class="font-semibold">3</span>
 				{/if}
 			  </div>
-			  <span class="text-sm font-medium text-gray-600">Goals & Context</span>
+			  <span class="text-sm font-medium text-gray-600">{$t('questionnaire.progress_step3')}</span>
 			</div>
 		  </div>
 		</div>
@@ -205,25 +205,25 @@
 			<div class="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
 			  <div class="text-white">
 				<div class="flex items-center justify-between mb-2">
-				  <h3 class="text-lg font-semibold">Step 1: Your Life Context</h3>
+				  <h3 class="text-lg font-semibold">{$t('questionnaire.step1_title')}</h3>
 				  {#if sessionData.cv_text}
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
 					</svg>
 				  {/if}
 				</div>
-				<p class="text-blue-100 text-sm">Share your professional background and experiences</p>
+				<p class="text-blue-100 text-sm">{$t('questionnaire.step1_desc')}</p>
 			  </div>
 			</div>
 			<div class="p-6">
 			  <p class="text-gray-600 mb-4">
-				Upload your CV or tell us about your work experience, education, and key achievements.
+				{$t('questionnaire.step1_instructions')}
 			  </p>
 			  <button 
 				on:click={() => goToStep('step1')}
 				class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors"
 			  >
-				{sessionData.cv_text ? 'Edit Experience' : 'Start Here'}
+				{sessionData.cv_text ? $t('questionnaire.edit_experience') : $t('questionnaire.start_here')}
 			  </button>
 			</div>
 		  </div>
@@ -233,19 +233,19 @@
 			<div class="bg-gradient-to-r from-green-500 to-teal-600 p-6">
 			  <div class="text-white">
 				<div class="flex items-center justify-between mb-2">
-				  <h3 class="text-lg font-semibold">Step 2: Your Experience</h3>
+				  <h3 class="text-lg font-semibold">{$t('questionnaire.step2_title')}</h3>
 				  {#if sessionData.ikigai_love}
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
 					</svg>
 				  {/if}
 				</div>
-				<p class="text-green-100 text-sm">Discover what gives your life meaning and purpose</p>
+				<p class="text-green-100 text-sm">{$t('questionnaire.step2_desc')}</p>
 			  </div>
 			</div>
 			<div class="p-6">
 			  <p class="text-gray-600 mb-4">
-				Explore what you love, what you're good at, what inspires you, and what you care about.
+				{$t('questionnaire.step2_instructions')}
 			  </p>
 			  <button 
 				on:click={() => goToStep('step2')}
@@ -253,7 +253,7 @@
 				disabled={!isStep1Started()}
 				title={!isStep1Started() ? 'Complete Step 1 first.' : ''}
 			  >
-				{sessionData.ikigai_love ? 'Edit Ikigai' : isStep1Started() ? 'Continue' : 'Complete Step 1 First'}
+				{sessionData.ikigai_love ? $t('questionnaire.edit_ikigai') : isStep1Started() ? $t('questionnaire.continue') : $t('questionnaire.complete_step1_first')}
 			  </button>
 			</div>
 		  </div>
@@ -263,19 +263,19 @@
 			<div class="bg-gradient-to-r from-purple-500 to-pink-600 p-6">
 			  <div class="text-white">
 				<div class="flex items-center justify-between mb-2">
-				  <h3 class="text-lg font-semibold">Step 3: Your Ikigai</h3>
+				  <h3 class="text-lg font-semibold">{$t('questionnaire.step3_title')}</h3>
 				  {#if sessionData.goals}
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
 					</svg>
 				  {/if}
 				</div>
-				<p class="text-purple-100 text-sm">Define your aspirations and personal context</p>
+				<p class="text-purple-100 text-sm">{$t('questionnaire.step3_desc')}</p>
 			  </div>
 			</div>
 			<div class="p-6">
 			  <p class="text-gray-600 mb-4">
-				Tell us about your career goals, personality, and life context to complete your profile.
+				{$t('questionnaire.step3_instructions')}
 			  </p>
 			  <button 
 				on:click={() => goToStep('step3')}
@@ -283,7 +283,7 @@
 				disabled={!isStep2Started()}
 				title={!isStep2Started() ? 'Complete Step 2 first.' : ''}
 			  >
-				{sessionData.goals ? 'Edit Goals' : isStep2Started() ? 'Continue' : 'Complete Step 2 First'}
+				{sessionData.goals ? $t('questionnaire.edit_goals') : isStep2Started() ? $t('questionnaire.continue') : $t('questionnaire.complete_step2_first')}
 			  </button>
 			</div>
 		  </div>
@@ -291,14 +291,12 @@
   
 		<!-- Instructions -->
 		<div class="bg-white rounded-2xl shadow-xl p-8 text-center">
-		  <h3 class="text-xl font-semibold text-gray-800 mb-3">💡 How it Works</h3>
+		  <h3 class="text-xl font-semibold text-gray-800 mb-3">{$t('questionnaire.how_it_works')}</h3>
 		  <p class="text-gray-600 mb-4">
-			Complete all three steps to build your comprehensive career profile. Once finished, 
-			we'll generate personalized insights including a reflection letter, career themes, 
-			and ideal company matches.
+			{$t('questionnaire.how_it_works_desc')}
 		  </p>
 		  <div class="text-sm text-gray-500">
-			⏱️ Total time: 15-20 minutes • 🔒 Your data is private and secure
+			{$t('questionnaire.time_and_privacy')}
 		  </div>
 		</div>
 
@@ -306,18 +304,18 @@
 		{#if userEmail}
 		  <div class="text-center mt-4">
 			<p class="text-xs text-gray-400">
-			  Session for: {userEmail}
+			  {$t('questionnaire.session_for', { email: userEmail })}
 			</p>
 		  </div>
 		{/if}
 	  {:else}
 		<div class="bg-white rounded-2xl shadow-xl p-8 text-center">
-		  <p class="text-red-500 text-lg">Session not found.</p>
+		  <p class="text-red-500 text-lg">{$t('questionnaire.session_not_found')}</p>
 		  <button 
 			on:click={() => goto('/')}
 			class="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg"
 		  >
-			Go Back Home
+			{$t('questionnaire.go_back_home')}
 		  </button>
 		</div>
 	  {/if}

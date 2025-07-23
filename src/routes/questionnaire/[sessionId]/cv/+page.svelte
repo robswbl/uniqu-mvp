@@ -3,6 +3,7 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { t } from 'svelte-i18n';
 
 	const sessionId = $page.params.sessionId;
 
@@ -215,7 +216,7 @@
 	<div class="bg-white shadow-sm">
 		<div class="max-w-4xl mx-auto p-4">
 			<div class="flex items-center justify-between text-sm text-gray-600 mb-2">
-				<span>Step 1 of 3</span>
+				<span>{$t('cv.progress')}</span>
 				<span class="text-xs bg-gray-100 px-2 py-1 rounded">{saveStatus}</span>
 			</div>
 			<div class="w-full bg-gray-200 rounded-full h-2">
@@ -233,16 +234,16 @@
 				</svg>
 			</div>
 			<h1 class="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
-				Share Your Professional Story, {userFirstName || 'there'}
+				{$t('cv.heading', { name: userFirstName || $t('cv.default_name') })}
 			</h1>
 			<p class="text-xl text-gray-600 max-w-2xl mx-auto">
-				Let's start with your CV or resume. This helps us understand your background and experience.
+				{$t('cv.intro')}
 			</p>
 		</div>
 
 		<!-- Method Selection -->
 		<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-			<h2 class="text-2xl font-bold text-gray-800 mb-6">How would you like to share your CV?</h2>
+			<h2 class="text-2xl font-bold text-gray-800 mb-6">{$t('cv.method_heading')}</h2>
 			
 			<div class="grid md:grid-cols-2 gap-6 mb-8">
 				<button
@@ -255,8 +256,8 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
 						</svg>
 					</div>
-					<h3 class="text-lg font-semibold text-gray-800 mb-2">Paste Text</h3>
-					<p class="text-gray-600 text-sm">Copy and paste your CV content directly</p>
+					<h3 class="text-lg font-semibold text-gray-800 mb-2">{$t('cv.paste_text')}</h3>
+					<p class="text-gray-600 text-sm">{$t('cv.paste_text_desc')}</p>
 				</button>
 
 				<button
@@ -269,23 +270,21 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
 						</svg>
 					</div>
-					<h3 class="text-lg font-semibold text-gray-800 mb-2">Upload File</h3>
-					<p class="text-gray-600 text-sm">Upload a PDF document (.pdf)</p>
+					<h3 class="text-lg font-semibold text-gray-800 mb-2">{$t('cv.upload_file')}</h3>
+					<p class="text-gray-600 text-sm">{$t('cv.upload_file_desc')}</p>
 				</button>
 			</div>
 
 			<!-- Content Input -->
 			{#if uploadMethod === 'paste'}
 				<div class="space-y-4">
-					<label for="cv-textarea" class="block text-lg font-medium text-gray-800">
-						Paste your CV content here
-					</label>
+					<label for="cv-textarea" class="block text-lg font-medium text-gray-800">{$t('cv.paste_text_label')}</label>
 					<div class="relative">
 						<textarea 
 							id="cv-textarea"
 							bind:value={cv_text} 
 							on:input={saveProgress} 
-							placeholder="Paste your CV or resume content here... Include your work experience, education, skills, and any other relevant information."
+							placeholder={$t('cv.paste_text_placeholder')}
 							class="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 resize-none overflow-y-auto p-4 text-gray-700 placeholder-gray-400"
 							style="height: 200px !important; max-height: 200px !important;"
 						></textarea>
@@ -324,9 +323,9 @@
 							on:click={() => document.getElementById('cv-upload')?.click()}
 							class="text-indigo-600 hover:text-indigo-500 font-medium"
 						>
-							Choose a file
+							{$t('cv.choose_file')}
 						</button>
-						<p class="text-gray-500 text-sm mt-2">or drag and drop a .pdf file here (max 20MB)</p>
+						<p class="text-gray-500 text-sm mt-2">{$t('cv.drag_drop_hint')}</p>
 						{#if uploadStatus}
 							<div class="mt-4 text-lg font-semibold {uploadStatus.includes('complete') || uploadStatus.includes('processed') ? 'text-green-600' : uploadStatus.includes('Processing') ? 'text-blue-600' : 'text-red-600'}">{uploadStatus}</div>
 						{/if}
@@ -340,13 +339,13 @@
 
 					{#if cv_text}
 						<div class="bg-gray-50 rounded-xl p-4">
-							<h4 class="font-medium text-gray-800 mb-2">Your CV Content (Editable):</h4>
-							<p class="text-sm text-gray-600 mb-3">The content below was extracted from your uploaded file. You can edit it if needed:</p>
+							<h4 class="font-medium text-gray-800 mb-2">{$t('cv.content_editable')}</h4>
+							<p class="text-sm text-gray-600 mb-3">{$t('cv.content_editable_desc')}</p>
 							<div class="relative">
 								<textarea 
 									bind:value={cv_text} 
 									on:input={saveProgress} 
-									placeholder="Your CV content will appear here after processing..."
+									placeholder={$t('cv.content_editable_placeholder')}
 									class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 resize-none overflow-y-auto p-4 text-gray-700 placeholder-gray-400 bg-white"
 									style="height: 200px !important; max-height: 200px !important;"
 								></textarea>
@@ -357,13 +356,13 @@
 								{/if}
 							</div>
 							<div class="mt-3 flex items-center justify-between text-xs text-gray-500">
-								<span>✅ Content processed and ready to edit</span>
+								<span>✅ {$t('cv.content_ready')}</span>
 								<button 
 									type="button"
 									on:click={() => cv_text = ''}
 									class="text-red-600 hover:text-red-800 underline"
 								>
-									Clear content
+									{$t('cv.clear_content')}
 								</button>
 							</div>
 						</div>
@@ -375,14 +374,14 @@
 		<!-- Navigation -->
 		<div class="flex justify-between mt-8">
 			<button on:click={goToBack} class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
-				Back
+				{$t('buttons.back')}
 			</button>
 			<button
 				on:click={goToNext}
 				class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-colors text-lg"
 				disabled={!cv_text || pollingCvText}
 			>
-				{fromOnboarding ? 'Continue to Ikigai Questions' : 'Go to Ikigai Overview'}
+				{fromOnboarding ? $t('cv.continue_ikigai') : $t('cv.go_to_ikigai')}
 			</button>
 		</div>
 	</div>

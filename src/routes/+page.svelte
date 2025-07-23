@@ -1,6 +1,7 @@
 <script lang="ts">
     import { supabase } from '$lib/supabaseClient';
     import { goto } from '$app/navigation';
+    import { t } from 'svelte-i18n';
   
     let userEmail = '';
     let isLoading = false;
@@ -8,7 +9,7 @@
   
     async function handleStart() {
       if (!userEmail) {
-        alert('Please enter your email address.');
+        alert($t('landing.enter_email_alert'));
         return;
       }
       isLoading = true;
@@ -24,7 +25,8 @@
         console.log('User lookup:', { userData, userError });
   
         if (userError || !userData) {
-          throw new Error(`User with email ${userEmail} not found`);
+          alert($t('landing.user_not_found'));
+          throw new Error($t('landing.user_not_found_generic'));
         }
   
         // 2. Find their session
@@ -57,16 +59,20 @@
           console.error('Session fetch error:', sessionError);
           throw sessionError;
         } else {
-          // Session exists
-          sessionId = sessionData.id;
-          sessionStatus = sessionData.status;
+          // Add null check for sessionData before accessing its properties
+          if (sessionData) {
+            sessionId = sessionData.id;
+            sessionStatus = sessionData.status;
+          } else {
+            throw new Error($t('landing.session_not_found'));
+          }
         }
   
         console.log('Session info:', { sessionId, sessionStatus });
   
         // 🚀 SMART ROUTING LOGIC
         if (sessionStatus === 'completed') {
-          feedbackMessage = 'Welcome back! Taking you to your dashboard...';
+          feedbackMessage = $t('landing.welcome_back');
           setTimeout(async () => {
             await goto(`/dashboard/${sessionId}`);
           }, 1500);
@@ -79,14 +85,14 @@
             .single();
           console.log('Session details lookup:', { sessionDetails, detailsError });
           if (!sessionDetails?.onboarding_completed) {
-            feedbackMessage = 'Welcome! Let\'s start with a guided introduction...';
+            feedbackMessage = $t('landing.welcome_start');
             setTimeout(async () => {
               await goto(`/onboarding/${sessionId}`);
             }, 1000);
           } else {
             feedbackMessage = sessionStatus === 'in-progress' 
-              ? 'Resuming your questionnaire...'
-              : 'Starting your journey...';
+              ? $t('landing.resuming')
+              : $t('landing.starting');
             setTimeout(async () => {
               await goto(`/questionnaire/${sessionId}`);
             }, 1000);
@@ -94,7 +100,7 @@
         }
   
       } catch (e) {
-        let message = 'An unknown error occurred.';
+        let message = $t('landing.unknown_error');
         if (e instanceof Error) {
           message = e.message;
         }
@@ -109,13 +115,13 @@
   <div class="flex min-h-screen items-center justify-center bg-gray-100 p-4">
     <div class="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
       <div class="text-center">
-        <h1 class="text-3xl font-bold text-gray-800">UniqU</h1>
-        <p class="mt-2 text-gray-600">Enter your email to begin your journey.</p>
+        <h1 class="text-3xl font-bold text-gray-800">{$t('app.title')}</h1>
+        <p class="mt-2 text-gray-600">{$t('landing.subtitle')}</p>
       </div>
   
       <form class="mt-8 space-y-6" on:submit|preventDefault={handleStart}>
         <div>
-          <label for="email" class="sr-only">Email address</label>
+          <label for="email" class="sr-only">{$t('landing.email_label')}</label>
           <input
             bind:value={userEmail}
             id="email"
@@ -123,7 +129,7 @@
             type="email"
             required
             class="w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-500 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-            placeholder="Email address"
+            placeholder={$t('landing.email_placeholder')}
             disabled={isLoading}
           />
         </div>
@@ -134,9 +140,9 @@
             disabled={isLoading}
           >
             {#if isLoading}
-              <span>Loading...</span>
+              <span>{$t('landing.loading')}</span>
             {:else}
-              <span>Start</span>
+              <span>{$t('landing.start')}</span>
             {/if}
           </button>
         </div>

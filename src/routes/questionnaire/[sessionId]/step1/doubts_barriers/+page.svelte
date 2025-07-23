@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import QuestionCard from '$lib/QuestionCard.svelte';
   import { get } from 'svelte/store';
+  import { t } from 'svelte-i18n';
 
   const sessionId = $page.params.sessionId;
 
@@ -80,21 +81,21 @@
 </script>
 
 <svelte:head>
-  <title>Step 1: Doubts & Barriers - UniqU</title>
+  <title>{$t('step1.doubts_barriers.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <QuestionCard
-  title="Step 1: Doubts & Barriers"
+  title={$t('step1.doubts_barriers.title')}
   emoji="🤔"
-  explainer="Any doubts or barriers you're facing?"
+  explainer={$t('step1.doubts_barriers.explainer')}
   explainerColor="indigo"
-  textareaPlaceholder="What concerns or obstacles are you thinking about regarding your career path?"
+  textareaPlaceholder={$t('step1.doubts_barriers.textarea_placeholder')}
   bind:textareaValue={doubtsBarriers}
   saveStatus={saveStatus}
   onInput={handleInput}
   onNext={goToNext}
   onBack={goToBack}
-  nextLabel="Next"
-  backLabel="Back"
+  nextLabel={$t('buttons.next')}
+  backLabel={$t('buttons.back')}
   disabled={isSaving}
 /> 

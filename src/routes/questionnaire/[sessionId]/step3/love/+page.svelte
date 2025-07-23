@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import QuestionCard from '$lib/QuestionCard.svelte';
   import { get } from 'svelte/store';
+  import { t } from 'svelte-i18n';
 
   const sessionId = $page.params.sessionId;
   let ikigaiLove = '';
@@ -64,33 +65,33 @@
 </script>
 
 <svelte:head>
-  <title>Step 3: What do you love to do? - Ikigai</title>
+  <title>{$t('step3.love.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <QuestionCard
-  stepHeading="Step 3: Discover Your Ikigai"
-  title="What do you love to do?"
+  stepHeading={$t('step3.love.step_heading')}
+  title={$t('step3.love.title')}
   emoji="❤️"
-  explainer="💡 Need inspiration?"
+  explainer={$t('step3.love.explainer')}
   explainerColor="red"
-  textareaPlaceholder="What activities make you feel truly alive and energized?"
+  textareaPlaceholder={$t('step3.love.textarea_placeholder')}
   bind:textareaValue={ikigaiLove}
   saveStatus={saveStatus}
   onInput={handleInput}
   onNext={goToNext}
   onBack={goToBack}
-  nextLabel="Next"
-  backLabel="Back"
+  nextLabel={$t('buttons.next')}
+  backLabel={$t('buttons.back')}
   disabled={isSaving}
 >
   <div class="mb-4">
     <button type="button" class="text-sm text-red-700 underline" on:click={() => showInspiration = !showInspiration}>
-      {showInspiration ? 'Hide inspiration' : 'Show inspiration'}
+      {showInspiration ? $t('step3.love.hide_inspiration') : $t('step3.love.show_inspiration')}
     </button>
     {#if showInspiration}
       <div class="p-4 bg-red-50 rounded-lg border border-red-200 space-y-3 mt-2">
-        <p class="text-gray-600 text-sm">You know those hobbies you just can't get enough of? The activities you look forward to all week? Think about what you're doing when you lose track of time, when the outside world seems to just fade away.</p>
-        <p class="text-gray-500 text-xs italic">Examples: I enjoy cooking – planning meals, chopping ingredients... Building my own computer. Playing in hockey tournaments.</p>
+        <p class="text-gray-600 text-sm">{$t('step3.love.inspiration_text')}</p>
+        <p class="text-gray-500 text-xs italic">{$t('step3.love.inspiration_examples')}</p>
       </div>
     {/if}
   </div>

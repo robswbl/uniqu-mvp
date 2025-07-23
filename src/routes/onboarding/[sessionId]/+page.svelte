@@ -3,6 +3,7 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/supabaseClient';
+	import { t } from 'svelte-i18n';
 
 	export let data;
 	const { sessionId } = data;
@@ -18,51 +19,51 @@
 	const situations = [
 		{
 			id: 'laid-off',
-			title: 'I just got laid off',
-			description: 'Feeling lost and uncertain about what comes next',
+			title: $t('onboarding.option_laid_off'),
+			description: $t('onboarding.option_laid_off'),
 			icon: '💔',
 			tone: 'supportive',
-			message: "I understand this is a difficult time. You're not alone, and this doesn't define your worth or capabilities."
+			message: ''
 		},
 		{
 			id: 'quit',
-			title: 'I quit my job',
-			description: 'Feeling brave but scared about the unknown',
+			title: $t('onboarding.option_quit'),
+			description: $t('onboarding.option_quit'),
 			icon: '🦁',
 			tone: 'encouraging',
-			message: "That took courage. Now let's channel that bravery into creating something even better for yourself."
+			message: ''
 		},
 		{
 			id: 'career-change',
-			title: 'I want to change careers',
-			description: 'Feeling stuck but hopeful about new possibilities',
+			title: $t('onboarding.option_career_change'),
+			description: $t('onboarding.option_career_change'),
 			icon: '🔄',
 			tone: 'inspiring',
-			message: "Change is exciting and scary. Let's discover what's calling you and how to get there."
+			message: ''
 		},
 		{
 			id: 'retirement',
-			title: "I'm nearing retirement",
-			description: 'Feeling ready for a new chapter but unsure how to begin',
+			title: $t('onboarding.option_retirement'),
+			description: $t('onboarding.option_retirement'),
 			icon: '🌟',
 			tone: 'celebratory',
-			message: "This is a beautiful transition. Let's honor your experience while exploring what's next."
+			message: ''
 		},
 		{
 			id: 'burnout',
-			title: 'I feel burned out and need direction',
-			description: 'Feeling exhausted and needing to rediscover purpose',
+			title: $t('onboarding.option_burnout'),
+			description: $t('onboarding.option_burnout'),
 			icon: '🕯️',
 			tone: 'gentle',
-			message: "You've been through a lot. Let's help you rediscover what brings you energy and joy."
+			message: ''
 		},
 		{
 			id: 'other',
-			title: 'Something else',
-			description: 'My situation is different from these options',
+			title: $t('onboarding.option_other'),
+			description: $t('onboarding.option_other'),
 			icon: '💭',
 			tone: 'open',
-			message: "Every journey is unique. Let's understand your specific situation and how we can help."
+			message: ''
 		}
 	];
 
@@ -146,7 +147,7 @@
 </script>
 
 <svelte:head>
-	<title>Welcome to Your Career Journey - VueYou</title>
+	<title>{$t('onboarding.welcome')}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -161,7 +162,7 @@
 			<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
 			</svg>
-			Back
+			{$t('buttons.back')}
 		</button>
 
 		{#if currentStep === 0}
@@ -169,20 +170,19 @@
 			<div class="text-center mb-12">
 				<div class="mb-8">
 					<h1 class="text-4xl font-bold text-gray-900 mb-4">
-						Welcome to UniqU, {userFirstName || 'there'}!
+						{$t('onboarding.welcome')}
 					</h1>
 					<p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-						You're not alone. Many people reach a point of uncertainty — after a job ends, a decision is made, or a new phase begins. 
-						This isn't about "fixing" you, but helping you reflect, reconnect, and reimagine what's next.
+						{$t('app.subtitle')}
 					</p>
 				</div>
 
 				<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
 					<h2 class="text-2xl font-semibold text-gray-800 mb-6">
-						Where are you right now?
+						{$t('onboarding.question')}
 					</h2>
 					<p class="text-gray-600 mb-8">
-						Understanding your current situation helps us create a more meaningful experience for you.
+						{$t('onboarding.understanding_situation')}
 					</p>
 
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -214,11 +214,9 @@
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
 						</svg>
 						<div>
-							<h3 class="font-medium text-blue-900 mb-2">What to expect</h3>
+							<h3 class="font-medium text-blue-900 mb-2">{$t('onboarding.what_to_expect_title')}</h3>
 							<p class="text-blue-700 text-sm">
-								By the end of this journey, you'll have a clear understanding of your unique value, 
-								specific insights about what motivates you, and a personalized roadmap for your next steps. 
-								This is about rediscovering your direction, not just generating documents.
+								{$t('onboarding.what_to_expect_desc')}
 							</p>
 						</div>
 					</div>
@@ -245,18 +243,17 @@
 						<textarea
 							class="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 resize-none p-4 text-gray-700 placeholder-gray-400 mb-8"
 							rows="3"
-							placeholder="Tell us a little bit more about your current situation."
+							placeholder={$t('onboarding.where_now_placeholder')}
 							bind:value={whereNow}
 							on:input={handleWhereNowInput}
 						></textarea>
 
 						<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
 							<h2 class="text-2xl font-semibold text-gray-800 mb-6">
-								Let's take this one step at a time
+								{$t('onboarding.step2_title')}
 							</h2>
 							<p class="text-gray-600 mb-6">
-								I'm here to guide you through a thoughtful reflection process. There are no perfect answers — 
-								just honesty about where you are and where you'd like to go.
+								{$t('onboarding.step2_desc')}
 							</p>
 							
 							<div class="space-y-4 text-left">
@@ -264,19 +261,19 @@
 									<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
 										<span class="text-indigo-600 text-sm font-medium">1</span>
 									</div>
-									<p class="text-gray-700">We'll explore your past experiences and what you've built</p>
+									<p class="text-gray-700">{$t('onboarding.step2_point1')}</p>
 								</div>
 								<div class="flex items-start space-x-3">
 									<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
 										<span class="text-indigo-600 text-sm font-medium">2</span>
 									</div>
-									<p class="text-gray-700">Discover what truly motivates and energizes you</p>
+									<p class="text-gray-700">{$t('onboarding.step2_point2')}</p>
 								</div>
 								<div class="flex items-start space-x-3">
 									<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
 										<span class="text-indigo-600 text-sm font-medium">3</span>
 									</div>
-									<p class="text-gray-700">Create a clear roadmap for your next chapter</p>
+									<p class="text-gray-700">{$t('onboarding.step2_point3')}</p>
 								</div>
 							</div>
 						</div>
@@ -287,7 +284,7 @@
 								class="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-gray-400 transition-colors"
 								type="button"
 							>
-								Go back
+								{$t('buttons.go_back')}
 							</button>
 							<button
 								on:click={startJourney}
@@ -300,9 +297,9 @@
 										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 										<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 									</svg>
-									Starting your journey...
+									{$t('onboarding.starting_journey')}
 								{:else}
-									Begin your journey
+									{$t('onboarding.begin_journey')}
 								{/if}
 							</button>
 						</div>

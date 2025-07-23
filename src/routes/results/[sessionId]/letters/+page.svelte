@@ -5,6 +5,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/supabaseClient.js';
+	import { t } from 'svelte-i18n';
 
 	let sessionId = $page.params.sessionId;
 	let applicationLetters = [];
@@ -510,7 +511,7 @@
 </script>
 
 <svelte:head>
-	<title>Application Letters - UniqU</title>
+	<title>{$t('letters.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
@@ -527,13 +528,13 @@
 				<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
 				</svg>
-				Back to Results
+				{$t('letters.back_to_results')}
 			</button>
 			
 			<div class="flex items-center justify-between">
 				<div>
-					<h1 class="text-3xl font-bold text-gray-900 mb-2">Application Letters</h1>
-					<p class="text-gray-600">Generate and track your personalized application letters</p>
+					<h1 class="text-3xl font-bold text-gray-900 mb-2">{$t('letters.heading')}</h1>
+					<p class="text-gray-600">{$t('letters.subheading')}</p>
 				</div>
 				
 				<button
@@ -545,7 +546,7 @@
 					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
 					</svg>
-					<span>Generate New Letter</span>
+					<span>{$t('letters.generate_new_letter')}</span>
 				</button>
 			</div>
 		</div>
@@ -556,7 +557,7 @@
 			</div>
 		{:else if error}
 			<div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-				<h3 class="text-lg font-semibold text-red-800 mb-2">Error Loading Letters</h3>
+				<h3 class="text-lg font-semibold text-red-800 mb-2">{$t('letters.error_loading')}</h3>
 				<p class="text-red-600">{error}</p>
 				<button 
 					on:click={fetchData}
@@ -564,7 +565,7 @@
 					type="button"
 					aria-label="Try Again"
 				>
-					Try Again
+					{$t('letters.try_again')}
 				</button>
 			</div>
 		{:else}
@@ -572,20 +573,20 @@
 			<!-- New Letter Form -->
 			{#if showNewLetterForm}
 				<div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200">
-					<h3 class="text-xl font-semibold text-gray-900 mb-4">Generate New Application Letter</h3>
+					<h3 class="text-xl font-semibold text-gray-900 mb-4">{$t('letters.generate_new_application_letter')}</h3>
 					
 					<div class="space-y-4">
 						{#if matchedCompanies.length > 0}
 							<div>
 								<label for="company-select" class="block text-sm font-medium text-gray-700 mb-2">
-									Select from your matched companies:
+									{$t('letters.select_matched_company')}
 								</label>
 								<select 
 									id="company-select"
 									bind:value={selectedCompany}
 									class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
 								>
-									<option value="">-- Select a company --</option>
+									<option value="">-- {$t('letters.select_company_placeholder')} --</option>
 									{#each matchedCompanies as company}
 										<option value={company}>{company}</option>
 									{/each}
@@ -593,19 +594,19 @@
 							</div>
 							
 							<div class="text-center text-gray-500 text-sm">
-								OR
+								{$t('letters.or')}
 							</div>
 						{/if}
 						
 						<div>
 							<label for="custom-company" class="block text-sm font-medium text-gray-700 mb-2">
-								Enter a different company name:
+								{$t('letters.enter_different_company')}
 							</label>
 							<input
 								id="custom-company"
 								type="text"
 								bind:value={customCompany}
-								placeholder="Enter company name..."
+								placeholder="{$t('letters.enter_company_placeholder')}"
 								class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
 							/>
 						</div>
@@ -613,33 +614,33 @@
 						<!-- Pain Points Field -->
 						<div>
 							<label for="pain-points" class="block text-sm font-medium text-gray-700 mb-2">
-								<span class="text-red-500">*</span> Key pain points of the company:
+								<span class="text-red-500">*</span> {$t('letters.key_pain_points')}
 							</label>
 							<textarea
 								id="pain-points"
 								bind:value={painPoints}
-								placeholder="What challenges does this company face? What problems need solving?"
+								placeholder="{$t('letters.pain_points_placeholder')}"
 								class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
 								rows="3"
 								required
 							></textarea>
-							<p class="text-xs text-gray-500 mt-1">These will be used to tailor your motivational letter to address specific company needs.</p>
+							<p class="text-xs text-gray-500 mt-1">{$t('letters.pain_points_hint')}</p>
 						</div>
 						
 						<!-- Address Field -->
 						<div>
 							<label for="address" class="block text-sm font-medium text-gray-700 mb-2">
-								<span class="text-red-500">*</span> Company address:
+								<span class="text-red-500">*</span> {$t('letters.company_address')}
 							</label>
 							<textarea
 								id="address"
 								bind:value={address}
-								placeholder="Company Name&#10;Street Address&#10;City, Postal Code&#10;Country"
+								placeholder="{$t('letters.address_placeholder')}"
 								class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
 								rows="3"
 								required
 							></textarea>
-							<p class="text-xs text-gray-500 mt-1">Full company address for proper letter formatting.</p>
+							<p class="text-xs text-gray-500 mt-1">{$t('letters.address_hint')}</p>
 						</div>
 						
 						<div class="flex items-center space-x-4 pt-4">
@@ -652,12 +653,12 @@
 							>
 								{#if generating}
 									<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-									<span>Generating...</span>
+									<span>{$t('letters.generating')}</span>
 								{:else}
 									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
 									</svg>
-									<span>Generate Letter</span>
+									<span>{$t('letters.generate_letter')}</span>
 								{/if}
 							</button>
 							
@@ -667,7 +668,7 @@
 								type="button"
 								aria-label="Cancel"
 							>
-								Cancel
+								{$t('letters.cancel')}
 							</button>
 						</div>
 					</div>
@@ -683,15 +684,15 @@
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
 							</svg>
 						</div>
-						<h3 class="text-xl font-semibold text-gray-900 mb-2">No Letters Yet</h3>
-						<p class="text-gray-600 mb-6">Generate your first application letter to get started with your job applications.</p>
+						<h3 class="text-xl font-semibold text-gray-900 mb-2">{$t('letters.no_letters_yet')}</h3>
+						<p class="text-gray-600 mb-6">{$t('letters.no_letters_desc')}</p>
 						<button 
 							on:click={() => showNewLetterForm = true}
 							class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium"
 							type="button"
 							aria-label="Generate First Letter"
 						>
-							Generate First Letter
+							{$t('letters.generate_first_letter')}
 						</button>
 					</div>
 				</div>
@@ -705,9 +706,9 @@
 								<div class="flex-1">
 									<h3 class="text-xl font-semibold text-gray-900 mb-1">{letter.company_name}</h3>
 									<p class="text-sm text-gray-500">
-										Created {new Date(letter.created_at).toLocaleDateString()}
+										{$t('letters.created_at')}: {new Date(letter.created_at).toLocaleDateString()}
 										{#if letter.updated_at !== letter.created_at}
-											• Updated {new Date(letter.updated_at).toLocaleDateString()}
+											{$t('letters.updated_at')}: {new Date(letter.updated_at).toLocaleDateString()}
 										{/if}
 									</p>
 								</div>
@@ -722,7 +723,7 @@
 										disabled={letter.status === 'draft' && !isLetterGenerated(letter)}
 									>
 										{#each statusOptions as option}
-											<option value={option.value}>{option.label}</option>
+											<option value={option.value}>{$t(`letters.status.${option.value}`)}</option>
 										{/each}
 									</select>
 									
@@ -735,7 +736,7 @@
 														<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 														<path class="opacity-50" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 													</svg>
-													<span class="text-red-500 font-medium">Generation failed or timed out</span>
+													<span class="text-red-500 font-medium">{$t('letters.generation_failed')}</span>
 												</div>
 												<div class="w-40 bg-gray-200 rounded-full h-2">
 													<div 
@@ -743,7 +744,7 @@
 														style="width: 100%"
 													></div>
 												</div>
-												<div class="text-xs text-red-400 mt-1">Please try again or contact support.</div>
+												<div class="text-xs text-red-400 mt-1">{$t('letters.try_again_or_contact_support')}</div>
 											</div>
 										{:else}
 											{#if isActivelyGenerating(letter)}
@@ -753,7 +754,7 @@
 															<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 															<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 														</svg>
-														<span class="text-indigo-700 font-medium">Generating...</span>
+														<span class="text-indigo-700 font-medium">{$t('letters.generating')}</span>
 													</div>
 													<div class="w-40 bg-gray-200 rounded-full h-2">
 														<div 
@@ -761,7 +762,7 @@
 															style="width: {Math.round((letterProgress[letter.id] || 0) * 100)}%"
 														></div>
 													</div>
-													<div class="text-xs text-gray-500 mt-1">~20 seconds remaining</div>
+													<div class="text-xs text-gray-500 mt-1">{$t('letters.estimate_time')}</div>
 												</div>
 											{:else}
 												<div class="flex flex-col items-end min-w-[180px]">
@@ -770,7 +771,7 @@
 															<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
 															<path class="opacity-50" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
 														</svg>
-														<span class="text-gray-500 font-medium">Still generating...</span>
+														<span class="text-gray-500 font-medium">{$t('letters.still_generating')}</span>
 													</div>
 													<div class="w-40 bg-gray-200 rounded-full h-2">
 														<div 
@@ -778,7 +779,7 @@
 															style="width: 100%"
 														></div>
 													</div>
-													<div class="text-xs text-gray-400 mt-1">Taking longer than usual</div>
+													<div class="text-xs text-gray-400 mt-1">{$t('letters.taking_longer')}</div>
 												</div>
 											{/if}
 										{/if}
@@ -795,7 +796,7 @@
 												<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
 												</svg>
-												<span class="ml-1">Test</span>
+												<span>{$t('letters.test')}</span>
 											</button>
 											<!-- View Letter Button -->
 											<button 
@@ -809,7 +810,7 @@
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
 												</svg>
-												<span>View this letter</span>
+												<span>{$t('letters.view_this_letter')}</span>
 											</button>
 											<!-- Delete Button -->
 											<button 
@@ -822,7 +823,7 @@
 												<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
 												</svg>
-												<span class="ml-1">Delete</span>
+												<span class="ml-1">{$t('buttons.delete')}</span>
 											</button>
 										</div>
 									{/if}
@@ -832,13 +833,13 @@
 							<!-- Status Timeline -->
 							<div class="mb-4">
 								<div class="flex items-center space-x-2 text-xs text-gray-600">
-									<span>Status:</span>
+									<span>{$t('letters.status')}:</span>
 									<span class="font-medium">{getStatusLabel(letter.status)}</span>
 									{#if letter.sent_at}
-										<span>• Sent {new Date(letter.sent_at).toLocaleDateString()}</span>
+										<span>{$t('letters.sent')} {new Date(letter.sent_at).toLocaleDateString()}</span>
 									{/if}
 									{#if letter.response_received_at}
-										<span>• Response {new Date(letter.response_received_at).toLocaleDateString()}</span>
+										<span>{$t('letters.response')} {new Date(letter.response_received_at).toLocaleDateString()}</span>
 									{/if}
 								</div>
 							</div>
@@ -847,13 +848,13 @@
 							<div class="mb-4 space-y-2">
 								{#if letter.pain_points}
 									<div>
-										<span class="text-xs font-medium text-gray-600">Key Pain Points:</span>
+										<span class="text-xs font-medium text-gray-600">{$t('letters.key_pain_points')}</span>
 										<p class="text-sm text-gray-700 mt-1 bg-gray-50 p-2 rounded">{letter.pain_points}</p>
 									</div>
 								{/if}
 								{#if letter.address}
 									<div>
-										<span class="text-xs font-medium text-gray-600">Address:</span>
+										<span class="text-xs font-medium text-gray-600">{$t('letters.address')}</span>
 										<p class="text-sm text-gray-700 mt-1 bg-gray-50 p-2 rounded whitespace-pre-line">{letter.address}</p>
 									</div>
 								{/if}
@@ -862,7 +863,7 @@
 							<!-- Notes Section -->
 							<div class="border-t border-gray-100 pt-4">
 								<div class="flex items-start justify-between mb-2">
-									<label for="notes-{letter.id}" class="text-sm font-medium text-gray-700">Notes:</label>
+									<label for="notes-{letter.id}" class="text-sm font-medium text-gray-700">{$t('letters.notes')}</label>
 									{#if editingNotes[letter.id] !== undefined}
 										<div class="flex items-center space-x-2">
 											<button 
@@ -871,7 +872,7 @@
 												type="button"
 												aria-label="Save notes"
 											>
-												Save
+												{$t('letters.save')}
 											</button>
 											<button 
 												on:click={() => cancelEditingNotes(letter.id)}
@@ -879,7 +880,7 @@
 												type="button"
 												aria-label="Cancel editing notes"
 											>
-												Cancel
+												{$t('letters.cancel')}
 											</button>
 										</div>
 									{:else}
@@ -887,9 +888,9 @@
 											on:click={() => startEditingNotes(letter.id, letter.notes)}
 											class="text-xs text-indigo-600 hover:text-indigo-800 transition-colors"
 											type="button"
-											aria-label={letter.notes ? 'Edit notes' : 'Add notes'}
+											aria-label={letter.notes ? $t('letters.edit_notes') : $t('letters.add_note')}
 										>
-											{letter.notes ? 'Edit' : 'Add Note'}
+											{letter.notes ? $t('letters.edit') : $t('letters.add_note')}
 										</button>
 									{/if}
 								</div>
@@ -898,14 +899,14 @@
 									<textarea
 										id="notes-{letter.id}"
 										bind:value={editingNotes[letter.id]}
-										placeholder="Add notes about this application..."
+										placeholder="{$t('letters.notes_placeholder')}"
 										class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-sm"
 										rows="3"
 										aria-label="Letter notes"
 									></textarea>
 								{:else}
 									<p class="text-sm text-gray-600 italic min-h-[1.5rem]">
-										{letter.notes || 'No notes added yet.'}
+										{letter.notes || $t('letters.no_notes_added')}
 									</p>
 								{/if}
 							</div>
@@ -936,7 +937,7 @@
 			role="document"
 		>
 			<div class="flex items-center justify-between p-4 border-b border-gray-200">
-				<h3 id="modal-title" class="text-lg font-semibold text-gray-900">{currentLetterTitle}</h3>
+				<h3 id="modal-title" class="text-lg font-semibold text-gray-900">{$t('letters.modal_title')}</h3>
 				<div class="flex items-center space-x-2">
 					<button 
 						on:click={() => {
@@ -950,13 +951,13 @@
 						type="button"
 						aria-label="Copy letter"
 					>
-						Copy
+						{$t('letters.copy')}
 					</button>
 					{#if currentLetterContent && currentLetterContent.includes('pdf_url')}
 						<!-- If pdf_url is present in content, extract and use it -->
 						{#await (async () => { try { const match = currentLetterContent.match(/pdf_url\s*[:=]\s*['"]([^'"]+)/); return match ? match[1] : null; } catch { return null; } })() then pdfUrl}
 							{#if pdfUrl}
-								<a href={pdfUrl} target="_blank" rel="noopener" class="px-3 py-2 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors" aria-label="Download PDF">Download as PDF</a>
+								<a href={pdfUrl} target="_blank" rel="noopener" class="px-3 py-2 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors" aria-label="Download PDF">{$t('letters.download_pdf')}</a>
 							{/if}
 						{/await}
 					{:else}
@@ -976,7 +977,7 @@
 							type="button"
 							aria-label="Download as PDF"
 						>
-							Download as PDF
+							{$t('letters.download_pdf')}
 						</button>
 					{/if}
 					<button 

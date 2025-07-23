@@ -3,6 +3,7 @@
 	import { supabase } from '$lib/supabaseClient';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { t } from 'svelte-i18n';
 
 	const sessionId = $page.params.sessionId;
 
@@ -89,7 +90,7 @@
 	<div class="bg-white shadow-sm">
 		<div class="max-w-4xl mx-auto p-4">
 			<div class="flex items-center justify-between text-sm text-gray-600 mb-2">
-				<span>Step 2 of 3</span>
+				<span>{$t('ikigai.progress')}</span>
 				<span class="text-xs bg-gray-100 px-2 py-1 rounded">{saveStatus}</span>
 			</div>
 			<div class="w-full bg-gray-200 rounded-full h-2">
@@ -107,10 +108,10 @@
 				</svg>
 			</div>
 			<h1 class="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
-				Discover Your Ikigai
+				{$t('ikigai.heading')}
 			</h1>
 			<p class="text-xl text-gray-600 max-w-2xl mx-auto">
-				These five questions will help us understand what drives you, what you're passionate about, and what gives your life meaning.
+				{$t('ikigai.intro')}
 			</p>
 		</div>
 
@@ -122,7 +123,7 @@
 					<div class="w-12 h-12 bg-gradient-to-r from-red-400 to-pink-500 rounded-full flex items-center justify-center mr-4">
 						<span class="text-white font-bold text-lg">❤️</span>
 					</div>
-					<h2 class="text-2xl font-bold text-gray-800">What do you love to do?</h2>
+					<h2 class="text-2xl font-bold text-gray-800">{$t('ikigai.love_title')}</h2>
 				</div>
 				
 				<div class="border border-gray-200 rounded-lg mb-4">
@@ -131,13 +132,13 @@
 						class="w-full p-3 text-left bg-red-50 hover:bg-red-100 rounded-t-lg flex justify-between items-center text-sm font-medium text-gray-700"
 						on:click={() => toggleInstructions('love')}
 					>
-						<span>💡 Need inspiration?</span>
+						<span>{$t('ikigai.need_inspiration')}</span>
 						<span class="text-gray-400">{expandedInstructions['love'] ? '−' : '+'}</span>
 					</button>
 					{#if expandedInstructions['love']}
 						<div class="p-4 bg-red-50 rounded-b-lg border-t border-red-200 space-y-3">
-							<p class="text-gray-600 text-sm">You know those hobbies you just can't get enough of? The activities you look forward to all week? Think about what you're doing when you lose track of time, when the outside world seems to just fade away.</p>
-							<p class="text-gray-500 text-xs italic">Examples: I enjoy cooking – planning meals, chopping ingredients... Building my own computer. Playing in hockey tournaments.</p>
+							<p class="text-gray-600 text-sm">{$t('ikigai.love_inspiration')}</p>
+							<p class="text-gray-500 text-xs italic">{$t('ikigai.love_examples')}</p>
 						</div>
 					{/if}
 				</div>
@@ -146,7 +147,7 @@
 					bind:value={ikigai_love} 
 					on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
 					rows="4" 
-					placeholder="What activities make you feel truly alive and energized?"
+					placeholder={$t('ikigai.love_placeholder')}
 					class="w-full rounded-xl border-gray-300 shadow-sm focus:border-red-400 focus:ring-red-400 resize-none overflow-hidden min-h-[120px] p-4"
 				></textarea>
 			</div>
@@ -157,7 +158,7 @@
 					<div class="w-12 h-12 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mr-4">
 						<span class="text-white font-bold text-lg">⭐</span>
 					</div>
-					<h2 class="text-2xl font-bold text-gray-800">What are you great at?</h2>
+					<h2 class="text-2xl font-bold text-gray-800">{$t('ikigai.good_at_title')}</h2>
 				</div>
 				
 				<div class="border border-gray-200 rounded-lg mb-4">
@@ -166,13 +167,13 @@
 						class="w-full p-3 text-left bg-blue-50 hover:bg-blue-100 rounded-t-lg flex justify-between items-center text-sm font-medium text-gray-700"
 						on:click={() => toggleInstructions('good_at')}
 					>
-						<span>💡 Need inspiration?</span>
+						<span>{$t('ikigai.need_inspiration')}</span>
 						<span class="text-gray-400">{expandedInstructions['good_at'] ? '−' : '+'}</span>
 					</button>
 					{#if expandedInstructions['good_at']}
 						<div class="p-4 bg-blue-50 rounded-b-lg border-t border-blue-200 space-y-3">
-							<p class="text-gray-600 text-sm">What activities flow naturally? What skills have you developed? When do people turn to you for help or advice? Think about tasks where you've been complimented or recognized.</p>
-							<p class="text-gray-500 text-xs italic">Examples: People ask me for guidance on tech... I'm known for keeping houseplants healthy. Friends come to me for relationship advice.</p>
+							<p class="text-gray-600 text-sm">{$t('ikigai.good_at_inspiration')}</p>
+							<p class="text-gray-500 text-xs italic">{$t('ikigai.good_at_examples')}</p>
 						</div>
 					{/if}
 				</div>
@@ -181,7 +182,7 @@
 					bind:value={ikigai_good_at} 
 					on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
 					rows="4" 
-					placeholder="What are your natural talents and developed skills?"
+					placeholder={$t('ikigai.good_at_placeholder')}
 					class="w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-400 focus:ring-blue-400 resize-none overflow-hidden min-h-[120px] p-4"
 				></textarea>
 			</div>
@@ -192,7 +193,7 @@
 					<div class="w-12 h-12 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mr-4">
 						<span class="text-white font-bold text-lg">🌍</span>
 					</div>
-					<h2 class="text-2xl font-bold text-gray-800">What do you care about?</h2>
+					<h2 class="text-2xl font-bold text-gray-800">{$t('ikigai.care_about_title')}</h2>
 				</div>
 				
 				<div class="border border-gray-200 rounded-lg mb-4">
@@ -201,13 +202,13 @@
 						class="w-full p-3 text-left bg-green-50 hover:bg-green-100 rounded-t-lg flex justify-between items-center text-sm font-medium text-gray-700"
 						on:click={() => toggleInstructions('care')}
 					>
-						<span>💡 Need inspiration?</span>
+						<span>{$t('ikigai.need_inspiration')}</span>
 						<span class="text-gray-400">{expandedInstructions['care'] ? '−' : '+'}</span>
 					</button>
 					{#if expandedInstructions['care']}
 						<div class="p-4 bg-green-50 rounded-b-lg border-t border-green-200 space-y-3">
-							<p class="text-gray-600 text-sm">What societal, environmental, or humanitarian issues ignite your passion? What problems do you see that you want to help fix?</p>
-							<p class="text-gray-500 text-xs italic">Examples: Better access to education in developing countries. Building a circular economy. Diversity and inclusion.</p>
+							<p class="text-gray-600 text-sm">{$t('ikigai.care_about_inspiration')}</p>
+							<p class="text-gray-500 text-xs italic">{$t('ikigai.care_about_examples')}</p>
 						</div>
 					{/if}
 				</div>
@@ -216,7 +217,7 @@
 					bind:value={ikigai_care_about} 
 					on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
 					rows="4" 
-					placeholder="What causes or issues deeply matter to you?"
+					placeholder={$t('ikigai.care_about_placeholder')}
 					class="w-full rounded-xl border-gray-300 shadow-sm focus:border-green-400 focus:ring-green-400 resize-none overflow-hidden min-h-[120px] p-4"
 				></textarea>
 			</div>
@@ -227,7 +228,7 @@
 					<div class="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center mr-4">
 						<span class="text-white font-bold text-lg">🚀</span>
 					</div>
-					<h2 class="text-2xl font-bold text-gray-800">What inspires you?</h2>
+					<h2 class="text-2xl font-bold text-gray-800">{$t('ikigai.inspires_title')}</h2>
 				</div>
 				
 				<div class="border border-gray-200 rounded-lg mb-4">
@@ -236,13 +237,13 @@
 						class="w-full p-3 text-left bg-orange-50 hover:bg-orange-100 rounded-t-lg flex justify-between items-center text-sm font-medium text-gray-700"
 						on:click={() => toggleInstructions('inspires')}
 					>
-						<span>💡 Need inspiration?</span>
+						<span>{$t('ikigai.need_inspiration')}</span>
 						<span class="text-gray-400">{expandedInstructions['inspires'] ? '−' : '+'}</span>
 					</button>
 					{#if expandedInstructions['inspires']}
 						<div class="p-4 bg-orange-50 rounded-b-lg border-t border-orange-200 space-y-3">
-							<p class="text-gray-600 text-sm">Which industries or fields capture your imagination? What draws you to them - innovation, helping people, creativity, or something else?</p>
-							<p class="text-gray-500 text-xs italic">Examples: Software because I like creating things people use. Animal welfare because I want to help them. Recruiting because I meet interesting people.</p>
+							<p class="text-gray-600 text-sm">{$t('ikigai.inspires_inspiration')}</p>
+							<p class="text-gray-500 text-xs italic">{$t('ikigai.inspires_examples')}</p>
 						</div>
 					{/if}
 				</div>
@@ -251,7 +252,7 @@
 					bind:value={ikigai_inspires} 
 					on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
 					rows="4" 
-					placeholder="What industries or fields excite and motivate you?"
+					placeholder={$t('ikigai.inspires_placeholder')}
 					class="w-full rounded-xl border-gray-300 shadow-sm focus:border-orange-400 focus:ring-orange-400 resize-none overflow-hidden min-h-[120px] p-4"
 				></textarea>
 			</div>
@@ -262,7 +263,7 @@
 					<div class="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mr-4">
 						<span class="text-white font-bold text-lg">✨</span>
 					</div>
-					<h2 class="text-2xl font-bold text-gray-800">Who do you want to be?</h2>
+					<h2 class="text-2xl font-bold text-gray-800">{$t('ikigai.want_to_be_title')}</h2>
 				</div>
 				
 				<div class="border border-gray-200 rounded-lg mb-4">
@@ -271,13 +272,13 @@
 						class="w-full p-3 text-left bg-purple-50 hover:bg-purple-100 rounded-t-lg flex justify-between items-center text-sm font-medium text-gray-700"
 						on:click={() => toggleInstructions('want_to_be')}
 					>
-						<span>💡 Need inspiration?</span>
+						<span>{$t('ikigai.need_inspiration')}</span>
 						<span class="text-gray-400">{expandedInstructions['want_to_be'] ? '−' : '+'}</span>
 					</button>
 					{#if expandedInstructions['want_to_be']}
 						<div class="p-4 bg-purple-50 rounded-b-lg border-t border-purple-200 space-y-3">
-							<p class="text-gray-600 text-sm">Think about your dreams and long-term aspirations. What legacy do you want to leave? What lifestyle do you dream of? What milestones are you striving to reach?</p>
-							<p class="text-gray-500 text-xs italic">Examples: I want to spend more time with my kids. Write a book about scuba diving. Earn enough to retire comfortably at 55.</p>
+							<p class="text-gray-600 text-sm">{$t('ikigai.want_to_be_inspiration')}</p>
+							<p class="text-gray-500 text-xs italic">{$t('ikigai.want_to_be_examples')}</p>
 						</div>
 					{/if}
 				</div>
@@ -286,7 +287,7 @@
 					bind:value={ikigai_want_to_be} 
 					on:input={(e) => { autogrow(e.currentTarget); saveProgress(); }} 
 					rows="4" 
-					placeholder="What are your dreams and aspirations for the future?"
+					placeholder={$t('ikigai.want_to_be_placeholder')}
 					class="w-full rounded-xl border-gray-300 shadow-sm focus:border-purple-400 focus:ring-purple-400 resize-none overflow-hidden min-h-[120px] p-4"
 				></textarea>
 			</div>
@@ -302,7 +303,7 @@
 				<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
 				</svg>
-				Back to CV
+				{$t('ikigai.back_to_cv')}
 			</button>
 
 			<button
@@ -310,7 +311,7 @@
 				on:click={proceedToStep3}
 				class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center"
 			>
-				Continue to Final Questions
+				{$t('ikigai.continue_to_final')}
 				<svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
 				</svg>

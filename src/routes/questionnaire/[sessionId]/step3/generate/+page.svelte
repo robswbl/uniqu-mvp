@@ -4,6 +4,7 @@
   import { fade, scale } from 'svelte/transition';
   import { onMount } from 'svelte';
   import { get } from 'svelte/store';
+  import { t } from 'svelte-i18n';
 
   const sessionId = $page.params.sessionId;
   let isGenerating = false;
@@ -32,7 +33,7 @@
 </script>
 
 <svelte:head>
-  <title>Congratulations! Ready to Generate Your Results?</title>
+  <title>{$t('step3.generate.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <div class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 p-6">
@@ -42,14 +43,14 @@
       in:scale={{ duration: 2000, start: 0.95 }}
     >
       <div class="flex flex-col items-center">
-        <div class="text-6xl mb-6 animate-bounce" in:fade={{ duration: 2000 }}>🎉</div>
+        <div class="text-6xl mb-6 animate-bounce" in:fade={{ duration: 2000 }}>{'🎉'}</div>
       </div>
-      <h1 class="text-3xl font-bold text-gray-800 mb-6">Congratulations on completing the questions!</h1>
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">{$t('step3.generate.congrats_heading')}</h1>
       <p class="text-lg text-gray-700 mb-8">
-        You’ve shown incredible dedication and self-reflection. That’s what sets successful people apart. When you click <strong>Generate</strong>, you’ll receive a personalized analysis—a big revelation about yourself that could change your trajectory moving forward.
+        {$t('step3.generate.congrats_text')}
       </p>
       <p class="text-md text-gray-600 mb-12">
-        Take a deep breath and get ready for your next chapter. We’re excited to show you what you’ve discovered!
+        {$t('step3.generate.next_chapter')}
       </p>
       <div class="flex justify-center">
         <button
@@ -57,7 +58,7 @@
           on:click={handleGenerate}
           disabled={isGenerating}
         >
-          {isGenerating ? 'Generating...' : 'Generate Now'}
+          {isGenerating ? $t('step3.generate.generating') : $t('step3.generate.generate_now')}
         </button>
       </div>
     </div>

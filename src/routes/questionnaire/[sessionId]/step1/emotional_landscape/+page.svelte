@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import QuestionCard from '$lib/QuestionCard.svelte';
   import { get } from 'svelte/store';
+  import { t } from 'svelte-i18n';
 
   const sessionId = $page.params.sessionId;
 
@@ -81,21 +82,21 @@
 </script>
 
 <svelte:head>
-  <title>Step 1: Emotional Landscape - UniqU</title>
+  <title>{$t('step1.emotional_landscape.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <QuestionCard
-  title="Step 1: Emotional Landscape"
+  title={$t('step1.emotional_landscape.title')}
   emoji="💭"
-  explainer="How are you feeling about your career journey?"
+  explainer={$t('step1.emotional_landscape.explainer')}
   explainerColor="indigo"
-  textareaPlaceholder="Excited, uncertain, ready for change? Share your current emotional state..."
+  textareaPlaceholder={$t('step1.emotional_landscape.textarea_placeholder')}
   bind:textareaValue={emotionalLandscape}
   saveStatus={saveStatus}
   onInput={handleInput}
   onNext={goToNext}
   onBack={goToBack}
-  nextLabel={isLastStep1Question ? 'Continue to Step 2' : 'Next'}
-  backLabel="Back"
+  nextLabel={isLastStep1Question ? $t('step1.emotional_landscape.continue_to_step2') : $t('buttons.next')}
+  backLabel={$t('buttons.back')}
   disabled={isSaving}
 />

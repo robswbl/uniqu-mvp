@@ -1,6 +1,7 @@
 <!-- src/routes/create-user/+page.svelte -->
 <script lang="ts">
   import { goto } from '$app/navigation';
+  import { t } from 'svelte-i18n';
 
   let firstName = '';
   let lastName = '';
@@ -23,7 +24,7 @@
 
   async function createUser() {
     if (!firstName || !lastName || !gender || !email || !language || !agency) {
-      message = 'Please fill in all fields';
+      message = $t('create_user.fill_all_fields');
       messageType = 'error';
       return;
     }
@@ -51,7 +52,7 @@
       });
 
       if (response.ok) {
-        message = 'User created successfully!';
+        message = $t('create_user.success');
         messageType = 'success';
         // Clear form
         firstName = '';
@@ -61,12 +62,12 @@
         language = '';
         agency = '';
       } else {
-        message = 'Failed to create user. Please try again.';
+        message = $t('create_user.fail');
         messageType = 'error';
       }
     } catch (error) {
       console.error('Error creating user:', error);
-      message = 'Error creating user. Please try again.';
+      message = $t('create_user.error');
       messageType = 'error';
     } finally {
       isSubmitting = false;
@@ -75,7 +76,7 @@
 </script>
 
 <svelte:head>
-  <title>Create User - Internal Testing</title>
+  <title>{$t('create_user.title')}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
@@ -91,11 +92,11 @@
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
         </svg>
-        Back to Home
+        {$t('create_user.back_to_home')}
       </button>
       
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">Create New User</h1>
-      <p class="text-gray-600">Internal testing tool for creating new users</p>
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">{$t('create_user.heading')}</h1>
+      <p class="text-gray-600">{$t('create_user.subheading')}</p>
     </div>
 
     <!-- Form -->
@@ -105,7 +106,7 @@
         <!-- First Name -->
         <div>
           <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">
-            First Name *
+            {$t('create_user.first_name_label')} *
           </label>
           <input
             id="firstName"
@@ -113,14 +114,14 @@
             bind:value={firstName}
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-            placeholder="Enter first name"
+            placeholder={$t('create_user.first_name_placeholder')}
           />
         </div>
 
         <!-- Last Name -->
         <div>
           <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">
-            Last Name *
+            {$t('create_user.last_name_label')} *
           </label>
           <input
             id="lastName"
@@ -128,14 +129,14 @@
             bind:value={lastName}
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-            placeholder="Enter last name"
+            placeholder={$t('create_user.last_name_placeholder')}
           />
         </div>
 
         <!-- Gender -->
         <div>
           <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">
-            Gender *
+            {$t('create_user.gender_label')} *
           </label>
           <select
             id="gender"
@@ -143,16 +144,16 @@
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
           >
-            <option value="">Select gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="">{$t('create_user.gender_select')}</option>
+            <option value="male">{$t('create_user.gender_male')}</option>
+            <option value="female">{$t('create_user.gender_female')}</option>
           </select>
         </div>
 
         <!-- Email -->
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-            Email *
+            {$t('create_user.email_label')} *
           </label>
           <input
             id="email"
@@ -160,14 +161,14 @@
             bind:value={email}
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-            placeholder="Enter email address"
+            placeholder={$t('create_user.email_placeholder')}
           />
         </div>
 
         <!-- Language -->
         <div>
           <label for="language" class="block text-sm font-medium text-gray-700 mb-2">
-            Language *
+            {$t('create_user.language_label')} *
           </label>
           <select
             id="language"
@@ -175,16 +176,16 @@
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
           >
-            <option value="">Select language</option>
-            <option value="English">English</option>
-            <option value="German">German</option>
+            <option value="">{$t('create_user.language_select')}</option>
+            <option value="English">{$t('create_user.language_english')}</option>
+            <option value="German">{$t('create_user.language_german')}</option>
           </select>
         </div>
 
         <!-- Agency -->
         <div>
           <label for="agency" class="block text-sm font-medium text-gray-700 mb-2">
-            Agency *
+            {$t('create_user.agency_label')} *
           </label>
           <input
             id="agency"
@@ -192,7 +193,7 @@
             bind:value={agency}
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-            placeholder="Enter agency name"
+            placeholder={$t('create_user.agency_placeholder')}
           />
         </div>
 
@@ -214,9 +215,9 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Creating User...
+            {$t('create_user.creating')}
           {:else}
-            Create User
+            {$t('create_user.create')}
           {/if}
         </button>
       </form>
@@ -229,9 +230,9 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <div>
-          <h3 class="text-sm font-medium text-blue-900">Internal Testing Tool</h3>
+          <h3 class="text-sm font-medium text-blue-900">{$t('create_user.info_title')}</h3>
           <p class="text-sm text-blue-700 mt-1">
-            This form sends user data to the n8n webhook for database creation. For internal testing purposes only.
+            {$t('create_user.info_desc')}
           </p>
         </div>
       </div>

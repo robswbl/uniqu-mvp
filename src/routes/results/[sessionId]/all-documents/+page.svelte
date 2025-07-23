@@ -2,7 +2,9 @@
   import { onMount } from 'svelte';
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { supabase } from '$lib/supabaseClient.ts';
+  import { supabase } from '$lib/supabaseClient';
+  import { t } from 'svelte-i18n';
+  // Remove import { t as $t } from 'svelte-i18n';
 
   let sessionId = $page.params.sessionId;
   let documents: any[] = [];
@@ -122,33 +124,36 @@
   onMount(() => {
     fetchDocuments();
   });
+
+  // Remove any $: $t = t; assignment
+  // Use {$t('key')} in markup
 </script>
 
 <svelte:head>
-  <title>All Generated Documents - UniqU</title>
+  <title>{$t('all_documents.title')} - {$t('app.title')}</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
   <div class="max-w-5xl mx-auto">
     <div class="mb-8 flex items-center justify-between flex-wrap gap-2">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">All Generated Documents</h1>
-        <p class="text-gray-600">Below is a list of all documents generated for this session.</p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">{$t('all_documents.heading')}</h1>
+        <p class="text-gray-600">{$t('all_documents.subheading')}</p>
       </div>
       <div class="flex items-center gap-4 flex-wrap">
-        <label class="text-sm text-gray-700">Filter by type:</label>
-        <select bind:value={filterType} class="p-2 border rounded">
-          <option value="all">All</option>
-          <option value="reflection_letter">Reflection Letter</option>
-          <option value="career_themes">Career Themes</option>
-          <option value="ideal_companies">Ideal Companies</option>
-          <option value="application_letter">Application Letter</option>
+        <label for="filter-type-select" class="text-sm text-gray-700">{$t('all_documents.filter_by_type')}</label>
+        <select id="filter-type-select" bind:value={filterType} class="p-2 border rounded">
+          <option value="all">{$t('all_documents.all')}</option>
+          <option value="reflection_letter">{$t('all_documents.reflection_letter')}</option>
+          <option value="career_themes">{$t('all_documents.career_themes')}</option>
+          <option value="ideal_companies">{$t('all_documents.ideal_companies')}</option>
+          <option value="application_letter">{$t('all_documents.application_letter')}</option>
         </select>
         <button on:click={() => goto(`/dashboard/${sessionId}`)} class="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors duration-200" type="button">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
           </svg>
-          Back to Dashboard
+          {$t('all_documents.back_to_dashboard')}
         </button>
       </div>
     </div>
@@ -156,7 +161,7 @@
     {#if loading}
       <div class="bg-white rounded-xl shadow-lg p-8 text-center">
         <div class="animate-spin w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-        <p class="text-gray-600">Loading documents...</p>
+        <p class="text-gray-600">{$t('all_documents.loading')}</p>
       </div>
     {:else if error}
       <div class="bg-white rounded-xl shadow-lg p-8 text-center">
@@ -164,29 +169,29 @@
       </div>
     {:else if filteredDocs().length === 0}
       <div class="bg-white rounded-xl shadow-lg p-8 text-center">
-        <p class="text-gray-600">No documents generated yet.</p>
+        <p class="text-gray-600">{$t('all_documents.no_documents')}</p>
       </div>
     {:else}
       <div class="bg-white rounded-xl shadow-lg p-8 overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead>
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" on:click={() => setSort('document_type')}>Type {sortBy === 'document_type' ? (sortAsc ? '▲' : '▼') : ''}</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" on:click={() => setSort('document_type')}>{$t('all_documents.type')} {sortBy === 'document_type' ? (sortAsc ? '▲' : '▼') : ''}</th>
               {#if filterType === applicationLetterType || filterType === 'all'}
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" on:click={() => setSort('company_name')}>Company {sortBy === 'company_name' ? (sortAsc ? '▲' : '▼') : ''}</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" on:click={() => setSort('company_name')}>{$t('all_documents.company')} {sortBy === 'company_name' ? (sortAsc ? '▲' : '▼') : ''}</th>
               {/if}
               {#if filterType === 'all' || mainTypes.includes(filterType)}
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" on:click={() => setSort('version')}>Version {sortBy === 'version' ? (sortAsc ? '▲' : '▼') : ''}</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" on:click={() => setSort('version')}>{$t('all_documents.version')} {sortBy === 'version' ? (sortAsc ? '▲' : '▼') : ''}</th>
               {/if}
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" on:click={() => setSort('created_at')}>Time Stamp {sortBy === 'created_at' ? (sortAsc ? '▲' : '▼') : ''}</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Open</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Download</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" on:click={() => setSort('created_at')}>{$t('all_documents.timestamp')} {sortBy === 'created_at' ? (sortAsc ? '▲' : '▼') : ''}</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{$t('all_documents.open')}</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{$t('all_documents.download')}</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             {#each filteredDocs() as doc}
               <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{doc.document_type.replace('_', ' ') === 'application letter' ? 'Application Letter' : doc.document_type.replace('_', ' ')}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{doc.document_type.replace('_', ' ') === 'application letter' ? $t('all_documents.application_letter') : $t(`all_documents.${doc.document_type}`)}</td>
                 {#if (filterType === applicationLetterType || filterType === 'all')}
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{doc.document_type === applicationLetterType ? doc.company_name || '-' : ''}</td>
                 {/if}
@@ -195,10 +200,10 @@
                 {/if}
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{new Date(doc.created_at).toLocaleString()}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <button on:click={() => openDocument(doc)} class="text-indigo-600 hover:text-indigo-800 font-medium underline">Open</button>
+                  <button on:click={() => openDocument(doc)} class="text-indigo-600 hover:text-indigo-800 font-medium underline">{$t('all_documents.open')}</button>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <button on:click={() => downloadDocument(doc)} class="text-green-600 hover:text-green-800 font-medium underline">Download</button>
+                  <button on:click={() => downloadDocument(doc)} class="text-green-600 hover:text-green-800 font-medium underline">{$t('all_documents.download')}</button>
                 </td>
               </tr>
             {/each}

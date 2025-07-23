@@ -833,7 +833,7 @@
 							<!-- Status Timeline -->
 							<div class="mb-4">
 								<div class="flex items-center space-x-2 text-xs text-gray-600">
-									<span>{$t('letters.status')}:</span>
+									<span>{$t('letters.status_label')}:</span>
 									<span class="font-medium">{getStatusLabel(letter.status)}</span>
 									{#if letter.sent_at}
 										<span>{$t('letters.sent')} {new Date(letter.sent_at).toLocaleDateString()}</span>

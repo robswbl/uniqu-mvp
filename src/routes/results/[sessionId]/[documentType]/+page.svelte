@@ -8,8 +8,9 @@
   import { get } from 'svelte/store';
   import { t } from 'svelte-i18n';
 
-  const sessionId = $page.params.sessionId;
-  const documentType = $page.params.documentType;
+  // Replace static assignment with reactive declarations
+  $: sessionId = $page.params.sessionId;
+  $: documentType = $page.params.documentType;
   
   let documentData: any = null;
   let isLoading = true;
@@ -37,7 +38,7 @@
     }
   }
 
-  onMount(fetchDocument);
+  // Remove onMount(fetchDocument); as the reactive statement will handle all cases.
 
   $: if ($page.params.documentType) {
     fetchDocument();

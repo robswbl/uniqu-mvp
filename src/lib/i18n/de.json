@@ -144,7 +144,8 @@
     "modal_title": "Bewerbungsschreiben",
     "copy": "Kopieren",
     "download_pdf": "Als PDF herunterladen",
-    "close_modal": "Schließen"
+    "close_modal": "Schließen",
+    "status_label": "Status"
   },
   "all_documents": {
     "title": "Alle generierten Dokumente",

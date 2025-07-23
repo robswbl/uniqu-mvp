@@ -73,7 +73,23 @@
         .eq('session_id', sessionId)
         .order('created_at', { ascending: false });
       if (fetchError) throw fetchError;
-      documents = data || [];
+      let docs = data || [];
+
+      // --- Frontend join: fetch application_letters and merge company_name ---
+      const { data: letters } = await supabase
+        .from('application_letters')
+        .select('id, company_name, session_id');
+      docs = docs.map(doc => {
+        if (doc.document_type === applicationLetterType) {
+          // Try to match by document_id or session_id (adjust as needed)
+          const letter = letters?.find(l => l.session_id === doc.session_id && l.company_name);
+          return { ...doc, company_name: letter?.company_name || '-' };
+        }
+        return doc;
+      });
+      documents = docs;
+      // --- END Frontend join ---
+      // TODO: For best performance, update n8n to always write company_name into generated_documents for application_letter type.
     } catch (err: any) {
       error = err?.message || 'Failed to load documents';
     } finally {

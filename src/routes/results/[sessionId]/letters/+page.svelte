@@ -72,7 +72,7 @@
 				.select('content_html')
 				.eq('session_id', sessionId)
 				.eq('document_type', 'matching_companies')
-				.single();
+				.maybeSingle();
 
 			if (companiesError && companiesError.code !== 'PGRST116') {
 				console.warn('No matching companies document found:', companiesError);
@@ -156,7 +156,7 @@
 			// First, get the user_id from questionnaire_sessions
 			const { data: sessionData, error: sessionError } = await supabase
 				.from('questionnaire_sessions')
-				.select('user_id')
+				.select('user_id, generation_id')
 				.eq('id', sessionId)
 				.single();
 
@@ -206,7 +206,8 @@
 					body: JSON.stringify({
 						user_id: sessionData.user_id,
 						session_id: sessionId,
-						application_letter_id: newLetter.id
+						application_letter_id: newLetter.id,
+						generation_id: sessionData.generation_id
 					})
 				});
 
@@ -365,7 +366,7 @@
 			// Get user_id from session
 			const { data: sessionData, error: sessionError } = await supabase
 				.from('questionnaire_sessions')
-				.select('user_id')
+				.select('user_id, generation_id')
 				.eq('id', sessionId)
 				.single();
 
@@ -381,7 +382,8 @@
 				body: JSON.stringify({
 					user_id: sessionData.user_id,
 					session_id: sessionId,
-					application_letter_id: letter.id
+					application_letter_id: letter.id,
+					generation_id: sessionData.generation_id
 				})
 			});
 

@@ -8,10 +8,7 @@ const path = require('path');
 const { translate } = require('@vitalets/google-translate-api');
 
 const LANGS = [
-  { code: 'de', name: 'German' },
-  { code: 'fr', name: 'French' },
-  { code: 'it', name: 'Italian' },
-  { code: 'es', name: 'Spanish' }
+  { code: 'de', name: 'German' }
 ];
 const BASE_PATH = path.join(__dirname, '../src/lib/i18n');
 const EN_FILE = path.join(BASE_PATH, 'en.json');
@@ -22,6 +19,10 @@ function readJson(file) {
 
 function writeJson(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2) + '\n', 'utf8');
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Translation provider abstraction
@@ -45,6 +46,7 @@ async function translateKeys(base, target, to, pathArr = []) {
       if (!target || !(key in target) || target[key] === base[key]) {
         console.log(`[${to}] Translating: ${currentPath.join('.')} ...`);
         result[key] = await translateText(base[key], to);
+        await sleep(2000); // 2 second delay
       } else {
         result[key] = target[key];
       }

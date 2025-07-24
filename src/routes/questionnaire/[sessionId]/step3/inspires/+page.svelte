@@ -54,13 +54,30 @@
       : `/questionnaire/${sessionId}/step3/want_to_be`;
     goto(nextUrl);
   }
-  function goToBack() {
-    const urlParams = get(page).url.searchParams;
-    const fromOnboarding = urlParams.get('from') === 'onboarding';
-    const backUrl = fromOnboarding
-      ? `/questionnaire/${sessionId}/step3/care_about?from=onboarding`
-      : `/questionnaire/${sessionId}/step3/care_about`;
-    goto(backUrl);
+  async function goToBack() {
+    const { data } = await supabase
+      .from('question_order')
+      .select('order')
+      .eq('step_id', 'step3')
+      .single();
+    if (data && data.order && Array.isArray(data.order)) {
+      const order = data.order;
+      const currentIndex = order.indexOf('inspires');
+      const urlParams = get(page).url.searchParams;
+      const fromOnboarding = urlParams.get('from') === 'onboarding';
+      if (currentIndex > 0) {
+        const prevQuestion = order[currentIndex - 1];
+        const prevUrl = fromOnboarding
+          ? `/questionnaire/${sessionId}/step3/${prevQuestion}?from=onboarding`
+          : `/questionnaire/${sessionId}/step3/${prevQuestion}`;
+        goto(prevUrl);
+      } else {
+        const onboardingUrl = fromOnboarding
+          ? `/onboarding/${sessionId}?from=onboarding`
+          : `/onboarding/${sessionId}`;
+        goto(onboardingUrl);
+      }
+    }
   }
 </script>
 

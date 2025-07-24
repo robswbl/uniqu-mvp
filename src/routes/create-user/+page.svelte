@@ -2,6 +2,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { t } from 'svelte-i18n';
+  import { supabase } from '$lib/supabaseClient';
 
   let firstName = '';
   let lastName = '';
@@ -24,8 +25,23 @@
     });
   }
 
+  // Wait for user to appear in Supabase after webhook
+  async function waitForUser(email: string, maxTries = 5, delayMs = 2000) {
+    console.log('waitForUser lookup for email:', email);
+    for (let i = 0; i < maxTries; i++) {
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('user_uuid')
+        .eq('user_email', email)
+        .single();
+      if (user && user.user_uuid) return user.user_uuid;
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+    return null;
+  }
+
   async function createUser() {
-    if (!firstName || !lastName || !gender || !email || !language || !agency) {
+    if (!firstName || !lastName || !gender || !email || !language) {
       message = $t('create_user.fill_all_fields');
       messageType = 'error';
       return;
@@ -56,17 +72,33 @@
       });
 
       if (response.ok) {
-        message = $t('create_user.success');
-        messageType = 'success';
-        // Clear form
-        firstName = '';
-        lastName = '';
-        gender = '';
-        email = '';
-        language = '';
-        agency = '';
-        user_search_regions = '';
-        user_search_industries = '';
+        // Wait for user to appear in Supabase
+        const userUuid = await waitForUser(email);
+        if (userUuid) {
+          // Create a new session for the user
+          const { error: sessionError } = await supabase
+            .from('questionnaire_sessions')
+            .insert({ user_id: userUuid, status: 'in-progress', created_at: new Date().toISOString() });
+          if (sessionError) {
+            message = 'User created, but failed to create session.';
+            messageType = 'error';
+          } else {
+            message = $t('create_user.success');
+            messageType = 'success';
+            // Clear form
+            firstName = '';
+            lastName = '';
+            gender = '';
+            email = '';
+            language = '';
+            agency = '';
+            user_search_regions = '';
+            user_search_industries = '';
+          }
+        } else {
+          message = 'User created, but could not find user UUID to create session.';
+          messageType = 'error';
+        }
       } else {
         message = $t('create_user.fail');
         messageType = 'error';
@@ -191,13 +223,12 @@
         <!-- Agency -->
         <div>
           <label for="agency" class="block text-sm font-medium text-gray-700 mb-2">
-            {$t('create_user.agency_label')} *
+            {$t('create_user.agency_label')}
           </label>
           <input
             id="agency"
             type="text"
             bind:value={agency}
-            required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
             placeholder={$t('create_user.agency_placeholder')}
           />

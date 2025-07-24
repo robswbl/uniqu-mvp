@@ -30,7 +30,8 @@
     "generate": "Generate",
     "download": "Download",
     "open": "Open",
-    "delete": "Delete"
+    "delete": "Delete",
+    "go_back": "Go back"
   },
   "next_steps": {
     "title": "What Happens Next?",
@@ -361,12 +362,11 @@
     "error_saving": "Error saving",
     "loaded_existing_data": "Loaded existing data.",
     "love": {
-      "title": "What do you love to do?",
-      "show_inspiration": "Show inspiration",
-      "hide_inspiration": "Hide inspiration",
-      "inspiration_text": "What activities make you feel truly alive and energized? Think about hobbies, interests, or work that excites you.",
+      "step_heading": "Step 3: What do you love?",
+      "explainer": "Reflect on the activities and passions that make you feel alive.",
+      "inspiration_text": "What activities make you feel truly alive and energized? Think about hobbies, interests, or work you are passionate about.",
       "inspiration_examples": "Examples: Playing music, helping others, solving puzzles, building things.",
-      "textarea_placeholder": "What activities make you feel truly alive and energized?"
+      "hide_inspiration": "Hide inspiration"
     },
     "good_at": {
       "step_heading": "Step 3: What are you good at?",
@@ -374,15 +374,36 @@
     },
     "care_about": {
       "step_heading": "Step 3: What do you care about?",
-      "explainer": "Reflect on the causes or issues that deeply matter to you."
+      "explainer": "Reflect on the causes or issues that deeply matter to you.",
+      "title": "What do you care about?",
+      "textarea_placeholder": "What causes or issues deeply matter to you?",
+      "show_inspiration": "Show inspiration",
+      "inspiration_text": "What societal, environmental, or humanitarian issues ignite your passion? What problems do you see that you want to help fix?",
+      "inspiration_examples": "Examples: Better access to education in developing countries. Building a circular economy. Diversity and inclusion.",
+      "hide_inspiration": "Hide inspiration"
     },
     "inspires": {
       "step_heading": "Step 3: What inspires you?",
-      "explainer": "Consider the industries, fields, or people that inspire you."
+      "explainer": "Consider the industries, fields, or people that inspire you.",
+      "title": "What inspires you?",
+      "textarea_placeholder": "What industries, fields, or people inspire you?",
+      "show_inspiration": "Show inspiration",
+      "inspiration_text": "What industries, fields, or people inspire you? Think about what you admire in others or what you find fascinating.",
+      "inspiration_examples": "Examples: Space exploration, social entrepreneurs, artists, scientists, activists.",
+      "hide_inspiration": "Hide inspiration"
     },
     "want_to_be": {
       "step_heading": "Step 3: Who do you want to become?",
-      "explainer": "Think about the qualities you admire and the impact you want to have."
+      "explainer": "Think about the qualities you admire and the impact you want to have.",
+      "title": "Who do you want to become?",
+      "textarea_placeholder": "Who do you want to become? What impact do you want to have?",
+      "finish": "Finish",
+      "show_inspiration": "Show inspiration",
+      "speak_button": "Start speech recognition",
+      "speak": "Speak",
+      "inspiration_text": "Think about the qualities you admire in others, the legacy you want to leave, or the kind of impact you hope to have on your community or the world.",
+      "inspiration_examples": "Examples: I want to be known as someone who lifts others up. I hope to inspire my children to follow their dreams. I want to be a leader who brings out the best in my team.",
+      "hide_inspiration": "Hide inspiration"
     },
     "generate": {
       "title": "Congratulations on finishing the questions!",

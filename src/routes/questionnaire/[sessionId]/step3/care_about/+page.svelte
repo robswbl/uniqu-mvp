@@ -54,13 +54,50 @@
       : `/questionnaire/${sessionId}/step3/good_at`;
     goto(nextUrl);
   }
-  function goToBack() {
-    const urlParams = get(page).url.searchParams;
-    const fromOnboarding = urlParams.get('from') === 'onboarding';
-    const backUrl = fromOnboarding
-      ? `/questionnaire/${sessionId}/step3/want_to_be?from=onboarding`
-      : `/questionnaire/${sessionId}/step3/want_to_be`;
-    goto(backUrl);
+  async function goToBack() {
+    const { data } = await supabase
+      .from('question_order')
+      .select('order')
+      .eq('step_id', 'step3')
+      .single();
+    if (data && data.order && Array.isArray(data.order)) {
+      const order = data.order;
+      const currentIndex = order.indexOf('care_about');
+      const urlParams = get(page).url.searchParams;
+      const fromOnboarding = urlParams.get('from') === 'onboarding';
+      if (currentIndex > 0) {
+        const prevQuestion = order[currentIndex - 1];
+        const prevUrl = fromOnboarding
+          ? `/questionnaire/${sessionId}/step3/${prevQuestion}?from=onboarding`
+          : `/questionnaire/${sessionId}/step3/${prevQuestion}`;
+        goto(prevUrl);
+      } else if (currentIndex === 0) {
+        // Go to last step2 question
+        const { data: step2Data } = await supabase
+          .from('question_order')
+          .select('order')
+          .eq('step_id', 'step2')
+          .single();
+        if (step2Data && step2Data.order && Array.isArray(step2Data.order) && step2Data.order.length > 0) {
+          const lastStep2 = step2Data.order[step2Data.order.length - 1];
+          const prevUrl = fromOnboarding
+            ? `/questionnaire/${sessionId}/step2/${lastStep2}?from=onboarding`
+            : `/questionnaire/${sessionId}/step2/${lastStep2}`;
+          goto(prevUrl);
+        } else {
+          // fallback to step2 root
+          const prevUrl = fromOnboarding
+            ? `/questionnaire/${sessionId}/step2?from=onboarding`
+            : `/questionnaire/${sessionId}/step2`;
+          goto(prevUrl);
+        }
+      } else {
+        const onboardingUrl = fromOnboarding
+          ? `/onboarding/${sessionId}?from=onboarding`
+          : `/onboarding/${sessionId}`;
+        goto(onboardingUrl);
+      }
+    }
   }
 </script>
 

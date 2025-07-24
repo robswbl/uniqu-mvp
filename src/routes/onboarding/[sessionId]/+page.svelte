@@ -9,6 +9,7 @@
 	const { sessionId } = data;
 
 	let userFirstName = '';
+	let userLoaded = false;
 	let currentStep = 0;
 	let selectedSituation = '';
 	let isSubmitting = false;
@@ -17,54 +18,12 @@
 	let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	const situations = [
-		{
-			id: 'laid-off',
-			title: $t('onboarding.option_laid_off'),
-			description: $t('onboarding.option_laid_off'),
-			icon: '💔',
-			tone: 'supportive',
-			message: ''
-		},
-		{
-			id: 'quit',
-			title: $t('onboarding.option_quit'),
-			description: $t('onboarding.option_quit'),
-			icon: '🦁',
-			tone: 'encouraging',
-			message: ''
-		},
-		{
-			id: 'career-change',
-			title: $t('onboarding.option_career_change'),
-			description: $t('onboarding.option_career_change'),
-			icon: '🔄',
-			tone: 'inspiring',
-			message: ''
-		},
-		{
-			id: 'retirement',
-			title: $t('onboarding.option_retirement'),
-			description: $t('onboarding.option_retirement'),
-			icon: '🌟',
-			tone: 'celebratory',
-			message: ''
-		},
-		{
-			id: 'burnout',
-			title: $t('onboarding.option_burnout'),
-			description: $t('onboarding.option_burnout'),
-			icon: '🕯️',
-			tone: 'gentle',
-			message: ''
-		},
-		{
-			id: 'other',
-			title: $t('onboarding.option_other'),
-			description: $t('onboarding.option_other'),
-			icon: '💭',
-			tone: 'open',
-			message: ''
-		}
+		{ id: 'laid-off', titleKey: 'onboarding.option_laid_off', icon: '💔', tone: 'supportive', message: '' },
+		{ id: 'quit', titleKey: 'onboarding.option_quit', icon: '🦁', tone: 'encouraging', message: '' },
+		{ id: 'career-change', titleKey: 'onboarding.option_career_change', icon: '🔄', tone: 'inspiring', message: '' },
+		{ id: 'retirement', titleKey: 'onboarding.option_retirement', icon: '🌟', tone: 'celebratory', message: '' },
+		{ id: 'burnout', titleKey: 'onboarding.option_burnout', icon: '🕯️', tone: 'gentle', message: '' },
+		{ id: 'other', titleKey: 'onboarding.option_other', icon: '💭', tone: 'open', message: '' }
 	];
 
 	onMount(async () => {
@@ -80,7 +39,7 @@
 		if (sessionData?.user_id) {
 			userId = sessionData.user_id;
 			
-			// Fetch user first name for personalization
+			// Fetch user first name for personalization (robust, like dashboard)
 			const { data: user, error: userError } = await supabase
 				.from('users')
 				.select('user_firstname')
@@ -89,9 +48,12 @@
 
 			console.log('User data:', user, 'Error:', userError);
 			
-			if (user?.user_firstname) {
+			if (user && user.user_firstname) {
 				userFirstName = user.user_firstname;
+			} else {
+				userFirstName = '';
 			}
+			userLoaded = true;
 		}
 		if (sessionData?.where_now) whereNow = sessionData.where_now;
 	});
@@ -170,7 +132,9 @@
 			<div class="text-center mb-12">
 				<div class="mb-8">
 					<h1 class="text-4xl font-bold text-gray-900 mb-4">
-						{$t('onboarding.welcome')}
+						{userLoaded && userFirstName
+							? $t('onboarding.welcome', { name: userFirstName } as any)
+							: $t('onboarding.welcome', { name: '' } as any)}
 					</h1>
 					<p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
 						{$t('app.subtitle')}
@@ -196,10 +160,10 @@
 									<span class="text-3xl">{situation.icon}</span>
 									<div class="flex-1">
 										<h3 class="font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">
-											{situation.title}
+											{$t(situation.titleKey)}
 										</h3>
 										<p class="text-sm text-gray-600 mt-1">
-											{situation.description}
+											{$t(situation.titleKey)}
 										</p>
 									</div>
 								</div>

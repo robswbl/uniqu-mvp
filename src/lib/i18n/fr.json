@@ -30,7 +30,8 @@
     "generate": "Générer",
     "download": "Télécharger",
     "open": "Ouvrir",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "go_back": "Retour"
   },
   "next_steps": {
     "title": "Que se passe-t-il ensuite ?",
@@ -361,12 +362,11 @@
     "error_saving": "Erreur d'enregistrement",
     "loaded_existing_data": "Données existantes chargées.",
     "love": {
-      "title": "Qu'aimez-vous faire ?",
-      "show_inspiration": "Montrer l'inspiration",
-      "hide_inspiration": "Masquer l'inspiration",
+      "step_heading": "Étape 3 : Qu'est-ce que vous aimez ?",
+      "explainer": "Réfléchissez aux activités et passions qui vous font vous sentir vivant.",
       "inspiration_text": "Quelles activités vous font vous sentir vraiment vivant(e) et énergisé(e) ? Pensez aux passe-temps, intérêts ou travail qui vous passionne.",
       "inspiration_examples": "Exemples : Jouer de la musique, aider les autres, résoudre des énigmes, construire des choses.",
-      "textarea_placeholder": "Quelles activités vous font vous sentir vraiment vivant(e) et énergisé(e) ?"
+      "hide_inspiration": "Masquer l'inspiration"
     },
     "good_at": {
       "title": "Dans quoi excellez-vous ?",
@@ -377,32 +377,25 @@
       "textarea_placeholder": "Quels sont vos talents naturels et compétences développées ?"
     },
     "care_about": {
-      "title": "Qu'est-ce qui vous tient à cœur ?",
-      "show_inspiration": "Montrer l'inspiration",
-      "hide_inspiration": "Masquer l'inspiration",
-      "inspiration_text": "Quelles questions sociétales, environnementales ou humanitaires éveillent votre passion ? Quels problèmes voyez-vous que vous voulez aider à résoudre ?",
-      "inspiration_examples": "Exemples : Meilleur accès à l'éducation dans les pays en développement. Construire une économie circulaire. Diversité et inclusion.",
-      "textarea_placeholder": "Quelles causes ou questions vous tiennent profondément à cœur ?"
+      "step_heading": "Étape 3 : Qu'est-ce qui vous tient à cœur ?",
+      "explainer": "Réfléchissez aux causes ou questions qui vous tiennent profondément à cœur.",
+      "textarea_placeholder": "Quelles causes ou questions vous tiennent profondément à cœur ?",
+      "show_inspiration": "Montrer l'inspiration"
     },
     "inspires": {
-      "title": "Qu'est-ce qui vous inspire ?",
-      "show_inspiration": "Montrer l'inspiration",
-      "hide_inspiration": "Masquer l'inspiration",
-      "inspiration_text": "Quelles industries, domaines ou personnes vous inspirent ? Pensez à ce que vous admirez chez les autres ou ce que vous trouvez fascinant.",
-      "inspiration_examples": "Exemples : Exploration spatiale, entrepreneurs sociaux, artistes, scientifiques, activistes.",
-      "textarea_placeholder": "Quelles industries, domaines ou personnes vous inspirent ?"
+      "step_heading": "Étape 3 : Qu'est-ce qui vous inspire ?",
+      "explainer": "Considérez les industries, domaines ou personnes qui vous inspirent.",
+      "textarea_placeholder": "Quelles industries, domaines ou personnes vous inspirent ?",
+      "show_inspiration": "Montrer l'inspiration"
     },
     "want_to_be": {
-      "title": "Qui voulez-vous devenir ?",
-      "show_inspiration": "Montrer l'inspiration",
-      "hide_inspiration": "Masquer l'inspiration",
-      "inspiration_text": "Pensez aux qualités que vous admirez chez les autres, l'héritage que vous voulez laisser, ou le type d'impact que vous espérez avoir sur votre communauté ou le monde.",
-      "inspiration_examples": "Exemples : Je veux être connu(e) comme quelqu'un qui élève les autres. J'espère inspirer mes enfants à suivre leurs rêves. Je veux être un(e) leader qui fait ressortir le meilleur de mon équipe.",
+      "step_heading": "Étape 3 : Qui voulez-vous devenir ?",
+      "explainer": "Pensez aux qualités que vous admirez et à l'impact que vous souhaitez avoir.",
       "textarea_placeholder": "Qui voulez-vous devenir ? Quel impact voulez-vous avoir ?",
       "finish": "Terminer",
-      "speak": "Parler",
-      "listening": "Écoute...",
-      "speak_button": "Démarrer la reconnaissance vocale"
+      "show_inspiration": "Montrer l'inspiration",
+      "speak_button": "Démarrer la reconnaissance vocale",
+      "speak": "Parler"
     },
     "generate": {
       "title": "Félicitations pour avoir terminé les questions !",

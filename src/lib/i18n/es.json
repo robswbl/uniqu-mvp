@@ -30,7 +30,8 @@
     "generate": "Generar",
     "download": "Descargar",
     "open": "Abrir",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "go_back": "Volver"
   },
   "next_steps": {
     "title": "¿Qué sigue?",
@@ -361,12 +362,11 @@
     "error_saving": "Error al guardar",
     "loaded_existing_data": "Datos existentes cargados.",
     "love": {
-      "title": "¿Qué te encanta hacer?",
-      "show_inspiration": "Mostrar inspiración",
-      "hide_inspiration": "Ocultar inspiración",
-      "inspiration_text": "¿Qué actividades te hacen sentir verdaderamente vivo y energizado? Piensa en pasatiempos, intereses o trabajo que te emociona.",
+      "step_heading": "Paso 3: ¿Qué amas?",
+      "explainer": "Reflexiona sobre las actividades y pasiones que te hacen sentir vivo.",
+      "inspiration_text": "¿Qué actividades te hacen sentir realmente vivo y lleno de energía? Piensa en pasatiempos, intereses o trabajos que te apasionan.",
       "inspiration_examples": "Ejemplos: Tocar música, ayudar a otros, resolver acertijos, construir cosas.",
-      "textarea_placeholder": "¿Qué actividades te hacen sentir verdaderamente vivo y energizado?"
+      "hide_inspiration": "Ocultar inspiración"
     },
     "good_at": {
       "title": "¿En qué eres excelente?",
@@ -377,32 +377,29 @@
       "textarea_placeholder": "¿Cuáles son tus talentos naturales y habilidades desarrolladas?"
     },
     "care_about": {
-      "title": "¿Qué te importa?",
-      "show_inspiration": "Mostrar inspiración",
-      "hide_inspiration": "Ocultar inspiración",
+      "step_heading": "Paso 3: ¿Qué te importa?",
+      "explainer": "Reflexiona sobre las causas o temas que realmente te importan.",
       "inspiration_text": "¿Qué temas sociales, ambientales o humanitarios encienden tu pasión? ¿Qué problemas ves que quieres ayudar a resolver?",
-      "inspiration_examples": "Ejemplos: Mejor acceso a educación en países en desarrollo. Construir una economía circular. Diversidad e inclusión.",
-      "textarea_placeholder": "¿Qué causas o temas te importan profundamente?"
+      "inspiration_examples": "Ejemplos: Mejor acceso a la educación en países en desarrollo. Construir una economía circular. Diversidad e inclusión.",
+      "hide_inspiration": "Ocultar inspiración"
     },
     "inspires": {
-      "title": "¿Qué te inspira?",
-      "show_inspiration": "Mostrar inspiración",
-      "hide_inspiration": "Ocultar inspiración",
+      "step_heading": "Paso 3: ¿Qué te inspira?",
+      "explainer": "Considera las industrias, campos o personas que te inspiran.",
       "inspiration_text": "¿Qué industrias, campos o personas te inspiran? Piensa en lo que admiras en otros o lo que encuentras fascinante.",
       "inspiration_examples": "Ejemplos: Exploración espacial, emprendedores sociales, artistas, científicos, activistas.",
-      "textarea_placeholder": "¿Qué industrias, campos o personas te inspiran?"
+      "hide_inspiration": "Ocultar inspiración"
     },
     "want_to_be": {
-      "title": "¿En quién quieres convertirte?",
-      "show_inspiration": "Mostrar inspiración",
-      "hide_inspiration": "Ocultar inspiración",
-      "inspiration_text": "Piensa en las cualidades que admiras en otros, el legado que quieres dejar, o el tipo de impacto que esperas tener en tu comunidad o el mundo.",
+      "step_heading": "Paso 3: ¿En quién quieres convertirte?",
+      "explainer": "Piensa en las cualidades que admiras y el impacto que quieres tener.",
+      "inspiration_text": "Piensa en las cualidades que admiras en otros, el legado que quieres dejar o el tipo de impacto que esperas tener en tu comunidad o en el mundo.",
       "inspiration_examples": "Ejemplos: Quiero ser conocido como alguien que eleva a otros. Espero inspirar a mis hijos a seguir sus sueños. Quiero ser un líder que saca lo mejor de mi equipo.",
-      "textarea_placeholder": "¿En quién quieres convertirte? ¿Qué impacto quieres tener?",
+      "hide_inspiration": "Ocultar inspiración",
       "finish": "Terminar",
-      "speak": "Hablar",
-      "listening": "Escuchando...",
-      "speak_button": "Iniciar reconocimiento de voz"
+      "show_inspiration": "Mostrar inspiración",
+      "speak_button": "Iniciar reconocimiento de voz",
+      "speak": "Hablar"
     },
     "generate": {
       "title": "¡Felicidades por terminar las preguntas!",

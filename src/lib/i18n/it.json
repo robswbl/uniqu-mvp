@@ -30,7 +30,8 @@
     "generate": "Genera",
     "download": "Scarica",
     "open": "Apri",
-    "delete": "Elimina"
+    "delete": "Elimina",
+    "go_back": "Indietro"
   },
   "next_steps": {
     "title": "Cosa succede dopo?",
@@ -361,12 +362,11 @@
     "error_saving": "Errore nel salvataggio",
     "loaded_existing_data": "Dati esistenti caricati.",
     "love": {
-      "title": "Cosa ami fare?",
-      "show_inspiration": "Mostra ispirazione",
-      "hide_inspiration": "Nascondi ispirazione",
-      "inspiration_text": "Quali attività ti fanno sentire veramente vivo ed energico? Pensa agli hobby, interessi o lavoro che ti entusiasma.",
-      "inspiration_examples": "Esempi: Suonare musica, aiutare gli altri, risolvere puzzle, costruire cose.",
-      "textarea_placeholder": "Quali attività ti fanno sentire veramente vivo ed energico?"
+      "step_heading": "Fase 3: Cosa ami?",
+      "explainer": "Rifletti sulle attività e passioni che ti fanno sentire vivo.",
+      "inspiration_text": "Quali attività ti fanno sentire davvero vivo e pieno di energia? Pensa a hobby, interessi o lavori che ti appassionano.",
+      "inspiration_examples": "Esempi: Suonare musica, aiutare gli altri, risolvere enigmi, costruire cose.",
+      "hide_inspiration": "Nascondi ispirazione"
     },
     "good_at": {
       "title": "In cosa sei bravo?",
@@ -377,32 +377,34 @@
       "textarea_placeholder": "Quali sono i tuoi talenti naturali e competenze sviluppate?"
     },
     "care_about": {
-      "title": "Cosa ti sta a cuore?",
+      "step_heading": "Fase 3: Cosa ti sta a cuore?",
+      "explainer": "Rifletti sulle cause o questioni che ti stanno profondamente a cuore.",
+      "textarea_placeholder": "Quali cause o questioni ti stanno profondamente a cuore?",
       "show_inspiration": "Mostra ispirazione",
-      "hide_inspiration": "Nascondi ispirazione",
       "inspiration_text": "Quali questioni sociali, ambientali o umanitarie accendono la tua passione? Quali problemi vedi che vuoi aiutare a risolvere?",
-      "inspiration_examples": "Esempi: Migliore accesso all'istruzione nei paesi in via di sviluppo. Costruire un'economia circolare. Diversità e inclusione.",
-      "textarea_placeholder": "Quali cause o questioni ti stanno profondamente a cuore?"
+      "inspiration_examples": "Esempi: Miglior accesso all'istruzione nei paesi in via di sviluppo. Costruire un'economia circolare. Diversità e inclusione.",
+      "hide_inspiration": "Nascondi ispirazione"
     },
     "inspires": {
-      "title": "Cosa ti ispira?",
+      "step_heading": "Fase 3: Cosa ti ispira?",
+      "explainer": "Considera le industrie, i settori o le persone che ti ispirano.",
+      "textarea_placeholder": "Quali industrie, settori o persone ti ispirano?",
       "show_inspiration": "Mostra ispirazione",
-      "hide_inspiration": "Nascondi ispirazione",
-      "inspiration_text": "Quali settori, campi o persone ti ispirano? Pensa a quello che ammiri negli altri o quello che trovi affascinante.",
+      "inspiration_text": "Quali industrie, settori o persone ti ispirano? Pensa a ciò che ammiri negli altri o che trovi affascinante.",
       "inspiration_examples": "Esempi: Esplorazione spaziale, imprenditori sociali, artisti, scienziati, attivisti.",
-      "textarea_placeholder": "Quali settori, campi o persone ti ispirano?"
+      "hide_inspiration": "Nascondi ispirazione"
     },
     "want_to_be": {
-      "title": "Chi vuoi diventare?",
-      "show_inspiration": "Mostra ispirazione",
-      "hide_inspiration": "Nascondi ispirazione",
-      "inspiration_text": "Pensa alle qualità che ammiri negli altri, all'eredità che vuoi lasciare, o al tipo di impatto che speri di avere sulla tua comunità o sul mondo.",
-      "inspiration_examples": "Esempi: Voglio essere conosciuto come qualcuno che eleva gli altri. Spero di ispirare i miei figli a seguire i loro sogni. Voglio essere un leader che tira fuori il meglio dal mio team.",
+      "step_heading": "Fase 3: Chi vuoi diventare?",
+      "explainer": "Pensa alle qualità che ammiri e all'impatto che vuoi avere.",
       "textarea_placeholder": "Chi vuoi diventare? Che impatto vuoi avere?",
       "finish": "Termina",
+      "show_inspiration": "Mostra ispirazione",
+      "speak_button": "Avvia riconoscimento vocale",
       "speak": "Parla",
-      "listening": "Ascoltando...",
-      "speak_button": "Avvia riconoscimento vocale"
+      "inspiration_text": "Pensa alle qualità che ammiri negli altri, all'eredità che vuoi lasciare o al tipo di impatto che speri di avere sulla tua comunità o sul mondo.",
+      "inspiration_examples": "Esempi: Voglio essere conosciuto come qualcuno che eleva gli altri. Spero di ispirare i miei figli a seguire i loro sogni. Voglio essere un leader che tira fuori il meglio dal mio team.",
+      "hide_inspiration": "Nascondi ispirazione"
     },
     "generate": {
       "title": "Congratulazioni per aver completato le domande!",

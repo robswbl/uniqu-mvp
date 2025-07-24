@@ -30,7 +30,8 @@
     "generate": "Generieren",
     "download": "Herunterladen",
     "open": "Öffnen",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "go_back": "Zurück"
   },
   "next_steps": {
     "title": "Was passiert als Nächstes?",
@@ -361,12 +362,11 @@
     "error_saving": "Fehler beim Speichern",
     "loaded_existing_data": "Vorhandene Daten geladen.",
     "love": {
-      "title": "Was machst du gerne?",
-      "show_inspiration": "Inspiration zeigen",
-      "hide_inspiration": "Inspiration verbergen",
-      "inspiration_text": "Du kennst diese Hobbys, von denen du einfach nicht genug bekommen kannst? Die Aktivitäten, auf die du dich die ganze Woche freust? Denk daran, was du tust, wenn du die Zeit vergisst, wenn die Außenwelt einfach zu verschwinden scheint.",
-      "inspiration_examples": "Beispiele: Ich koche gerne – Mahlzeiten planen, Zutaten schneiden... Meinen eigenen Computer bauen. Bei Hockeyturnieren spielen.",
-      "textarea_placeholder": "Welche Aktivitäten lassen dich wirklich lebendig und energiegeladen fühlen?"
+      "step_heading": "Schritt 3: Was liebst du?",
+      "explainer": "Denke über die Aktivitäten und Leidenschaften nach, die dich lebendig fühlen lassen.",
+      "inspiration_text": "Welche Aktivitäten lassen dich wirklich lebendig und energiegeladen fühlen? Denke an Hobbys, Interessen oder Arbeit, für die du brennst.",
+      "inspiration_examples": "Beispiele: Musik machen, anderen helfen, Rätsel lösen, Dinge bauen.",
+      "hide_inspiration": "Inspiration verbergen"
     },
     "good_at": {
       "title": "Worin bist du großartig?",
@@ -378,15 +378,36 @@
     },
     "care_about": {
       "step_heading": "Schritt 3: Was liegt dir am Herzen?",
-      "explainer": "Denke über die Themen oder Anliegen nach, die dir wirklich wichtig sind."
+      "explainer": "Denke über die Themen oder Anliegen nach, die dir wirklich wichtig sind.",
+      "title": "Was liegt dir am Herzen?",
+      "textarea_placeholder": "Welche Ursachen oder Themen sind dir wichtig?",
+      "show_inspiration": "Inspiration zeigen",
+      "inspiration_text": "Welche gesellschaftlichen, umweltbezogenen oder humanitären Themen entfachen deine Leidenschaft? Welche Probleme siehst du, bei denen du helfen möchtest?",
+      "inspiration_examples": "Beispiele: Besserer Zugang zu Bildung in Entwicklungsländern. Aufbau einer Kreislaufwirtschaft. Vielfalt und Inklusion.",
+      "hide_inspiration": "Inspiration verbergen"
     },
     "inspires": {
       "step_heading": "Schritt 3: Was inspiriert dich?",
-      "explainer": "Denke an Branchen, Bereiche oder Menschen, die dich inspirieren."
+      "explainer": "Denke an Branchen, Bereiche oder Menschen, die dich inspirieren.",
+      "title": "Was inspiriert dich?",
+      "textarea_placeholder": "Welche Branchen, Bereiche oder Menschen inspirieren dich?",
+      "show_inspiration": "Inspiration zeigen",
+      "inspiration_text": "Welche Branchen, Bereiche oder Menschen inspirieren dich? Denke an das, was du an anderen bewunderst oder was du faszinierend findest.",
+      "inspiration_examples": "Beispiele: Raumfahrt, Sozialunternehmer, Künstler, Wissenschaftler, Aktivisten.",
+      "hide_inspiration": "Inspiration verbergen"
     },
     "want_to_be": {
       "step_heading": "Schritt 3: Wer möchtest du werden?",
-      "explainer": "Überlege, welche Eigenschaften du bewunderst und welchen Einfluss du haben möchtest."
+      "explainer": "Überlege, welche Eigenschaften du bewunderst und welchen Einfluss du haben möchtest.",
+      "title": "Wer möchtest du werden?",
+      "textarea_placeholder": "Wer möchtest du werden? Welchen Einfluss möchtest du haben?",
+      "finish": "Abschließen",
+      "show_inspiration": "Inspiration zeigen",
+      "speak_button": "Spracherkennung starten",
+      "speak": "Sprechen",
+      "inspiration_text": "Denke an die Qualitäten, die du an anderen bewunderst, das Vermächtnis, das du hinterlassen möchtest, oder die Art von Einfluss, den du auf deine Gemeinschaft oder die Welt haben möchtest.",
+      "inspiration_examples": "Beispiele: Ich möchte als jemand bekannt sein, der andere aufbaut. Ich hoffe, meine Kinder zu inspirieren, ihren Träumen zu folgen. Ich möchte eine Führungskraft sein, die das Beste in meinem Team hervorbringt.",
+      "hide_inspiration": "Inspiration verbergen"
     },
     "generate": {
       "title": "Glückwunsch! Bereit, deine Ergebnisse zu generieren?",

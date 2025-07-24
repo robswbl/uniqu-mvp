@@ -78,12 +78,15 @@ async function changeLang(lang: string) {
   if (typeof window !== 'undefined') {
     localStorage.setItem('userLang', lang);
   }
+  // Debug: log Supabase config and user info
+  console.log('[LANG PATCH DEBUG] Supabase URL:', supabase?.url);
+  console.log('[LANG PATCH DEBUG] Supabase Key:', supabase?.key);
+  console.log('[LANG PATCH DEBUG] userId:', userId, 'lang:', lang);
   // If userId is available, update in DB
   if (userId) {
     // Debug: log userId and session
     if (import.meta.env && import.meta.env.DEV) {
       const { data: { session } } = await supabase.auth.getSession();
-      console.log('[LANG PATCH DEBUG] userId:', userId);
       console.log('[LANG PATCH DEBUG] session:', session);
     }
     const { error, data, status } = await supabase
@@ -91,9 +94,7 @@ async function changeLang(lang: string) {
       .update({ user_language: lang })
       .eq('user_uuid', userId);
     // Debug: log full response
-    if (import.meta.env && import.meta.env.DEV) {
-      console.log('[LANG PATCH DEBUG] PATCH response:', { error, data, status });
-    }
+    console.log('[LANG PATCH DEBUG] PATCH response:', { error, data, status });
     if (error) {
       errorMsg = 'Failed to update language in your profile. Please try again.';
     } else {

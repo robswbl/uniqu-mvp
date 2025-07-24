@@ -215,8 +215,11 @@
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
           >
             <option value="">{$t('create_user.language_select')}</option>
-            <option value="English">{$t('create_user.language_english')}</option>
-            <option value="German">{$t('create_user.language_german')}</option>
+            <option value="en">{$t('create_user.language_english')}</option>
+            <option value="de">{$t('create_user.language_german')}</option>
+            <option value="fr">{$t('create_user.language_french')}</option>
+            <option value="it">{$t('create_user.language_italian')}</option>
+            <option value="es">{$t('create_user.language_spanish')}</option>
           </select>
         </div>
 

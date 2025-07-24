@@ -9,6 +9,8 @@
   let email = '';
   let language = '';
   let agency = '';
+  let user_search_regions = '';
+  let user_search_industries = '';
   let isSubmitting = false;
   let message = '';
   let messageType = '';
@@ -40,7 +42,9 @@
         gender,
         email,
         language,
-        agency
+        agency,
+        user_search_regions,
+        user_search_industries
       };
 
       const response = await fetch('https://manage.app.n8n.cloud/webhook/clients/uniqu-createuser', {
@@ -61,6 +65,8 @@
         email = '';
         language = '';
         agency = '';
+        user_search_regions = '';
+        user_search_industries = '';
       } else {
         message = $t('create_user.fail');
         messageType = 'error';
@@ -194,6 +200,34 @@
             required
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
             placeholder={$t('create_user.agency_placeholder')}
+          />
+        </div>
+
+        <!-- User Search Regions -->
+        <div>
+          <label for="user_search_regions" class="block text-sm font-medium text-gray-700 mb-2">
+            In which city/cities or region(s) is the user looking for work?
+          </label>
+          <input
+            id="user_search_regions"
+            type="text"
+            bind:value={user_search_regions}
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+            placeholder="e.g. Berlin, Hamburg, Bavaria, remote, ..."
+          />
+        </div>
+
+        <!-- User Search Industries -->
+        <div>
+          <label for="user_search_industries" class="block text-sm font-medium text-gray-700 mb-2">
+            Which are the preferred industries of the user?
+          </label>
+          <input
+            id="user_search_industries"
+            type="text"
+            bind:value={user_search_industries}
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+            placeholder="e.g. Tech, Healthcare, Education, ..."
           />
         </div>
 

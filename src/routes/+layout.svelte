@@ -11,6 +11,7 @@ import { locale, waitLocale } from '$lib/i18n';
 import { t } from 'svelte-i18n';
 import { supabase } from '$lib/supabaseClient';
 import { goto } from '$app/navigation';
+import { page } from '$app/stores';
 
 let userLang = '';
 let localeReady = false;
@@ -107,18 +108,27 @@ async function changeLang(lang: string) {
 {#if localeReady}
 <div class="min-h-screen flex flex-col">
   <header class="flex items-center justify-between p-4 bg-white shadow">
-    <h1 class="text-2xl font-bold text-indigo-700">{$t('app.title')}</h1>
+    {#if $page.params?.sessionId}
+      <a href="/dashboard/{$page.params.sessionId}" class="text-2xl font-bold text-indigo-700 hover:underline">{$t('app.title')}</a>
+    {:else}
+      <a href="/" class="text-2xl font-bold text-indigo-700 hover:underline">{$t('app.title')}</a>
+    {/if}
     <div>
-      <select
-        class="p-2 border rounded"
-        bind:value={$locale}
-        on:change={(e) => changeLang((e.target as HTMLSelectElement).value)}
-        aria-label="Select language"
-      >
-        {#each availableLangs as lang}
-          <option value={lang.code}>{lang.label}</option>
-        {/each}
-      </select>
+      <div class="relative inline-flex items-center">
+        <select
+          class="appearance-none bg-none p-2 pr-8 border rounded-lg text-base font-normal text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          bind:value={$locale}
+          on:change={(e) => changeLang((e.target as HTMLSelectElement).value)}
+          aria-label="Select language"
+        >
+          {#each availableLangs as lang}
+            <option value={lang.code}>{lang.label}</option>
+          {/each}
+        </select>
+        <svg class="w-4 h-4 absolute right-2 pointer-events-none text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
       {#if errorMsg}
         <div class="text-red-600 text-xs mt-1">{errorMsg}</div>
       {/if}

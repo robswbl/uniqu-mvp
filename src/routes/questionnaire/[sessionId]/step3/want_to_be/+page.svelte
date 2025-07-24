@@ -6,6 +6,7 @@
   import QuestionCard from '$lib/QuestionCard.svelte';
   import { get } from 'svelte/store';
   import { t } from 'svelte-i18n';
+  import { locale } from '$lib/i18n';
 
   const sessionId = $page.params.sessionId;
   let ikigaiWantToBe = '';
@@ -13,6 +14,17 @@
   let isSaving = false;
   let saveTimeout: ReturnType<typeof setTimeout> | null = null;
   let showInspiration = false;
+  let recognizing = false;
+  let recognition;
+
+  // Map app locale to Web Speech API language codes
+  const speechLangMap = {
+    en: 'en-US',
+    de: 'de-DE',
+    fr: 'fr-FR',
+    it: 'it-IT',
+    es: 'es-ES'
+  };
 
   onMount(async () => {
     const { data } = await supabase
@@ -62,6 +74,32 @@
       : `/questionnaire/${sessionId}/step3/inspires`;
     goto(backUrl);
   }
+
+  function startRecognition() {
+    // @ts-ignore
+    if (!('webkitSpeechRecognition' in window)) {
+      alert('Speech recognition not supported in this browser.');
+      return;
+    }
+    // @ts-ignore
+    recognition = new webkitSpeechRecognition();
+    let currentLocale = get(locale) as keyof typeof speechLangMap;
+    if (!(currentLocale in speechLangMap)) currentLocale = 'en';
+    const langCode = speechLangMap[currentLocale];
+    recognition.lang = langCode;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    // @ts-ignore
+    recognition.onresult = (event) => {
+      const result = event.results[0][0].transcript;
+      ikigaiWantToBe = ikigaiWantToBe ? ikigaiWantToBe.trim() + '\n' + result : result;
+      handleInput();
+    };
+    recognition.onend = () => recognizing = false;
+    recognition.onerror = () => recognizing = false;
+    recognition.start();
+    recognizing = true;
+  }
 </script>
 
 <svelte:head>
@@ -94,5 +132,18 @@
         <p class="text-gray-500 text-xs italic">{$t('step3.want_to_be.inspiration_examples')}</p>
       </div>
     {/if}
+  </div>
+  <div class="flex items-center mt-4">
+    <button
+      type="button"
+      class="flex items-center px-4 py-2 bg-purple-100 text-purple-700 rounded-lg shadow-sm hover:bg-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 disabled:opacity-50"
+      on:click={startRecognition}
+      disabled={recognizing}
+      aria-label="{$t('step3.want_to_be.speak_button') || 'Speak'}"
+    >
+      <span class="mr-2">🎤</span>
+      {recognizing ? ($t('step3.want_to_be.listening') || 'Listening...') : ($t('step3.want_to_be.speak') || 'Speak')}
+    </button>
+    <span class="ml-3 text-sm text-gray-500">{recognizing ? ($t('step3.want_to_be.listening') || 'Listening...') : ''}</span>
   </div>
 </QuestionCard> 

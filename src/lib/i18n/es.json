@@ -399,13 +399,16 @@
       "inspiration_text": "Piensa en las cualidades que admiras en otros, el legado que quieres dejar, o el tipo de impacto que esperas tener en tu comunidad o el mundo.",
       "inspiration_examples": "Ejemplos: Quiero ser conocido como alguien que eleva a otros. Espero inspirar a mis hijos a seguir sus sueños. Quiero ser un líder que saca lo mejor de mi equipo.",
       "textarea_placeholder": "¿En quién quieres convertirte? ¿Qué impacto quieres tener?",
-      "finish": "Terminar"
+      "finish": "Terminar",
+      "speak": "Hablar",
+      "listening": "Escuchando...",
+      "speak_button": "Iniciar reconocimiento de voz"
     },
     "generate": {
-      "title": "¡Felicitaciones!",
-      "congrats_heading": "¡Has completado el paso 3!",
-      "congrats_text": "Has terminado la reflexión de Ikigai. Estás listo para generar tus documentos profesionales personalizados.",
-      "next_chapter": "¿Listo para el siguiente capítulo?",
+      "title": "¡Felicidades por terminar las preguntas!",
+      "congrats_heading": "¡Felicidades por terminar las preguntas!",
+      "congrats_text": "Has demostrado una increíble dedicación y autorreflexión. Eso es lo que distingue a las personas exitosas. Cuando hagas clic en Generar, recibirás un análisis personalizado: una gran revelación sobre ti mismo que podría cambiar tu dirección futura.",
+      "next_chapter": "Respira hondo y prepárate para tu próximo capítulo. ¡Estamos deseando mostrarte lo que has descubierto!",
       "generate_now": "Generar ahora"
     }
   },
@@ -489,5 +492,35 @@
     "life_context_intro": "Comienza definiendo tu contexto de vida, valores y metas.",
     "life_context_desc": "Define tu historia, valores y aspiraciones.",
     "edit_life_context": "Editar contexto de vida"
+  },
+  "create_user": {
+    "heading": "Crear un nuevo usuario",
+    "subheading": "Rellena el formulario para añadir un nuevo usuario.",
+    "first_name_label": "Nombre",
+    "first_name_placeholder": "Introduce el nombre",
+    "last_name_label": "Apellido",
+    "last_name_placeholder": "Introduce el apellido",
+    "gender_label": "Género",
+    "gender_select": "Selecciona el género",
+    "gender_male": "Masculino",
+    "gender_female": "Femenino",
+    "email_label": "Correo electrónico",
+    "email_placeholder": "Introduce el correo electrónico",
+    "language_label": "Idioma",
+    "language_select": "Selecciona el idioma",
+    "language_english": "Inglés",
+    "language_german": "Alemán",
+    "agency_label": "Agencia",
+    "agency_placeholder": "Introduce el nombre de la agencia",
+    "create": "Crear usuario",
+    "creating": "Creando...",
+    "success": "¡Usuario creado con éxito!",
+    "fail": "No se pudo crear el usuario.",
+    "error": "Ocurrió un error al crear el usuario.",
+    "fill_all_fields": "Por favor, completa todos los campos obligatorios.",
+    "back_to_home": "Volver al inicio",
+    "title": "Crear usuario",
+    "info_title": "¿Por qué necesitamos esta información?",
+    "info_desc": "Utilizamos esta información para personalizar la experiencia del usuario y encontrar las mejores oportunidades."
   }
 }

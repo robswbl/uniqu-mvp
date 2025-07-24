@@ -399,13 +399,16 @@
       "inspiration_text": "Pensez aux qualités que vous admirez chez les autres, l'héritage que vous voulez laisser, ou le type d'impact que vous espérez avoir sur votre communauté ou le monde.",
       "inspiration_examples": "Exemples : Je veux être connu(e) comme quelqu'un qui élève les autres. J'espère inspirer mes enfants à suivre leurs rêves. Je veux être un(e) leader qui fait ressortir le meilleur de mon équipe.",
       "textarea_placeholder": "Qui voulez-vous devenir ? Quel impact voulez-vous avoir ?",
-      "finish": "Terminer"
+      "finish": "Terminer",
+      "speak": "Parler",
+      "listening": "Écoute...",
+      "speak_button": "Démarrer la reconnaissance vocale"
     },
     "generate": {
-      "title": "Félicitations !",
-      "congrats_heading": "Vous avez terminé l'étape 3 !",
-      "congrats_text": "Vous avez terminé la réflexion Ikigai. Vous êtes prêt(e) à générer vos documents de carrière personnalisés.",
-      "next_chapter": "Prêt(e) pour le prochain chapitre ?",
+      "title": "Félicitations pour avoir terminé les questions !",
+      "congrats_heading": "Félicitations pour avoir terminé les questions !",
+      "congrats_text": "Vous avez fait preuve d'une incroyable implication et d'une grande réflexion sur vous-même. C'est ce qui distingue les personnes qui réussissent. Lorsque vous cliquez sur Générer, vous recevrez une analyse personnalisée — une grande révélation sur vous-même qui pourrait changer votre orientation future.",
+      "next_chapter": "Prenez une grande inspiration et préparez-vous pour votre prochain chapitre. Nous avons hâte de vous montrer ce que vous avez découvert !",
       "generate_now": "Générer maintenant"
     }
   },
@@ -489,5 +492,35 @@
     "life_context_intro": "Commencez par définir votre contexte de vie, vos valeurs et vos objectifs.",
     "life_context_desc": "Définissez votre parcours, vos valeurs et vos aspirations.",
     "edit_life_context": "Modifier le contexte de vie"
+  },
+  "create_user": {
+    "heading": "Créer un nouvel utilisateur",
+    "subheading": "Remplissez le formulaire pour ajouter un nouvel utilisateur.",
+    "first_name_label": "Prénom",
+    "first_name_placeholder": "Entrez le prénom",
+    "last_name_label": "Nom",
+    "last_name_placeholder": "Entrez le nom",
+    "gender_label": "Genre",
+    "gender_select": "Sélectionnez le genre",
+    "gender_male": "Homme",
+    "gender_female": "Femme",
+    "email_label": "Email",
+    "email_placeholder": "Entrez l'adresse email",
+    "language_label": "Langue",
+    "language_select": "Sélectionnez la langue",
+    "language_english": "Anglais",
+    "language_german": "Allemand",
+    "agency_label": "Agence",
+    "agency_placeholder": "Entrez le nom de l'agence",
+    "create": "Créer l'utilisateur",
+    "creating": "Création...",
+    "success": "Utilisateur créé avec succès !",
+    "fail": "Échec de la création de l'utilisateur.",
+    "error": "Une erreur est survenue lors de la création de l'utilisateur.",
+    "fill_all_fields": "Veuillez remplir tous les champs obligatoires.",
+    "back_to_home": "Retour à l'accueil",
+    "title": "Créer un utilisateur",
+    "info_title": "Pourquoi avons-nous besoin de ces informations ?",
+    "info_desc": "Nous utilisons ces informations pour personnaliser l'expérience de l'utilisateur et lui proposer les meilleures opportunités."
   }
 }

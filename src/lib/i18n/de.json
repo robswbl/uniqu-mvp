@@ -272,7 +272,7 @@
       "emotional_bullet3": "Deine Gefühle zu benennen kann dir helfen, mit Klarheit voranzuschreiten.",
       "emotional_placeholder": "Aufgeregt, unsicher, bereit für Veränderung? Teile deine aktuelle emotionale Verfassung mit...",
       "continue_to_step2": "Weiter zu Schritt 2",
-      "continue_to_step3": "Step 3"
+      "continue_to_step3": "Weiter zu Schritt 3"
     },
     "goals": {
       "title": "Deine Karriereziele",
@@ -311,46 +311,46 @@
       "error_saving": "Fehler beim Speichern"
     },
     "doubts_barriers": {
-      "title": "Doubts & Barriers",
-      "explainer": "Be honest about your concerns:",
-      "textarea_placeholder": "What concerns or obstacles are you thinking about regarding your career path?"
+      "title": "Zweifel & Hindernisse",
+      "explainer": "Sei ehrlich bezüglich deiner Sorgen:",
+      "textarea_placeholder": "Welche Sorgen oder Hindernisse beschäftigen dich bezüglich deines Karrierewegs?"
     },
     "emotional_landscape": {
-      "title": "How are you feeling about your journey?",
-      "explainer": "Check in with yourself:",
-      "textarea_placeholder": "Excited, uncertain, ready for change? Share your current emotional state...",
-      "continue_to_step2": "Continue to Step 2"
+      "title": "Wie fühlst du dich bezüglich deiner Reise?",
+      "explainer": "Checke mit dir selbst ein:",
+      "textarea_placeholder": "Aufgeregt, unsicher, bereit für Veränderung? Teile deine aktuelle emotionale Verfassung mit...",
+      "continue_to_step2": "Weiter zu Schritt 2"
     }
   },
   "step2": {
     "title": "Schritt 2: Deine Erfahrung",
     "heading": "Teile deine berufliche Geschichte",
     "intro": "Lass uns mit deinem Lebenslauf fortfahren. Dies hilft uns, deinen Hintergrund und deine Erfahrung zu verstehen.",
-    "method_heading": "How would you like to provide your CV?",
-    "paste_text": "Paste Text",
-    "paste_text_desc": "Paste your CV or resume content directly into the box.",
-    "paste_text_label": "Paste your CV content here",
-    "paste_text_placeholder": "Paste your CV or resume content here... Include your work experience, education, skills, and any other relevant information.",
-    "upload_file": "Upload File",
-    "upload_file_desc": "Upload a PDF version of your CV or resume.",
-    "upload_file_label": "Upload your CV file",
-    "choose_file": "Choose File",
-    "drag_drop_hint": "Drag and drop your PDF here, or click to select a file.",
-    "uploading": "Uploading...",
-    "upload_complete": "Upload complete!",
-    "upload_failed": "Upload failed.",
-    "processing_cv": "Processing your CV...",
-    "cv_processed": "CV processed!",
-    "content_editable": "Edit Extracted Content",
-    "content_editable_desc": "You can review and edit the extracted text below.",
-    "content_editable_placeholder": "Edit your CV content here...",
-    "content_ready": "Content ready!",
-    "clear_content": "Clear content",
+    "method_heading": "Wie möchtest du deinen Lebenslauf bereitstellen?",
+    "paste_text": "Text einfügen",
+    "paste_text_desc": "Füge deinen Lebenslauf oder CV-Inhalt direkt in das Feld ein.",
+    "paste_text_label": "Füge deinen Lebenslauf-Inhalt hier ein",
+    "paste_text_placeholder": "Füge deinen Lebenslauf oder CV-Inhalt hier ein... Füge deine Berufserfahrung, Ausbildung, Fähigkeiten und andere relevante Informationen hinzu.",
+    "upload_file": "Datei hochladen",
+    "upload_file_desc": "Lade eine PDF-Version deines Lebenslaufs oder CVs hoch.",
+    "upload_file_label": "Lade deine Lebenslauf-Datei hoch",
+    "choose_file": "Datei auswählen",
+    "drag_drop_hint": "Ziehe dein PDF hierher oder klicke, um eine Datei auszuwählen.",
+    "uploading": "Wird hochgeladen...",
+    "upload_complete": "Upload abgeschlossen!",
+    "upload_failed": "Upload fehlgeschlagen.",
+    "processing_cv": "Verarbeite deinen Lebenslauf...",
+    "cv_processed": "Lebenslauf verarbeitet!",
+    "content_editable": "Extrahierten Inhalt bearbeiten",
+    "content_editable_desc": "Du kannst den extrahierten Text unten überprüfen und bearbeiten.",
+    "content_editable_placeholder": "Bearbeite deinen Lebenslauf-Inhalt hier...",
+    "content_ready": "Inhalt bereit!",
+    "clear_content": "Inhalt löschen",
     "saving": "Wird gespeichert...",
     "saved": "Gespeichert ✓",
     "error_saving": "Fehler beim Speichern",
     "loaded_existing_data": "Vorhandene Daten geladen.",
-    "go_to_ikigai": "Continue to Ikigai"
+    "go_to_ikigai": "Weiter zu Ikigai"
   },
   "step3": {
     "title": "Schritt 3: Entdecke dein Ikigai",
@@ -377,34 +377,21 @@
       "textarea_placeholder": "Was sind deine natürlichen Talente und entwickelten Fähigkeiten?"
     },
     "care_about": {
-      "title": "Was liegt dir am Herzen?",
-      "show_inspiration": "Inspiration zeigen",
-      "hide_inspiration": "Inspiration verbergen",
-      "inspiration_text": "Welche gesellschaftlichen, umweltbezogenen oder humanitären Themen entfachen deine Leidenschaft? Welche Probleme siehst du, bei denen du helfen möchtest?",
-      "inspiration_examples": "Beispiele: Besserer Zugang zu Bildung in Entwicklungsländern. Aufbau einer Kreislaufwirtschaft. Vielfalt und Inklusion.",
-      "textarea_placeholder": "Welche Ursachen oder Themen sind dir wichtig?"
+      "step_heading": "Schritt 3: Was liegt dir am Herzen?",
+      "explainer": "Denke über die Themen oder Anliegen nach, die dir wirklich wichtig sind."
     },
     "inspires": {
-      "title": "Was inspiriert dich?",
-      "show_inspiration": "Inspiration zeigen",
-      "hide_inspiration": "Inspiration verbergen",
-      "inspiration_text": "Welche Branchen oder Bereiche fesseln deine Vorstellungskraft? Was zieht dich zu ihnen hin - Innovation, Menschen helfen, Kreativität oder etwas anderes?",
-      "inspiration_examples": "Beispiele: Software, weil ich gerne Dinge erschaffe, die Menschen nutzen. Tierschutz, weil ich ihnen helfen möchte. Recruiting, weil ich interessante Menschen treffe.",
-      "textarea_placeholder": "Welche Branchen, Bereiche oder Menschen inspirieren dich?"
+      "step_heading": "Schritt 3: Was inspiriert dich?",
+      "explainer": "Denke an Branchen, Bereiche oder Menschen, die dich inspirieren."
     },
     "want_to_be": {
-      "title": "Wer möchtest du werden?",
-      "show_inspiration": "Inspiration zeigen",
-      "hide_inspiration": "Inspiration verbergen",
-      "inspiration_text": "Denk an die Qualitäten, die du an anderen bewunderst, das Vermächtnis, das du hinterlassen möchtest, oder die Art von Einfluss, den du auf deine Gemeinschaft oder die Welt haben möchtest.",
-      "inspiration_examples": "Beispiele: Ich möchte als jemand bekannt sein, der andere aufbaut. Ich hoffe, meine Kinder zu inspirieren, ihren Träumen zu folgen. Ich möchte eine Führungskraft sein, die das Beste in meinem Team hervorbringt.",
-      "textarea_placeholder": "Wer möchtest du werden? Welchen Einfluss möchtest du haben?",
-      "finish": "Abschließen"
+      "step_heading": "Schritt 3: Wer möchtest du werden?",
+      "explainer": "Überlege, welche Eigenschaften du bewunderst und welchen Einfluss du haben möchtest."
     },
     "generate": {
       "title": "Glückwunsch! Bereit, deine Ergebnisse zu generieren?",
       "congrats_heading": "Glückwunsch zum Abschluss der Fragen!",
-      "congrats_text": "Du hast unglaubliche Hingabe und Selbstreflexion gezeigt. Das ist es, was erfolgreiche Menschen auszeichnet. Wenn du auf <strong>Generieren</strong> klickst, erhältst du eine personalisierte Analyse—eine große Enthüllung über dich selbst, die deine zukünftige Richtung verändern könnte.",
+      "congrats_text": "Du hast unglaubliche Hingabe und Selbstreflexion gezeigt. Das ist es, was erfolgreiche Menschen auszeichnet. Wenn du auf Generieren klickst, erhältst du eine personalisierte Analyse—eine große Enthüllung über dich selbst, die deine zukünftige Richtung verändern könnte.",
       "next_chapter": "Atme tief durch und mach dich bereit für dein nächstes Kapitel. Wir freuen uns darauf, dir zu zeigen, was du entdeckt hast!",
       "generate_now": "Jetzt generieren"
     }
@@ -476,18 +463,48 @@
     "session_for": "Sitzung für {email}",
     "session_not_found": "Sitzung nicht gefunden.",
     "go_back_home": "Zurück zur Startseite",
-    "back_to_dashboard": "Back to Dashboard",
-    "unsaved_changes": "You have unsaved changes",
-    "loading_session": "Loading your session...",
-    "life_context": "Your Life Context",
-    "professional_experience": "Your Professional Experience",
-    "professional_experience_intro": "Tell us about your experience and background.",
-    "professional_experience_desc": "Start by entering your CV details.",
-    "ikigai": "Your Ikigai",
-    "ikigai_intro": "Discover what motivates and inspires you.",
-    "ikigai_desc": "Reflect on your passions and strengths.",
-    "life_context_intro": "Start by defining your life context, values, and goals.",
-    "life_context_desc": "Define your background, values, and aspirations.",
-    "edit_life_context": "Edit Life Context"
+    "back_to_dashboard": "Zurück zum Dashboard",
+    "unsaved_changes": "Du hast ungespeicherte Änderungen",
+    "loading_session": "Lade deine Sitzung...",
+    "life_context": "Dein Lebenskontext",
+    "professional_experience": "Deine Berufserfahrung",
+    "professional_experience_intro": "Erzähl uns von deiner Erfahrung und deinem Hintergrund.",
+    "professional_experience_desc": "Beginne mit der Eingabe deiner Lebenslauf-Details.",
+    "ikigai": "Dein Ikigai",
+    "ikigai_intro": "Entdecke, was dich motiviert und inspiriert.",
+    "ikigai_desc": "Reflektiere über deine Leidenschaften und Stärken.",
+    "life_context_intro": "Beginne mit der Definition deines Lebenskontexts, deiner Werte und Ziele.",
+    "life_context_desc": "Definiere deinen Hintergrund, deine Werte und Bestrebungen.",
+    "edit_life_context": "Lebenskontext bearbeiten"
+  },
+  "create_user": {
+    "heading": "Neuen Benutzer anlegen",
+    "subheading": "Füllen Sie das Formular aus, um einen neuen Benutzer hinzuzufügen.",
+    "first_name_label": "Vorname",
+    "first_name_placeholder": "Vorname eingeben",
+    "last_name_label": "Nachname",
+    "last_name_placeholder": "Nachname eingeben",
+    "gender_label": "Geschlecht",
+    "gender_select": "Geschlecht wählen",
+    "gender_male": "Männlich",
+    "gender_female": "Weiblich",
+    "email_label": "E-Mail",
+    "email_placeholder": "E-Mail-Adresse eingeben",
+    "language_label": "Sprache",
+    "language_select": "Sprache wählen",
+    "language_english": "Englisch",
+    "language_german": "Deutsch",
+    "agency_label": "Agentur",
+    "agency_placeholder": "Name der Agentur eingeben",
+    "create": "Benutzer anlegen",
+    "creating": "Wird erstellt...",
+    "success": "Benutzer erfolgreich erstellt!",
+    "fail": "Benutzer konnte nicht erstellt werden.",
+    "error": "Beim Erstellen des Benutzers ist ein Fehler aufgetreten.",
+    "fill_all_fields": "Bitte füllen Sie alle Pflichtfelder aus.",
+    "back_to_home": "Zurück zur Startseite",
+    "title": "Benutzer anlegen",
+    "info_title": "Warum benötigen wir diese Informationen?",
+    "info_desc": "Wir verwenden diese Informationen, um die Benutzererfahrung zu personalisieren und passende Möglichkeiten zu finden."
   }
 }

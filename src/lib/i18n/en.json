@@ -369,44 +369,27 @@
       "textarea_placeholder": "What activities make you feel truly alive and energized?"
     },
     "good_at": {
-      "title": "What are you great at?",
-      "show_inspiration": "Show inspiration",
-      "hide_inspiration": "Hide inspiration",
-      "inspiration_text": "What are your natural talents and developed skills? Consider what others often praise you for.",
-      "inspiration_examples": "Examples: Teaching, coding, organizing, empathizing, public speaking.",
-      "textarea_placeholder": "What are your natural talents and developed skills?"
+      "step_heading": "Step 3: What are you good at?",
+      "explainer": "Think about your natural talents and developed skills."
     },
     "care_about": {
-      "title": "What do you care about?",
-      "show_inspiration": "Show inspiration",
-      "hide_inspiration": "Hide inspiration",
-      "inspiration_text": "What societal, environmental, or humanitarian issues ignite your passion? What problems do you see that you want to help fix?",
-      "inspiration_examples": "Examples: Better access to education in developing countries. Building a circular economy. Diversity and inclusion.",
-      "textarea_placeholder": "What causes or issues deeply matter to you?"
+      "step_heading": "Step 3: What do you care about?",
+      "explainer": "Reflect on the causes or issues that deeply matter to you."
     },
     "inspires": {
-      "title": "What inspires you?",
-      "show_inspiration": "Show inspiration",
-      "hide_inspiration": "Hide inspiration",
-      "inspiration_text": "What industries, fields, or people inspire you? Think about what you admire in others or what you find fascinating.",
-      "inspiration_examples": "Examples: Space exploration, social entrepreneurs, artists, scientists, activists.",
-      "textarea_placeholder": "What industries, fields, or people inspire you?"
+      "step_heading": "Step 3: What inspires you?",
+      "explainer": "Consider the industries, fields, or people that inspire you."
     },
     "want_to_be": {
-      "title": "Who do you want to become?",
-      "show_inspiration": "Show inspiration",
-      "hide_inspiration": "Hide inspiration",
-      "inspiration_text": "Think about the qualities you admire in others, the legacy you want to leave, or the kind of impact you hope to have on your community or the world.",
-      "inspiration_examples": "Examples: I want to be known as someone who lifts others up. I hope to inspire my children to follow their dreams. I want to be a leader who brings out the best in my team.",
-      "textarea_placeholder": "Who do you want to become? What impact do you want to have?",
-      "finish": "Finish"
+      "step_heading": "Step 3: Who do you want to become?",
+      "explainer": "Think about the qualities you admire and the impact you want to have."
     },
     "generate": {
-      "title": "Congratulations!",
-      "congrats_heading": "You’ve completed Step 3!",
-      "congrats_text": "You’ve finished the Ikigai reflection. You’re ready to generate your personalized career documents.",
-      "next_chapter": "Ready for the next chapter?",
-      "generate_now": "Generate Now"
+      "title": "Congratulations on finishing the questions!",
+      "congrats_heading": "Congratulations on finishing the questions!",
+      "congrats_text": "You have shown incredible dedication and self-reflection. That’s what sets successful people apart. When you click Generate, you’ll receive a personalized analysis—a major revelation about yourself that could change your future direction.",
+      "next_chapter": "Take a deep breath and get ready for your next chapter. We look forward to showing you what you’ve discovered!",
+      "generate_now": "Generate now"
     }
   },
   "dashboard": {
@@ -489,5 +472,35 @@
     "life_context_intro": "Start by defining your life context, values, and goals.",
     "life_context_desc": "Define your background, values, and aspirations.",
     "edit_life_context": "Edit Life Context"
+  },
+  "create_user": {
+    "heading": "Create a New User",
+    "subheading": "Fill out the form to add a new user.",
+    "first_name_label": "First Name",
+    "first_name_placeholder": "Enter first name",
+    "last_name_label": "Last Name",
+    "last_name_placeholder": "Enter last name",
+    "gender_label": "Gender",
+    "gender_select": "Select gender",
+    "gender_male": "Male",
+    "gender_female": "Female",
+    "email_label": "Email",
+    "email_placeholder": "Enter email address",
+    "language_label": "Language",
+    "language_select": "Select language",
+    "language_english": "English",
+    "language_german": "German",
+    "agency_label": "Agency",
+    "agency_placeholder": "Enter agency name",
+    "create": "Create User",
+    "creating": "Creating...",
+    "success": "User created successfully!",
+    "fail": "Failed to create user.",
+    "error": "An error occurred while creating the user.",
+    "fill_all_fields": "Please fill in all required fields.",
+    "back_to_home": "Back to Home",
+    "title": "Create User",
+    "info_title": "Why do we need this info?",
+    "info_desc": "We use this information to personalize the user's experience and match them with the best opportunities."
   }
 } 

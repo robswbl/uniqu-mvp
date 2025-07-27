@@ -589,6 +589,7 @@
   },
   "layout": {
     "profile_settings": "Paramètres du profil",
-    "sign_out": "Se déconnecter"
+    "sign_out": "Se déconnecter",
+    "dashboard": "Tableau de bord"
   }
 }

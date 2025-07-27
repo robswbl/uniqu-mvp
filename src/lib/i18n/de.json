@@ -601,6 +601,7 @@
   },
   "layout": {
     "profile_settings": "Profil-Einstellungen",
-    "sign_out": "Abmelden"
+    "sign_out": "Abmelden",
+    "dashboard": "Dashboard"
   }
 }

@@ -598,6 +598,7 @@
   },
   "layout": {
     "profile_settings": "Impostazioni del profilo",
-    "sign_out": "Disconnetti"
+    "sign_out": "Disconnetti",
+    "dashboard": "Dashboard"
   }
 }

@@ -593,6 +593,7 @@
   },
   "layout": {
     "profile_settings": "Configuración del perfil",
-    "sign_out": "Cerrar sesión"
+    "sign_out": "Cerrar sesión",
+    "dashboard": "Panel de control"
   }
 }

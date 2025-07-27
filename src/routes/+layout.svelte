@@ -129,6 +129,18 @@ async function changeLang(lang: string) {
       <a href="/" class="text-2xl font-bold text-indigo-700 hover:underline">{$t('app.title')}</a>
     {/if}
     <div class="flex items-center space-x-4">
+      {#if $page.params?.sessionId}
+        <a 
+          href="/dashboard/{$page.params.sessionId}" 
+          class="text-gray-700 hover:text-indigo-600 font-medium transition-colors flex items-center space-x-1"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"/>
+          </svg>
+          <span>{$t('layout.dashboard')}</span>
+        </a>
+      {/if}
       <div class="relative inline-flex items-center">
         <select
           class="appearance-none bg-none p-2 pr-8 border rounded-lg text-base font-normal text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"

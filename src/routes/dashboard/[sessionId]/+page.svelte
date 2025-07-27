@@ -167,7 +167,7 @@
     }
   
     function toggleSection(sectionKey: string) {
-      expandedSections[sectionKey] = !expandedSections[sectionKey];
+      expandedSections = { ...expandedSections, [sectionKey]: !expandedSections[sectionKey] };
     }
 
     function handleA11yClick(event: KeyboardEvent, handler: () => void) {

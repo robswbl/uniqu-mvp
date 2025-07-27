@@ -431,7 +431,7 @@
                   </div>
                 </div>
                 <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('cv')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('cv'))}>
-                  {getDisplayText(sessionData.cv_text, 'cv', 150)}
+                  {expandedSections['cv'] ? sessionData.cv_text : (sessionData.cv_text && sessionData.cv_text.length > 150 ? sessionData.cv_text.substring(0, 150) + '...' : sessionData.cv_text)}
                 </p>
                 <button 
                   class="absolute bottom-2 right-2 text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded transition-colors"
@@ -460,7 +460,7 @@
                   </div>
                 </div>
                 <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('love')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('love'))}>
-                  {getDisplayText(sessionData.ikigai_love, 'love', 120)}
+                  {expandedSections['love'] ? sessionData.ikigai_love : (sessionData.ikigai_love && sessionData.ikigai_love.length > 120 ? sessionData.ikigai_love.substring(0, 120) + '...' : sessionData.ikigai_love)}
                 </p>
                 <button 
                   class="absolute bottom-2 right-2 text-xs bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded transition-colors"
@@ -489,7 +489,7 @@
                   </div>
                 </div>
                 <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('inspires')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('inspires'))}>
-                  {getDisplayText(sessionData.ikigai_inspires, 'inspires', 120)}
+                  {expandedSections['inspires'] ? sessionData.ikigai_inspires : (sessionData.ikigai_inspires && sessionData.ikigai_inspires.length > 120 ? sessionData.ikigai_inspires.substring(0, 120) + '...' : sessionData.ikigai_inspires)}
                 </p>
                 <button 
                   class="absolute bottom-2 right-2 text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded transition-colors"
@@ -521,7 +521,7 @@
                   </div>
                 </div>
                 <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('good')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('good'))}>
-                  {getDisplayText(sessionData.ikigai_good_at, 'good', 120)}
+                  {expandedSections['good'] ? sessionData.ikigai_good_at : (sessionData.ikigai_good_at && sessionData.ikigai_good_at.length > 120 ? sessionData.ikigai_good_at.substring(0, 120) + '...' : sessionData.ikigai_good_at)}
                 </p>
                 <button 
                   class="absolute bottom-2 right-2 text-xs bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded transition-colors"
@@ -550,7 +550,7 @@
                   </div>
                 </div>
                 <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('goals')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('goals'))}>
-                  {getDisplayText(sessionData.goals, 'goals', 120)}
+                  {expandedSections['goals'] ? sessionData.goals : (sessionData.goals && sessionData.goals.length > 120 ? sessionData.goals.substring(0, 120) + '...' : sessionData.goals)}
                 </p>
                 <button 
                   class="absolute bottom-2 right-2 text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 px-2 py-1 rounded transition-colors"
@@ -579,7 +579,7 @@
                   </div>
                 </div>
                 <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('values')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('values'))}>
-                  {getDisplayText(sessionData.personality_values, 'values', 120)}
+                  {expandedSections['values'] ? sessionData.personality_values : (sessionData.personality_values && sessionData.personality_values.length > 120 ? sessionData.personality_values.substring(0, 120) + '...' : sessionData.personality_values)}
                 </p>
                 <button 
                   class="absolute bottom-2 right-2 text-xs bg-cyan-100 hover:bg-cyan-200 text-cyan-700 px-2 py-1 rounded transition-colors"
@@ -612,7 +612,7 @@
                 </div>
               </div>
               <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('life_context')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('life_context'))}>
-                {getDisplayText(sessionData.life_context, 'life_context', 120)}
+                {expandedSections['life_context'] ? sessionData.life_context : (sessionData.life_context && sessionData.life_context.length > 120 ? sessionData.life_context.substring(0, 120) + '...' : sessionData.life_context)}
               </p>
               <button 
                 class="absolute bottom-2 right-2 text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-2 py-1 rounded transition-colors"
@@ -641,7 +641,7 @@
                 </div>
               </div>
               <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('doubts')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('doubts'))}>
-                {getDisplayText(sessionData.doubts_barriers, 'doubts', 120)}
+                {expandedSections['doubts'] ? sessionData.doubts_barriers : (sessionData.doubts_barriers && sessionData.doubts_barriers.length > 120 ? sessionData.doubts_barriers.substring(0, 120) + '...' : sessionData.doubts_barriers)}
               </p>
               <button 
                 class="absolute bottom-2 right-2 text-xs bg-amber-100 hover:bg-amber-200 text-amber-700 px-2 py-1 rounded transition-colors"
@@ -673,7 +673,7 @@
                 </div>
               </div>
               <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('emotional')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('emotional'))}>
-                {getDisplayText(sessionData.emotional_landscape, 'emotional', 120)}
+                {expandedSections['emotional'] ? sessionData.emotional_landscape : (sessionData.emotional_landscape && sessionData.emotional_landscape.length > 120 ? sessionData.emotional_landscape.substring(0, 120) + '...' : sessionData.emotional_landscape)}
               </p>
               <button 
                 class="absolute bottom-2 right-2 text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 px-2 py-1 rounded transition-colors"
@@ -702,7 +702,7 @@
                 </div>
               </div>
               <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('core_summary')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('core_summary'))}>
-                {getDisplayText(sessionData.core_summary, 'core_summary', 120)}
+                {expandedSections['core_summary'] ? sessionData.core_summary : (sessionData.core_summary && sessionData.core_summary.length > 120 ? sessionData.core_summary.substring(0, 120) + '...' : sessionData.core_summary)}
               </p>
               <button 
                 class="absolute bottom-2 right-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded transition-colors"

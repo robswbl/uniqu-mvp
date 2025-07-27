@@ -419,7 +419,6 @@
                     <h3 class="font-semibold text-gray-700">{$t('dashboard.cv_summary')}</h3>
                   </div>
                   <div class="flex items-center space-x-2">
-                    <span class="text-sm {getCvStatus().color}">{getCvStatus().icon}</span>
                     {#if hasMoreContent(sessionData.cv_text, 150)}
                       <button 
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
@@ -448,7 +447,6 @@
                     <h3 class="font-semibold text-gray-700">{$t('dashboard.what_you_love')}</h3>
                   </div>
                   <div class="flex items-center space-x-2">
-                    <span class="text-sm {getLoveStatus().color}">{getLoveStatus().icon}</span>
                     {#if hasMoreContent(sessionData.ikigai_love, 120)}
                       <button 
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
@@ -477,7 +475,6 @@
                     <h3 class="font-semibold text-gray-700">{$t('dashboard.what_inspires_you')}</h3>
                   </div>
                   <div class="flex items-center space-x-2">
-                    <span class="text-sm {getInspiresStatus().color}">{getInspiresStatus().icon}</span>
                     {#if hasMoreContent(sessionData.ikigai_inspires, 120)}
                       <button 
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
@@ -509,7 +506,6 @@
                     <h3 class="font-semibold text-gray-700">{$t('dashboard.what_youre_good_at')}</h3>
                   </div>
                   <div class="flex items-center space-x-2">
-                    <span class="text-sm {getGoodStatus().color}">{getGoodStatus().icon}</span>
                     {#if hasMoreContent(sessionData.ikigai_good_at, 120)}
                       <button 
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
@@ -538,7 +534,6 @@
                     <h3 class="font-semibold text-gray-700">{$t('dashboard.your_goals')}</h3>
                   </div>
                   <div class="flex items-center space-x-2">
-                    <span class="text-sm {getGoalsStatus().color}">{getGoalsStatus().icon}</span>
                     {#if hasMoreContent(sessionData.goals, 120)}
                       <button 
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
@@ -567,7 +562,6 @@
                     <h3 class="font-semibold text-gray-700">{$t('dashboard.your_values')}</h3>
                   </div>
                   <div class="flex items-center space-x-2">
-                    <span class="text-sm {getValuesStatus().color}">{getValuesStatus().icon}</span>
                     {#if hasMoreContent(sessionData.personality_values, 120)}
                       <button 
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
@@ -600,7 +594,6 @@
                   <h3 class="font-semibold text-gray-700">{$t('dashboard.life_context')}</h3>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <span class="text-sm {getLifeContextStatus().color}">{getLifeContextStatus().icon}</span>
                   {#if hasMoreContent(sessionData.life_context, 120)}
                     <button 
                       class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
@@ -629,7 +622,6 @@
                   <h3 class="font-semibold text-gray-700">{$t('dashboard.doubts_barriers')}</h3>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <span class="text-sm {getDoubtsStatus().color}">{getDoubtsStatus().icon}</span>
                   {#if hasMoreContent(sessionData.doubts_barriers, 120)}
                     <button 
                       class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
@@ -661,7 +653,6 @@
                   <h3 class="font-semibold text-gray-700">{$t('dashboard.emotional_landscape')}</h3>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <span class="text-sm {getEmotionalStatus().color}">{getEmotionalStatus().icon}</span>
                   {#if hasMoreContent(sessionData.emotional_landscape, 120)}
                     <button 
                       class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
@@ -690,7 +681,6 @@
                   <h3 class="font-semibold text-gray-700">{$t('dashboard.core_summary')}</h3>
                 </div>
                 <div class="flex items-center space-x-2">
-                  <span class="text-sm {getCoreSummaryStatus().color}">{getCoreSummaryStatus().icon}</span>
                   {#if hasMoreContent(sessionData.core_summary, 120)}
                     <button 
                       class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"

@@ -364,17 +364,22 @@
     "love": {
       "step_heading": "Paso 3: ¿Qué amas?",
       "explainer": "Reflexiona sobre las actividades y pasiones que te hacen sentir vivo.",
+      "title": "¿Qué amas?",
+      "textarea_placeholder": "Describe lo que te trae alegría y realización...",
+      "show_inspiration": "Mostrar inspiración",
+      "hide_inspiration": "Ocultar inspiración",
       "inspiration_text": "¿Qué actividades te hacen sentir realmente vivo y lleno de energía? Piensa en pasatiempos, intereses o trabajos que te apasionan.",
-      "inspiration_examples": "Ejemplos: Tocar música, ayudar a otros, resolver acertijos, construir cosas.",
-      "hide_inspiration": "Ocultar inspiración"
+      "inspiration_examples": "Ejemplos: Tocar música, ayudar a otros, resolver acertijos, construir cosas."
     },
     "good_at": {
+      "step_heading": "Paso 3: ¿En qué eres excelente?",
+      "explainer": "Piensa en tus talentos naturales y habilidades desarrolladas.",
       "title": "¿En qué eres excelente?",
+      "textarea_placeholder": "¿Cuáles son tus talentos naturales y habilidades desarrolladas?",
       "show_inspiration": "Mostrar inspiración",
       "hide_inspiration": "Ocultar inspiración",
       "inspiration_text": "¿Cuáles son tus talentos naturales y habilidades desarrolladas? Considera por lo que otros te elogian frecuentemente.",
-      "inspiration_examples": "Ejemplos: Enseñar, programar, organizar, empatizar, hablar en público.",
-      "textarea_placeholder": "¿Cuáles son tus talentos naturales y habilidades desarrolladas?"
+      "inspiration_examples": "Ejemplos: Enseñar, programar, organizar, empatizar, hablar en público."
     },
     "care_about": {
       "step_heading": "Paso 3: ¿Qué te importa?",

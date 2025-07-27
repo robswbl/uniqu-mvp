@@ -430,7 +430,7 @@
                     {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('cv')}>
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('cv')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('cv'))}>
                   {getDisplayText(sessionData.cv_text, 'cv', 150)}
                 </p>
                 <button 
@@ -459,7 +459,7 @@
                     {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('love')}>
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('love')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('love'))}>
                   {getDisplayText(sessionData.ikigai_love, 'love', 120)}
                 </p>
                 <button 
@@ -488,7 +488,7 @@
                     {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('inspires')}>
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('inspires')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('inspires'))}>
                   {getDisplayText(sessionData.ikigai_inspires, 'inspires', 120)}
                 </p>
                 <button 
@@ -520,7 +520,7 @@
                     {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('good')}>
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('good')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('good'))}>
                   {getDisplayText(sessionData.ikigai_good_at, 'good', 120)}
                 </p>
                 <button 
@@ -549,7 +549,7 @@
                     {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('goals')}>
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('goals')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('goals'))}>
                   {getDisplayText(sessionData.goals, 'goals', 120)}
                 </p>
                 <button 
@@ -578,7 +578,7 @@
                     {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('values')}>
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('values')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('values'))}>
                   {getDisplayText(sessionData.personality_values, 'values', 120)}
                 </p>
                 <button 
@@ -611,7 +611,7 @@
                   {/if}
                 </div>
               </div>
-              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('life_context')}>
+              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('life_context')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('life_context'))}>
                 {getDisplayText(sessionData.life_context, 'life_context', 120)}
               </p>
               <button 
@@ -640,7 +640,7 @@
                   {/if}
                 </div>
               </div>
-              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('doubts')}>
+              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('doubts')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('doubts'))}>
                 {getDisplayText(sessionData.doubts_barriers, 'doubts', 120)}
               </p>
               <button 
@@ -672,7 +672,7 @@
                   {/if}
                 </div>
               </div>
-              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('emotional')}>
+              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('emotional')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('emotional'))}>
                 {getDisplayText(sessionData.emotional_landscape, 'emotional', 120)}
               </p>
               <button 
@@ -701,7 +701,7 @@
                   {/if}
                 </div>
               </div>
-              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('core_summary')}>
+              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('core_summary')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('core_summary'))}>
                 {getDisplayText(sessionData.core_summary, 'core_summary', 120)}
               </p>
               <button 

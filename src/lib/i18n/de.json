@@ -364,17 +364,22 @@
     "love": {
       "step_heading": "Schritt 3: Was liebst du?",
       "explainer": "Denke über die Aktivitäten und Leidenschaften nach, die dich lebendig fühlen lassen.",
+      "title": "Was liebst du?",
+      "textarea_placeholder": "Beschreibe, was dir Freude und Erfüllung bringt...",
+      "show_inspiration": "Inspiration zeigen",
+      "hide_inspiration": "Inspiration verbergen",
       "inspiration_text": "Welche Aktivitäten lassen dich wirklich lebendig und energiegeladen fühlen? Denke an Hobbys, Interessen oder Arbeit, für die du brennst.",
-      "inspiration_examples": "Beispiele: Musik machen, anderen helfen, Rätsel lösen, Dinge bauen.",
-      "hide_inspiration": "Inspiration verbergen"
+      "inspiration_examples": "Beispiele: Musik machen, anderen helfen, Rätsel lösen, Dinge bauen."
     },
     "good_at": {
+      "step_heading": "Schritt 3: Worin bist du großartig?",
+      "explainer": "Denke über deine natürlichen Talente und entwickelten Fähigkeiten nach.",
       "title": "Worin bist du großartig?",
+      "textarea_placeholder": "Was sind deine natürlichen Talente und entwickelten Fähigkeiten?",
       "show_inspiration": "Inspiration zeigen",
       "hide_inspiration": "Inspiration verbergen",
       "inspiration_text": "Welche Aktivitäten fließen natürlich? Welche Fähigkeiten hast du entwickelt? Wann wenden sich Menschen an dich um Hilfe oder Rat? Denk an Aufgaben, für die du gelobt oder anerkannt wurdest.",
-      "inspiration_examples": "Beispiele: Menschen fragen mich um Rat bei Technik... Ich bin bekannt dafür, Zimmerpflanzen gesund zu halten. Freunde kommen zu mir für Beziehungsberatung.",
-      "textarea_placeholder": "Was sind deine natürlichen Talente und entwickelten Fähigkeiten?"
+      "inspiration_examples": "Beispiele: Menschen fragen mich um Rat bei Technik... Ich bin bekannt dafür, Zimmerpflanzen gesund zu halten. Freunde kommen zu mir für Beziehungsberatung."
     },
     "care_about": {
       "step_heading": "Schritt 3: Was liegt dir am Herzen?",

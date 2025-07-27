@@ -364,17 +364,22 @@
     "love": {
       "step_heading": "Étape 3 : Qu'est-ce que vous aimez ?",
       "explainer": "Réfléchissez aux activités et passions qui vous font vous sentir vivant.",
+      "title": "Qu'est-ce que vous aimez ?",
+      "textarea_placeholder": "Décrivez ce qui vous apporte joie et épanouissement...",
+      "show_inspiration": "Montrer l'inspiration",
+      "hide_inspiration": "Masquer l'inspiration",
       "inspiration_text": "Quelles activités vous font vous sentir vraiment vivant(e) et énergisé(e) ? Pensez aux passe-temps, intérêts ou travail qui vous passionne.",
-      "inspiration_examples": "Exemples : Jouer de la musique, aider les autres, résoudre des énigmes, construire des choses.",
-      "hide_inspiration": "Masquer l'inspiration"
+      "inspiration_examples": "Exemples : Jouer de la musique, aider les autres, résoudre des énigmes, construire des choses."
     },
     "good_at": {
+      "step_heading": "Étape 3 : Dans quoi excellez-vous ?",
+      "explainer": "Pensez à vos talents naturels et compétences développées.",
       "title": "Dans quoi excellez-vous ?",
+      "textarea_placeholder": "Quels sont vos talents naturels et compétences développées ?",
       "show_inspiration": "Montrer l'inspiration",
       "hide_inspiration": "Masquer l'inspiration",
       "inspiration_text": "Quels sont vos talents naturels et compétences développées ? Considérez ce pour quoi les autres vous félicitent souvent.",
-      "inspiration_examples": "Exemples : Enseigner, coder, organiser, faire preuve d'empathie, parler en public.",
-      "textarea_placeholder": "Quels sont vos talents naturels et compétences développées ?"
+      "inspiration_examples": "Exemples : Enseigner, coder, organiser, faire preuve d'empathie, parler en public."
     },
     "care_about": {
       "step_heading": "Étape 3 : Qu'est-ce qui vous tient à cœur ?",

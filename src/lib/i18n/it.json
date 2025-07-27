@@ -364,17 +364,22 @@
     "love": {
       "step_heading": "Fase 3: Cosa ami?",
       "explainer": "Rifletti sulle attività e passioni che ti fanno sentire vivo.",
+      "title": "Cosa ami?",
+      "textarea_placeholder": "Descrivi cosa ti porta gioia e realizzazione...",
+      "show_inspiration": "Mostra ispirazione",
+      "hide_inspiration": "Nascondi ispirazione",
       "inspiration_text": "Quali attività ti fanno sentire davvero vivo e pieno di energia? Pensa a hobby, interessi o lavori che ti appassionano.",
-      "inspiration_examples": "Esempi: Suonare musica, aiutare gli altri, risolvere enigmi, costruire cose.",
-      "hide_inspiration": "Nascondi ispirazione"
+      "inspiration_examples": "Esempi: Suonare musica, aiutare gli altri, risolvere enigmi, costruire cose."
     },
     "good_at": {
+      "step_heading": "Fase 3: In cosa sei bravo?",
+      "explainer": "Pensa ai tuoi talenti naturali e competenze sviluppate.",
       "title": "In cosa sei bravo?",
+      "textarea_placeholder": "Quali sono i tuoi talenti naturali e competenze sviluppate?",
       "show_inspiration": "Mostra ispirazione",
       "hide_inspiration": "Nascondi ispirazione",
       "inspiration_text": "Quali sono i tuoi talenti naturali e competenze sviluppate? Considera per cosa gli altri ti elogiano spesso.",
-      "inspiration_examples": "Esempi: Insegnare, programmare, organizzare, empatizzare, parlare in pubblico.",
-      "textarea_placeholder": "Quali sono i tuoi talenti naturali e competenze sviluppate?"
+      "inspiration_examples": "Esempi: Insegnare, programmare, organizzare, empatizzare, parlare in pubblico."
     },
     "care_about": {
       "step_heading": "Fase 3: Cosa ti sta a cuore?",

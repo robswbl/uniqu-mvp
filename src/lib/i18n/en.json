@@ -364,13 +364,22 @@
     "love": {
       "step_heading": "Step 3: What do you love?",
       "explainer": "Reflect on the activities and passions that make you feel alive.",
+      "title": "What do you love?",
+      "textarea_placeholder": "Describe what brings you joy and fulfillment...",
+      "show_inspiration": "Show inspiration",
+      "hide_inspiration": "Hide inspiration",
       "inspiration_text": "What activities make you feel truly alive and energized? Think about hobbies, interests, or work you are passionate about.",
-      "inspiration_examples": "Examples: Playing music, helping others, solving puzzles, building things.",
-      "hide_inspiration": "Hide inspiration"
+      "inspiration_examples": "Examples: Playing music, helping others, solving puzzles, building things."
     },
     "good_at": {
       "step_heading": "Step 3: What are you good at?",
-      "explainer": "Think about your natural talents and developed skills."
+      "explainer": "Think about your natural talents and developed skills.",
+      "title": "What are you good at?",
+      "textarea_placeholder": "Describe your skills, talents, and what you excel at...",
+      "show_inspiration": "Show inspiration",
+      "hide_inspiration": "Hide inspiration",
+      "inspiration_text": "What activities come naturally to you? What skills have you developed? When do people turn to you for help or advice? Think about tasks for which you've been praised or recognized.",
+      "inspiration_examples": "Examples: People ask me for tech advice... I'm known for keeping houseplants alive. Friends come to me for relationship advice."
     },
     "care_about": {
       "step_heading": "Step 3: What do you care about?",

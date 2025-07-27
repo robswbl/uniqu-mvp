@@ -438,6 +438,9 @@
     "edit_profile": "Profil bearbeiten",
     "profile_settings": "Profil-Einstellungen",
     "update_personal_info": "Aktualisiere deine persönlichen Informationen und Präferenzen",
+    "application_letters": "Bewerbungsschreiben",
+    "view_and_manage_letters": "Bewerbungsschreiben anzeigen und verwalten",
+    "view_letters": "Schreiben anzeigen",
     "results_in_progress": "Ergebnisse in Bearbeitung",
     "personalized_analysis_being_generated": "Deine personalisierte Analyse wird generiert. Das dauert normalerweise 1-2 Minuten. Du wirst benachrichtigt, wenn sie fertig ist!",
     "your_profile_summary": "Deine Profil-Zusammenfassung",
@@ -589,5 +592,9 @@
     "cancel": "Abbrechen",
     "error_loading": "Fehler beim Laden des Profils",
     "error_loading_description": "Deine Profilinformationen konnten nicht geladen werden. Bitte versuche es erneut."
+  },
+  "layout": {
+    "profile_settings": "Profil-Einstellungen",
+    "sign_out": "Abmelden"
   }
 }

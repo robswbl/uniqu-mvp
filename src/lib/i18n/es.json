@@ -430,6 +430,9 @@
     "edit_profile": "Editar perfil",
     "profile_settings": "Configuración del perfil",
     "update_personal_info": "Actualiza tu información personal y preferencias",
+    "application_letters": "Cartas de solicitud",
+    "view_and_manage_letters": "Ver y gestionar tus cartas de solicitud",
+    "view_letters": "Ver cartas",
     "results_in_progress": "Resultados en progreso",
     "personalized_analysis_being_generated": "Tu análisis personalizado se está generando. Esto usualmente toma 1-2 minutos. ¡Te notificaremos cuando esté listo!",
     "your_profile_summary": "Resumen de tu perfil",
@@ -581,5 +584,9 @@
     "cancel": "Cancelar",
     "error_loading": "Error al cargar el perfil",
     "error_loading_description": "No se pudieron cargar tus información del perfil. Por favor, inténtalo de nuevo."
+  },
+  "layout": {
+    "profile_settings": "Configuración del perfil",
+    "sign_out": "Cerrar sesión"
   }
 }

@@ -434,6 +434,9 @@
     "edit_profile": "Edit Profile",
     "profile_settings": "Profile Settings",
     "update_personal_info": "Update your personal information and preferences",
+    "application_letters": "Application Letters",
+    "view_and_manage_letters": "View and manage your application letters",
+    "view_letters": "View Letters",
     "results_in_progress": "Results in Progress",
     "personalized_analysis_being_generated": "Your personalized analysis is being generated. This usually takes 1-2 minutes. You'll be notified when it's ready!",
     "your_profile_summary": "Your Profile Summary",
@@ -585,5 +588,9 @@
     "cancel": "Cancel",
     "error_loading": "Error Loading Profile",
     "error_loading_description": "Unable to load your profile information. Please try again."
+  },
+  "layout": {
+    "profile_settings": "Profile Settings",
+    "sign_out": "Sign Out"
   }
 } 

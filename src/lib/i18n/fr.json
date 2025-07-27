@@ -426,6 +426,9 @@
     "edit_profile": "Modifier le profil",
     "profile_settings": "Paramètres du profil",
     "update_personal_info": "Mettez à jour vos informations personnelles et préférences",
+    "application_letters": "Lettres de candidature",
+    "view_and_manage_letters": "Afficher et gérer vos lettres de candidature",
+    "view_letters": "Voir les lettres",
     "results_in_progress": "Résultats en cours",
     "personalized_analysis_being_generated": "Votre analyse personnalisée est en cours de génération. Cela prend généralement 1-2 minutes. Vous serez notifié(e) quand elle sera prête !",
     "your_profile_summary": "Résumé de votre profil",
@@ -577,5 +580,9 @@
     "cancel": "Annuler",
     "error_loading": "Erreur de chargement du profil",
     "error_loading_description": "Impossible de charger vos informations de profil. Veuillez réessayer."
+  },
+  "layout": {
+    "profile_settings": "Paramètres du profil",
+    "sign_out": "Se déconnecter"
   }
 }

@@ -17,6 +17,8 @@ let userLang = '';
 let localeReady = false;
 let userId = '';
 let errorMsg = '';
+let userData: any = null;
+let showProfileMenu = false;
 
 // SSR-safe: check if window is defined before accessing localStorage
 if (typeof window !== 'undefined') {
@@ -61,9 +63,10 @@ onMount(async () => {
       return;
     }
   }
-  // If userId is available, fetch language from DB
+  // If userId is available, fetch language from DB and user data
   if (userId) {
     await fetchUserLanguage();
+    await fetchUserData();
   } else if (typeof window !== 'undefined') {
     userLang = localStorage.getItem('userLang') || '';
     if (userLang) {
@@ -73,14 +76,25 @@ onMount(async () => {
   }
 });
 
+async function fetchUserData() {
+  if (userId) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('user_firstname, user_lastname, user_email')
+      .eq('user_uuid', userId)
+      .single();
+    if (!error && data) {
+      userData = data;
+    }
+  }
+}
+
 async function changeLang(lang: string) {
   locale.set(lang);
   if (typeof window !== 'undefined') {
     localStorage.setItem('userLang', lang);
   }
-  // Debug: log Supabase config and user info
-  console.log('[LANG PATCH DEBUG] Supabase URL:', supabase?.url);
-  console.log('[LANG PATCH DEBUG] Supabase Key:', supabase?.key);
+  // Debug: log user info
   console.log('[LANG PATCH DEBUG] userId:', userId, 'lang:', lang);
   // If userId is available, update in DB
   if (userId) {
@@ -114,7 +128,7 @@ async function changeLang(lang: string) {
     {:else}
       <a href="/" class="text-2xl font-bold text-indigo-700 hover:underline">{$t('app.title')}</a>
     {/if}
-    <div>
+    <div class="flex items-center space-x-4">
       <div class="relative inline-flex items-center">
         <select
           class="appearance-none bg-none p-2 pr-8 border rounded-lg text-base font-normal text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -130,6 +144,48 @@ async function changeLang(lang: string) {
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       </div>
+      
+      <!-- Profile Avatar -->
+      {#if userData && $page.params?.sessionId}
+        <div class="relative">
+          <button
+            on:click={() => showProfileMenu = !showProfileMenu}
+            class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            type="button"
+          >
+            <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+              {userData.user_firstname ? userData.user_firstname.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <span class="text-sm text-gray-700 font-medium hidden sm:block">
+              {userData.user_firstname || 'User'}
+            </span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          <!-- Profile Dropdown Menu -->
+          {#if showProfileMenu}
+            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <a
+                href="/profile/{$page.params.sessionId}"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                {$t('layout.profile_settings')}
+              </a>
+              <div class="border-t border-gray-200 my-1"></div>
+              <button
+                on:click={() => { showProfileMenu = false; goto('/'); }}
+                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                type="button"
+              >
+                {$t('layout.sign_out')}
+              </button>
+            </div>
+          {/if}
+        </div>
+      {/if}
+      
       {#if errorMsg}
         <div class="text-red-600 text-xs mt-1">{errorMsg}</div>
       {/if}

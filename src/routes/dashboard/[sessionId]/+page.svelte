@@ -328,21 +328,21 @@
             </div>
           </div>
 
-          <!-- Profile Settings Card -->
+          <!-- Application Letters Card -->
           <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
             <div class="text-center">
-              <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
               </div>
-              <h3 class="text-xl font-semibold text-gray-800 mb-2">{$t('dashboard.profile_settings')}</h3>
-              <p class="text-gray-600 mb-4">{$t('dashboard.update_personal_info')}</p>
+              <h3 class="text-xl font-semibold text-gray-800 mb-2">{$t('dashboard.application_letters')}</h3>
+              <p class="text-gray-600 mb-4">{$t('dashboard.view_and_manage_letters')}</p>
               <button 
-                on:click={() => goto(`/profile/${sessionId}`)}
-                class="w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
+                on:click={() => goto(`/results/${sessionId}/letters`)}
+                class="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
               >
-                {$t('dashboard.profile_settings')}
+                {$t('dashboard.view_letters')}
               </button>
             </div>
           </div>

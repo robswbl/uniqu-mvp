@@ -454,7 +454,8 @@
     "could_not_load_session_details": "Could not load session details",
     "issue_loading_profile_information": "There was an issue loading your profile information.",
     "try_again": "Try Again",
-    "go_back_home": "Go Back Home"
+    "go_back_home": "Go Back Home",
+    "edit": "Edit"
   },
   "questionnaire": {
     "welcome_heading": "Welcome to your questionnaire!",

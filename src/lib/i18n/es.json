@@ -450,7 +450,8 @@
     "could_not_load_session_details": "No se pudieron cargar los detalles de la sesión",
     "issue_loading_profile_information": "Hubo un problema cargando la información de tu perfil.",
     "try_again": "Intentar de nuevo",
-    "go_back_home": "Volver al inicio"
+    "go_back_home": "Volver al inicio",
+    "edit": "Editar"
   },
   "questionnaire": {
     "welcome_heading": "¡Bienvenido a tu cuestionario!",

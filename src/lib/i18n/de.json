@@ -458,7 +458,8 @@
     "could_not_load_session_details": "Sitzungsdetails konnten nicht geladen werden",
     "issue_loading_profile_information": "Es gab ein Problem beim Laden deiner Profilinformationen.",
     "try_again": "Erneut versuchen",
-    "go_back_home": "Zurück zur Startseite"
+    "go_back_home": "Zurück zur Startseite",
+    "edit": "Bearbeiten"
   },
   "questionnaire": {
     "welcome_heading": "Willkommen zu deinem Fragebogen!",

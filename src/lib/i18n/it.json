@@ -455,7 +455,8 @@
     "could_not_load_session_details": "Impossibile caricare i dettagli della sessione",
     "issue_loading_profile_information": "C'è stato un problema nel caricare le informazioni del tuo profilo.",
     "try_again": "Riprova",
-    "go_back_home": "Torna alla home"
+    "go_back_home": "Torna alla home",
+    "edit": "Modifica"
   },
   "questionnaire": {
     "welcome_heading": "Benvenuto nel tuo questionario!",

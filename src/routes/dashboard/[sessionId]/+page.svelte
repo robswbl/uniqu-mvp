@@ -184,6 +184,35 @@
       }
       return text.substring(0, maxLength) + '...';
     }
+
+    function hasMoreContent(text: string | null, maxLength: number = 120): boolean {
+      return Boolean(text && text.length > maxLength);
+    }
+
+    function getEditUrl(sectionKey: string): string {
+      const urlParams = $page.url.searchParams;
+      const fromOnboarding = urlParams.get('from') === 'onboarding';
+      const baseUrl = `/questionnaire/${sessionId}`;
+      
+      switch (sectionKey) {
+        case 'cv':
+          return `${baseUrl}/step2${fromOnboarding ? '?from=onboarding' : ''}`;
+        case 'love':
+        case 'good_at':
+        case 'care_about':
+        case 'inspires':
+        case 'want_to_be':
+          return `${baseUrl}/step3/${sectionKey}${fromOnboarding ? '?from=onboarding' : ''}`;
+        case 'goals':
+        case 'personality_values':
+        case 'life_context':
+        case 'doubts_barriers':
+        case 'emotional_landscape':
+          return `${baseUrl}/step1/${sectionKey}${fromOnboarding ? '?from=onboarding' : ''}`;
+        default:
+          return baseUrl;
+      }
+    }
   
     async function viewResults() {
       await goto(`/results/${sessionId}`);
@@ -383,7 +412,7 @@
           <div class="grid md:grid-cols-2 gap-6">
             <!-- Left Column -->
             <div class="space-y-4">
-              <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('cv')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('cv'))}>
+              <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">📄</span>
@@ -391,17 +420,28 @@
                   </div>
                   <div class="flex items-center space-x-2">
                     <span class="text-sm {getCvStatus().color}">{getCvStatus().icon}</span>
-                    <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                      {expandedSections['cv'] ? '▼ Less' : '▶ More'}
-                    </button>
+                    {#if hasMoreContent(sessionData.cv_text, 150)}
+                      <button 
+                        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                        on:click={(e) => { e.stopPropagation(); toggleSection('cv'); }}
+                      >
+                        {expandedSections['cv'] ? '▼ Less' : '▶ More'}
+                      </button>
+                    {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed">
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('cv')}>
                   {getDisplayText(sessionData.cv_text, 'cv', 150)}
                 </p>
+                <button 
+                  class="absolute bottom-2 right-2 text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded transition-colors"
+                  on:click={(e) => { e.stopPropagation(); goto(getEditUrl('cv')); }}
+                >
+                  {$t('dashboard.edit')}
+                </button>
               </div>
   
-              <div class="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('love')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('love'))}>
+              <div class="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">❤️</span>
@@ -409,17 +449,28 @@
                   </div>
                   <div class="flex items-center space-x-2">
                     <span class="text-sm {getLoveStatus().color}">{getLoveStatus().icon}</span>
-                    <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                      {expandedSections['love'] ? '▼ Less' : '▶ More'}
-                    </button>
+                    {#if hasMoreContent(sessionData.ikigai_love, 120)}
+                      <button 
+                        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                        on:click={(e) => { e.stopPropagation(); toggleSection('love'); }}
+                      >
+                        {expandedSections['love'] ? '▼ Less' : '▶ More'}
+                      </button>
+                    {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed">
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('love')}>
                   {getDisplayText(sessionData.ikigai_love, 'love', 120)}
                 </p>
+                <button 
+                  class="absolute bottom-2 right-2 text-xs bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded transition-colors"
+                  on:click={(e) => { e.stopPropagation(); goto(getEditUrl('love')); }}
+                >
+                  {$t('dashboard.edit')}
+                </button>
               </div>
 
-              <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('inspires')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('inspires'))}>
+              <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">🌟</span>
@@ -427,20 +478,31 @@
                   </div>
                   <div class="flex items-center space-x-2">
                     <span class="text-sm {getInspiresStatus().color}">{getInspiresStatus().icon}</span>
-                    <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                      {expandedSections['inspires'] ? '▼ Less' : '▶ More'}
-                    </button>
+                    {#if hasMoreContent(sessionData.ikigai_inspires, 120)}
+                      <button 
+                        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                        on:click={(e) => { e.stopPropagation(); toggleSection('inspires'); }}
+                      >
+                        {expandedSections['inspires'] ? '▼ Less' : '▶ More'}
+                      </button>
+                    {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed">
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('inspires')}>
                   {getDisplayText(sessionData.ikigai_inspires, 'inspires', 120)}
                 </p>
+                <button 
+                  class="absolute bottom-2 right-2 text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded transition-colors"
+                  on:click={(e) => { e.stopPropagation(); goto(getEditUrl('inspires')); }}
+                >
+                  {$t('dashboard.edit')}
+                </button>
               </div>
             </div>
   
             <!-- Right Column -->
             <div class="space-y-4">
-              <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('good')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('good'))}>
+              <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">⭐</span>
@@ -448,17 +510,28 @@
                   </div>
                   <div class="flex items-center space-x-2">
                     <span class="text-sm {getGoodStatus().color}">{getGoodStatus().icon}</span>
-                    <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                      {expandedSections['good'] ? '▼ Less' : '▶ More'}
-                    </button>
+                    {#if hasMoreContent(sessionData.ikigai_good_at, 120)}
+                      <button 
+                        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                        on:click={(e) => { e.stopPropagation(); toggleSection('good'); }}
+                      >
+                        {expandedSections['good'] ? '▼ Less' : '▶ More'}
+                      </button>
+                    {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed">
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('good')}>
                   {getDisplayText(sessionData.ikigai_good_at, 'good', 120)}
                 </p>
+                <button 
+                  class="absolute bottom-2 right-2 text-xs bg-green-100 hover:bg-green-200 text-green-700 px-2 py-1 rounded transition-colors"
+                  on:click={(e) => { e.stopPropagation(); goto(getEditUrl('good_at')); }}
+                >
+                  {$t('dashboard.edit')}
+                </button>
               </div>
   
-              <div class="bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('goals')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('goals'))}>
+              <div class="bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">🎯</span>
@@ -466,17 +539,28 @@
                   </div>
                   <div class="flex items-center space-x-2">
                     <span class="text-sm {getGoalsStatus().color}">{getGoalsStatus().icon}</span>
-                    <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                      {expandedSections['goals'] ? '▼ Less' : '▶ More'}
-                    </button>
+                    {#if hasMoreContent(sessionData.goals, 120)}
+                      <button 
+                        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                        on:click={(e) => { e.stopPropagation(); toggleSection('goals'); }}
+                      >
+                        {expandedSections['goals'] ? '▼ Less' : '▶ More'}
+                      </button>
+                    {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed">
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('goals')}>
                   {getDisplayText(sessionData.goals, 'goals', 120)}
                 </p>
+                <button 
+                  class="absolute bottom-2 right-2 text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 px-2 py-1 rounded transition-colors"
+                  on:click={(e) => { e.stopPropagation(); goto(getEditUrl('goals')); }}
+                >
+                  {$t('dashboard.edit')}
+                </button>
               </div>
 
-              <div class="bg-gradient-to-r from-cyan-50 to-blue-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('values')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('values'))}>
+              <div class="bg-gradient-to-r from-cyan-50 to-blue-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">💎</span>
@@ -484,21 +568,32 @@
                   </div>
                   <div class="flex items-center space-x-2">
                     <span class="text-sm {getValuesStatus().color}">{getValuesStatus().icon}</span>
-                    <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                      {expandedSections['values'] ? '▼ Less' : '▶ More'}
-                    </button>
+                    {#if hasMoreContent(sessionData.personality_values, 120)}
+                      <button 
+                        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                        on:click={(e) => { e.stopPropagation(); toggleSection('values'); }}
+                      >
+                        {expandedSections['values'] ? '▼ Less' : '▶ More'}
+                      </button>
+                    {/if}
                   </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed">
+                <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('values')}>
                   {getDisplayText(sessionData.personality_values, 'values', 120)}
                 </p>
+                <button 
+                  class="absolute bottom-2 right-2 text-xs bg-cyan-100 hover:bg-cyan-200 text-cyan-700 px-2 py-1 rounded transition-colors"
+                  on:click={(e) => { e.stopPropagation(); goto(getEditUrl('personality_values')); }}
+                >
+                  {$t('dashboard.edit')}
+                </button>
               </div>
             </div>
           </div>
 
           <!-- Additional Row for Missing Fields -->
           <div class="grid md:grid-cols-2 gap-6 mt-6">
-            <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('life_context')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('life_context'))}>
+            <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
               <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center space-x-2">
                   <span class="text-lg">🏠</span>
@@ -506,17 +601,28 @@
                 </div>
                 <div class="flex items-center space-x-2">
                   <span class="text-sm {getLifeContextStatus().color}">{getLifeContextStatus().icon}</span>
-                  <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                    {expandedSections['life_context'] ? '▼ Less' : '▶ More'}
-                  </button>
+                  {#if hasMoreContent(sessionData.life_context, 120)}
+                    <button 
+                      class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                      on:click={(e) => { e.stopPropagation(); toggleSection('life_context'); }}
+                    >
+                      {expandedSections['life_context'] ? '▼ Less' : '▶ More'}
+                    </button>
+                  {/if}
                 </div>
               </div>
-              <p class="text-gray-600 text-sm leading-relaxed">
+              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('life_context')}>
                 {getDisplayText(sessionData.life_context, 'life_context', 120)}
               </p>
+              <button 
+                class="absolute bottom-2 right-2 text-xs bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-2 py-1 rounded transition-colors"
+                on:click={(e) => { e.stopPropagation(); goto(getEditUrl('life_context')); }}
+              >
+                {$t('dashboard.edit')}
+              </button>
             </div>
 
-            <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('doubts')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('doubts'))}>
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
               <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center space-x-2">
                   <span class="text-lg">🤔</span>
@@ -524,20 +630,31 @@
                 </div>
                 <div class="flex items-center space-x-2">
                   <span class="text-sm {getDoubtsStatus().color}">{getDoubtsStatus().icon}</span>
-                  <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                    {expandedSections['doubts'] ? '▼ Less' : '▶ More'}
-                  </button>
+                  {#if hasMoreContent(sessionData.doubts_barriers, 120)}
+                    <button 
+                      class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                      on:click={(e) => { e.stopPropagation(); toggleSection('doubts'); }}
+                    >
+                      {expandedSections['doubts'] ? '▼ Less' : '▶ More'}
+                    </button>
+                  {/if}
                 </div>
               </div>
-              <p class="text-gray-600 text-sm leading-relaxed">
+              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('doubts')}>
                 {getDisplayText(sessionData.doubts_barriers, 'doubts', 120)}
               </p>
+              <button 
+                class="absolute bottom-2 right-2 text-xs bg-amber-100 hover:bg-amber-200 text-amber-700 px-2 py-1 rounded transition-colors"
+                on:click={(e) => { e.stopPropagation(); goto(getEditUrl('doubts_barriers')); }}
+              >
+                {$t('dashboard.edit')}
+              </button>
             </div>
           </div>
 
           <!-- Fourth Row for Remaining Fields -->
           <div class="grid md:grid-cols-2 gap-6 mt-6">
-            <div class="bg-gradient-to-r from-rose-50 to-pink-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('emotional')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('emotional'))}>
+            <div class="bg-gradient-to-r from-rose-50 to-pink-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
               <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center space-x-2">
                   <span class="text-lg">💭</span>
@@ -545,17 +662,28 @@
                 </div>
                 <div class="flex items-center space-x-2">
                   <span class="text-sm {getEmotionalStatus().color}">{getEmotionalStatus().icon}</span>
-                  <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                    {expandedSections['emotional'] ? '▼ Less' : '▶ More'}
-                  </button>
+                  {#if hasMoreContent(sessionData.emotional_landscape, 120)}
+                    <button 
+                      class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                      on:click={(e) => { e.stopPropagation(); toggleSection('emotional'); }}
+                    >
+                      {expandedSections['emotional'] ? '▼ Less' : '▶ More'}
+                    </button>
+                  {/if}
                 </div>
               </div>
-              <p class="text-gray-600 text-sm leading-relaxed">
+              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('emotional')}>
                 {getDisplayText(sessionData.emotional_landscape, 'emotional', 120)}
               </p>
+              <button 
+                class="absolute bottom-2 right-2 text-xs bg-rose-100 hover:bg-rose-200 text-rose-700 px-2 py-1 rounded transition-colors"
+                on:click={(e) => { e.stopPropagation(); goto(getEditUrl('emotional_landscape')); }}
+              >
+                {$t('dashboard.edit')}
+              </button>
             </div>
 
-            <div class="bg-gradient-to-r from-slate-50 to-gray-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer" on:click={() => toggleSection('core_summary')} role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, () => toggleSection('core_summary'))}>
+            <div class="bg-gradient-to-r from-slate-50 to-gray-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
               <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center space-x-2">
                   <span class="text-lg">📋</span>
@@ -563,14 +691,25 @@
                 </div>
                 <div class="flex items-center space-x-2">
                   <span class="text-sm {getCoreSummaryStatus().color}">{getCoreSummaryStatus().icon}</span>
-                  <button class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                    {expandedSections['core_summary'] ? '▼ Less' : '▶ More'}
-                  </button>
+                  {#if hasMoreContent(sessionData.core_summary, 120)}
+                    <button 
+                      class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                      on:click={(e) => { e.stopPropagation(); toggleSection('core_summary'); }}
+                    >
+                      {expandedSections['core_summary'] ? '▼ Less' : '▶ More'}
+                    </button>
+                  {/if}
                 </div>
               </div>
-              <p class="text-gray-600 text-sm leading-relaxed">
+              <p class="text-gray-600 text-sm leading-relaxed cursor-pointer" on:click={() => toggleSection('core_summary')}>
                 {getDisplayText(sessionData.core_summary, 'core_summary', 120)}
               </p>
+              <button 
+                class="absolute bottom-2 right-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded transition-colors"
+                on:click={(e) => { e.stopPropagation(); goto(getEditUrl('core_summary')); }}
+              >
+                {$t('dashboard.edit')}
+              </button>
             </div>
           </div>
         </div>

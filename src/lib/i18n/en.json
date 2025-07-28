@@ -603,5 +603,36 @@
     "profile_settings": "Profile Settings",
     "sign_out": "Sign Out",
     "dashboard": "Dashboard"
+  },
+  "agency": {
+    "dashboard": {
+      "title": "Agency Dashboard",
+      "clients": "Your Clients",
+      "clients_desc": "Manage and track your clients' progress",
+      "no_clients": "No clients yet",
+      "no_clients_desc": "Clients will appear here once they are assigned to your agency.",
+      "active_clients": "Active Clients",
+      "client": "Client",
+      "status": "Status",
+      "last_activity": "Last Activity",
+      "actions": "Actions",
+      "generate_summary": "Generate Summary",
+      "view_details": "View Details",
+      "back_to_dashboard": "Back to Agency Dashboard"
+    },
+    "client": {
+      "title": "Client Details",
+      "sessions": "Questionnaire Sessions",
+      "sessions_desc": "Track client progress through questionnaires",
+      "activities": "Agency Activities",
+      "activities_desc": "Track all interactions with this client",
+      "no_sessions": "No sessions yet",
+      "no_sessions_desc": "Client hasn't started any questionnaires.",
+      "no_activities": "No activities yet",
+      "no_activities_desc": "Activities will appear here as you interact with this client.",
+      "session_id": "Session ID",
+      "summary_generated": "Summary generation started! You will receive it shortly.",
+      "error_generating": "Error generating summary: "
+    }
   }
 } 

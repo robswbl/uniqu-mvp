@@ -63,8 +63,8 @@
     if (data && data.order && Array.isArray(data.order)) {
       const order = data.order;
       const currentIndex = order.indexOf('love');
-      const urlParams = get(page).url.searchParams;
-      const fromOnboarding = urlParams.get('from') === 'onboarding';
+    const urlParams = get(page).url.searchParams;
+    const fromOnboarding = urlParams.get('from') === 'onboarding';
       if (currentIndex > 0) {
         const prevQuestion = order[currentIndex - 1];
         const prevUrl = fromOnboarding

@@ -21,26 +21,45 @@
 
 	async function loadData() {
 		try {
+			console.log('Starting to load data...');
+			
+			// Check authentication
+			const { data: { session }, error: authError } = await supabase.auth.getSession();
+			console.log('Auth session:', { session, authError });
+			
+			// Test simple query first
+			console.log('Testing simple query...');
+			const { data: testData, error: testError } = await supabase
+				.from('agencies')
+				.select('count')
+				.limit(1);
+			console.log('Test query result:', { testData, testError });
+			
 			// Load users
+			console.log('Loading users...');
 			const { data: usersData, error: usersError } = await supabase
 				.from('users')
 				.select('user_uuid, user_firstname, user_lastname, user_email')
 				.order('user_firstname');
 
+			console.log('Users result:', { usersData, usersError });
 			if (usersError) throw usersError;
 			users = usersData || [];
 
 			// Load agencies
+			console.log('Loading agencies...');
 			const { data: agenciesData, error: agenciesError } = await supabase
 				.from('agencies')
 				.select('id, name, agency_type')
 				.eq('is_active', true)
 				.order('name');
 
+			console.log('Agencies result:', { agenciesData, agenciesError });
 			if (agenciesError) throw agenciesError;
 			agencies = agenciesData || [];
 
 		} catch (err: any) {
+			console.error('Error in loadData:', err);
 			message = 'Error loading data: ' + err.message;
 			messageType = 'error';
 		}

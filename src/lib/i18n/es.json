@@ -595,5 +595,60 @@
     "profile_settings": "Configuración del perfil",
     "sign_out": "Cerrar sesión",
     "dashboard": "Panel de control"
+  },
+  "signup": {
+    "heading": "Registrarse",
+    "subheading": "Crea tu cuenta",
+    "first_name_label": "Nombre",
+    "last_name_label": "Apellido",
+    "email_label": "Correo electrónico",
+    "gender_label": "Género",
+    "gender_select": "Selecciona género",
+    "gender_male": "Masculino",
+    "gender_female": "Femenino",
+    "phone_label": "Teléfono",
+    "street_label": "Calle",
+    "zip_label": "Código postal",
+    "city_label": "Ciudad",
+    "country_label": "País",
+    "language_label": "Idioma",
+    "language_select": "Selecciona idioma",
+    "language_english": "Inglés",
+    "language_german": "Alemán",
+    "language_french": "Francés",
+    "language_italian": "Italiano",
+    "language_spanish": "Español",
+    "search_regions_label": "Regiones de búsqueda",
+    "search_industries_label": "Industrias",
+    "password_label": "Contraseña",
+    "signup_code_label": "Código de registro",
+    "sign_up": "Registrarse",
+    "signing_up": "Registrando..."
+  },
+  "admin": {
+    "signup_codes": {
+      "heading": "Gestión de códigos de registro",
+      "subheading": "Genera y rastrea códigos de registro únicos para el registro de usuarios.",
+      "count_label": "Cantidad de códigos a generar:",
+      "generating": "Generando...",
+      "generate": "Generar",
+      "all_codes": "Todos los códigos de registro",
+      "code": "Código",
+      "status": "Estado",
+      "used_by": "Usado por",
+      "used_at": "Usado el",
+      "copy": "Copiar"
+    },
+    "nav": {
+      "heading": "Herramientas de administración",
+      "subheading": "Accede a todas las funciones de administración aquí.",
+      "password_label": "Introduce la contraseña de administrador:",
+      "unlock": "Desbloquear",
+      "incorrect_password": "Contraseña incorrecta.",
+      "pages": "Páginas de administración",
+      "signup_codes": "Gestión de códigos de registro",
+      "assign_agency": "Asignar usuarios a agencias",
+      "question_order": "Gestión del orden de preguntas"
+    }
   }
 }

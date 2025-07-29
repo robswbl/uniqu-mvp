@@ -603,5 +603,60 @@
     "profile_settings": "Profil-Einstellungen",
     "sign_out": "Abmelden",
     "dashboard": "Dashboard"
+  },
+  "signup": {
+    "heading": "Registrieren",
+    "subheading": "Erstelle deinen Account",
+    "first_name_label": "Vorname",
+    "last_name_label": "Nachname",
+    "email_label": "E-Mail",
+    "gender_label": "Geschlecht",
+    "gender_select": "Geschlecht wählen",
+    "gender_male": "Männlich",
+    "gender_female": "Weiblich",
+    "phone_label": "Telefon",
+    "street_label": "Straße",
+    "zip_label": "PLZ",
+    "city_label": "Stadt",
+    "country_label": "Land",
+    "language_label": "Sprache",
+    "language_select": "Sprache wählen",
+    "language_english": "Englisch",
+    "language_german": "Deutsch",
+    "language_french": "Französisch",
+    "language_italian": "Italienisch",
+    "language_spanish": "Spanisch",
+    "search_regions_label": "Suchregionen",
+    "search_industries_label": "Branchen",
+    "password_label": "Passwort",
+    "signup_code_label": "Registrierungscode",
+    "sign_up": "Registrieren",
+    "signing_up": "Registrierung..."
+  },
+  "admin": {
+    "signup_codes": {
+      "heading": "Registrierungscodes verwalten",
+      "subheading": "Erzeuge und verfolge eindeutige Registrierungscodes für die Benutzerregistrierung.",
+      "count_label": "Anzahl der zu generierenden Codes:",
+      "generating": "Generiere...",
+      "generate": "Generieren",
+      "all_codes": "Alle Registrierungscodes",
+      "code": "Code",
+      "status": "Status",
+      "used_by": "Verwendet von",
+      "used_at": "Verwendet am",
+      "copy": "Kopieren"
+    },
+    "nav": {
+      "heading": "Admin-Tools",
+      "subheading": "Hier findest du alle Admin-Funktionen.",
+      "password_label": "Admin-Passwort eingeben:",
+      "unlock": "Entsperren",
+      "incorrect_password": "Falsches Passwort.",
+      "pages": "Admin-Seiten",
+      "signup_codes": "Registrierungscodes verwalten",
+      "assign_agency": "Benutzer Agenturen zuweisen",
+      "question_order": "Fragenreihenfolge verwalten"
+    }
   }
 }

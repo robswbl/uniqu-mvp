@@ -634,5 +634,60 @@
       "summary_generated": "Summary generation started! You will receive it shortly.",
       "error_generating": "Error generating summary: "
     }
+  },
+  "signup": {
+    "heading": "Sign Up",
+    "subheading": "Create your account",
+    "first_name_label": "First Name",
+    "last_name_label": "Last Name",
+    "email_label": "Email",
+    "gender_label": "Gender",
+    "gender_select": "Select gender",
+    "gender_male": "Male",
+    "gender_female": "Female",
+    "phone_label": "Phone",
+    "street_label": "Street",
+    "zip_label": "ZIP",
+    "city_label": "City",
+    "country_label": "Country",
+    "language_label": "Language",
+    "language_select": "Select language",
+    "language_english": "English",
+    "language_german": "German",
+    "language_french": "French",
+    "language_italian": "Italian",
+    "language_spanish": "Spanish",
+    "search_regions_label": "Search Regions",
+    "search_industries_label": "Search Industries",
+    "password_label": "Password",
+    "signup_code_label": "Signup Code",
+    "sign_up": "Sign Up",
+    "signing_up": "Signing up..."
+  },
+  "admin": {
+    "signup_codes": {
+      "heading": "Signup Code Management",
+      "subheading": "Generate and track unique signup codes for user registration.",
+      "count_label": "Number of codes to generate:",
+      "generating": "Generating...",
+      "generate": "Generate",
+      "all_codes": "All Signup Codes",
+      "code": "Code",
+      "status": "Status",
+      "used_by": "Used By",
+      "used_at": "Used At",
+      "copy": "Copy"
+    },
+    "nav": {
+      "heading": "Admin Tools",
+      "subheading": "Access all admin features from here.",
+      "password_label": "Enter admin password:",
+      "unlock": "Unlock",
+      "incorrect_password": "Incorrect password.",
+      "pages": "Admin Pages",
+      "signup_codes": "Signup Code Management",
+      "assign_agency": "Assign Users to Agencies",
+      "question_order": "Question Order Management"
+    }
   }
 } 

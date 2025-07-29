@@ -591,5 +591,60 @@
     "profile_settings": "Paramètres du profil",
     "sign_out": "Se déconnecter",
     "dashboard": "Tableau de bord"
+  },
+  "signup": {
+    "heading": "S'inscrire",
+    "subheading": "Créez votre compte",
+    "first_name_label": "Prénom",
+    "last_name_label": "Nom",
+    "email_label": "Email",
+    "gender_label": "Genre",
+    "gender_select": "Sélectionnez le genre",
+    "gender_male": "Homme",
+    "gender_female": "Femme",
+    "phone_label": "Téléphone",
+    "street_label": "Rue",
+    "zip_label": "Code postal",
+    "city_label": "Ville",
+    "country_label": "Pays",
+    "language_label": "Langue",
+    "language_select": "Sélectionnez la langue",
+    "language_english": "Anglais",
+    "language_german": "Allemand",
+    "language_french": "Français",
+    "language_italian": "Italien",
+    "language_spanish": "Espagnol",
+    "search_regions_label": "Régions de recherche",
+    "search_industries_label": "Secteurs",
+    "password_label": "Mot de passe",
+    "signup_code_label": "Code d'inscription",
+    "sign_up": "S'inscrire",
+    "signing_up": "Inscription..."
+  },
+  "admin": {
+    "signup_codes": {
+      "heading": "Gestion des codes d'inscription",
+      "subheading": "Générez et suivez des codes d'inscription uniques pour l'enregistrement des utilisateurs.",
+      "count_label": "Nombre de codes à générer :",
+      "generating": "Génération...",
+      "generate": "Générer",
+      "all_codes": "Tous les codes d'inscription",
+      "code": "Code",
+      "status": "Statut",
+      "used_by": "Utilisé par",
+      "used_at": "Utilisé le",
+      "copy": "Copier"
+    },
+    "nav": {
+      "heading": "Outils d'administration",
+      "subheading": "Accédez à toutes les fonctionnalités d'administration ici.",
+      "password_label": "Entrez le mot de passe admin :",
+      "unlock": "Déverrouiller",
+      "incorrect_password": "Mot de passe incorrect.",
+      "pages": "Pages d'administration",
+      "signup_codes": "Gestion des codes d'inscription",
+      "assign_agency": "Affecter des utilisateurs aux agences",
+      "question_order": "Gestion de l'ordre des questions"
+    }
   }
 }

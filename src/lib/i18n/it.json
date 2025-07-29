@@ -600,5 +600,60 @@
     "profile_settings": "Impostazioni del profilo",
     "sign_out": "Disconnetti",
     "dashboard": "Dashboard"
+  },
+  "signup": {
+    "heading": "Registrati",
+    "subheading": "Crea il tuo account",
+    "first_name_label": "Nome",
+    "last_name_label": "Cognome",
+    "email_label": "Email",
+    "gender_label": "Genere",
+    "gender_select": "Seleziona genere",
+    "gender_male": "Maschio",
+    "gender_female": "Femmina",
+    "phone_label": "Telefono",
+    "street_label": "Via",
+    "zip_label": "CAP",
+    "city_label": "Città",
+    "country_label": "Paese",
+    "language_label": "Lingua",
+    "language_select": "Seleziona lingua",
+    "language_english": "Inglese",
+    "language_german": "Tedesco",
+    "language_french": "Francese",
+    "language_italian": "Italiano",
+    "language_spanish": "Spagnolo",
+    "search_regions_label": "Regioni di ricerca",
+    "search_industries_label": "Settori",
+    "password_label": "Password",
+    "signup_code_label": "Codice di registrazione",
+    "sign_up": "Registrati",
+    "signing_up": "Registrazione..."
+  },
+  "admin": {
+    "signup_codes": {
+      "heading": "Gestione codici di registrazione",
+      "subheading": "Genera e traccia codici di registrazione unici per la registrazione degli utenti.",
+      "count_label": "Numero di codici da generare:",
+      "generating": "Generazione...",
+      "generate": "Genera",
+      "all_codes": "Tutti i codici di registrazione",
+      "code": "Codice",
+      "status": "Stato",
+      "used_by": "Usato da",
+      "used_at": "Usato il",
+      "copy": "Copia"
+    },
+    "nav": {
+      "heading": "Strumenti di amministrazione",
+      "subheading": "Accedi a tutte le funzionalità di amministrazione da qui.",
+      "password_label": "Inserisci la password admin:",
+      "unlock": "Sblocca",
+      "incorrect_password": "Password errata.",
+      "pages": "Pagine di amministrazione",
+      "signup_codes": "Gestione codici di registrazione",
+      "assign_agency": "Assegna utenti alle agenzie",
+      "question_order": "Gestione ordine domande"
+    }
   }
 }

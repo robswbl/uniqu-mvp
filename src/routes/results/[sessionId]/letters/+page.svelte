@@ -785,19 +785,6 @@
 										{/if}
 									{:else}
 										<div class="flex items-center space-x-2">
-											<!-- Test Generate Button -->
-											<button 
-												on:click={() => triggerWebhookForLetter(letter)}
-												class="flex items-center space-x-1 p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
-												type="button"
-												aria-label="Test generate letter"
-												title="Test Generate Letter"
-											>
-												<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-												</svg>
-												<span>{$t('letters.test')}</span>
-											</button>
 											<!-- View Letter Button -->
 											<button 
 												on:click={() => viewLetter(letter.id)}

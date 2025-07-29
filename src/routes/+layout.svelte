@@ -19,6 +19,8 @@ let userId = '';
 let errorMsg = '';
 let userData: any = null;
 let showProfileMenu = false;
+let profileMenuRef;
+let profileButtonRef;
 
 // SSR-safe: check if window is defined before accessing localStorage
 if (typeof window !== 'undefined') {
@@ -74,6 +76,24 @@ onMount(async () => {
       waitLocale();
     }
   }
+});
+
+onMount(() => {
+  function handleClickOutside(event) {
+    if (
+      showProfileMenu &&
+      profileMenuRef &&
+      !profileMenuRef.contains(event.target) &&
+      profileButtonRef &&
+      !profileButtonRef.contains(event.target)
+    ) {
+      showProfileMenu = false;
+    }
+  }
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
 });
 
 async function fetchUserData() {
@@ -161,6 +181,7 @@ async function changeLang(lang: string) {
       {#if userData && $page.params?.sessionId}
         <div class="relative">
           <button
+            bind:this={profileButtonRef}
             on:click={() => showProfileMenu = !showProfileMenu}
             class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
             type="button"
@@ -178,7 +199,7 @@ async function changeLang(lang: string) {
           
           <!-- Profile Dropdown Menu -->
           {#if showProfileMenu}
-            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+            <div bind:this={profileMenuRef} class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
               <a
                 href="/profile/{$page.params.sessionId}"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"

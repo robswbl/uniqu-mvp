@@ -126,6 +126,30 @@
 		};
 		return icons[activityType] || '📋';
 	}
+
+	function formatActivityMetadata(metadata: any): string {
+		if (!metadata) return '';
+		
+		const action = metadata.action;
+		switch (action) {
+			case 'summary_generated':
+				return 'Summary generation was triggered';
+			case 'user_assigned':
+				const assignedBy = metadata.assigned_by || 'system';
+				const relationshipType = metadata.relationship_type || 'client';
+				return `Client assigned as ${relationshipType} by ${assignedBy}`;
+			case 'client_contacted':
+				return 'Client was contacted';
+			case 'meeting_scheduled':
+				return 'Meeting was scheduled';
+			case 'feedback_received':
+				return 'Feedback was received from client';
+			case 'follow_up_sent':
+				return 'Follow-up message was sent';
+			default:
+				return `Action: ${action}`;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -266,8 +290,8 @@
 												{formatDate(activity.created_at)}
 											</p>
 											{#if activity.metadata}
-												<p class="text-xs text-gray-400 mt-1">
-													{JSON.stringify(activity.metadata)}
+												<p class="text-sm text-gray-600 mt-1">
+													{formatActivityMetadata(activity.metadata)}
 												</p>
 											{/if}
 										</div>

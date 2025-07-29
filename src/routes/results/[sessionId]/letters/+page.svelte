@@ -505,6 +505,23 @@
 	  return generatedLetterIds.has(letter.id.toString());
 	}
 
+	let showNewLetterDropdown = false;
+	let newLetterType = null; // 'job' or 'spontaneous'
+	let newLetterLanguage = 'en';
+	const availableLetterLanguages = [
+	  { code: 'en', label: 'English' },
+	  { code: 'de', label: 'Deutsch' },
+	  { code: 'fr', label: 'Français' },
+	  { code: 'it', label: 'Italiano' },
+	  { code: 'es', label: 'Español' }
+	];
+
+	function openNewLetterForm(type) {
+	  newLetterType = type;
+	  showNewLetterForm = true;
+	  showNewLetterDropdown = false;
+	}
+
 	onMount(() => {
 		fetchData();
 	});
@@ -536,18 +553,40 @@
 					<h1 class="text-3xl font-bold text-gray-900 mb-2">{$t('letters.heading')}</h1>
 					<p class="text-gray-600">{$t('letters.subheading')}</p>
 				</div>
-				
-				<button
-					on:click={() => showNewLetterForm = !showNewLetterForm}
-					class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
-					type="button"
-					aria-label="Generate New Letter"
-				>
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-					</svg>
-					<span>{$t('letters.generate_new_letter')}</span>
-				</button>
+				<div class="relative">
+					<button
+						on:click={() => showNewLetterDropdown = !showNewLetterDropdown}
+						class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
+						type="button"
+						aria-label="Generate New Letter"
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+						</svg>
+						<span>{$t('letters.generate_new_letter')}</span>
+						<svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+						</svg>
+					</button>
+					{#if showNewLetterDropdown}
+						<div class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+							<button
+								class="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors"
+								type="button"
+								on:click={() => openNewLetterForm('job')}
+							>
+								{$t('letters.generate_based_on_job_opening')}
+							</button>
+							<button
+								class="block w-full text-left px-4 py-3 text-gray-700 hover:bg-gray-100 transition-colors"
+								type="button"
+								on:click={() => openNewLetterForm('spontaneous')}
+							>
+								{$t('letters.generate_spontaneous_application')}
+							</button>
+						</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 
@@ -573,9 +612,32 @@
 			<!-- New Letter Form -->
 			{#if showNewLetterForm}
 				<div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200">
-					<h3 class="text-xl font-semibold text-gray-900 mb-4">{$t('letters.generate_new_application_letter')}</h3>
-					
+					<h3 class="text-xl font-semibold text-gray-900 mb-4">
+						{#if newLetterType === 'job'}
+							{$t('letters.generate_new_application_letter_job')}
+						{:else if newLetterType === 'spontaneous'}
+							{$t('letters.generate_new_application_letter_spontaneous')}
+						{:else}
+							{$t('letters.generate_new_application_letter')}
+						{/if}
+					</h3>
 					<div class="space-y-4">
+						<!-- Language Selector -->
+						<div>
+							<label for="letter-language" class="block text-sm font-medium text-gray-700 mb-2">
+								{$t('letters.letter_language_label')}
+							</label>
+							<select
+								id="letter-language"
+								bind:value={newLetterLanguage}
+								class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+							>
+								{#each availableLetterLanguages as lang}
+									<option value={lang.code}>{lang.label}</option>
+								{/each}
+							</select>
+						</div>
+						
 						{#if matchedCompanies.length > 0}
 							<div>
 								<label for="company-select" class="block text-sm font-medium text-gray-700 mb-2">

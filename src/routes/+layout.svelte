@@ -19,8 +19,8 @@ let userId = '';
 let errorMsg = '';
 let userData: any = null;
 let showProfileMenu = false;
-let profileMenuRef;
-let profileButtonRef;
+let profileMenuRef: HTMLElement | null = null;
+let profileButtonRef: HTMLElement | null = null;
 
 // SSR-safe: check if window is defined before accessing localStorage
 if (typeof window !== 'undefined') {
@@ -79,13 +79,13 @@ onMount(async () => {
 });
 
 onMount(() => {
-  function handleClickOutside(event) {
+  function handleClickOutside(event: MouseEvent) {
     if (
       showProfileMenu &&
       profileMenuRef &&
-      !profileMenuRef.contains(event.target) &&
+      !profileMenuRef.contains(event.target as Node) &&
       profileButtonRef &&
-      !profileButtonRef.contains(event.target)
+      !profileButtonRef.contains(event.target as Node)
     ) {
       showProfileMenu = false;
     }

@@ -2,7 +2,6 @@
   import { supabase } from '$lib/supabaseClient';
   import { goto } from '$app/navigation';
   import { t } from 'svelte-i18n';
-  import bcrypt from 'bcryptjs';
   import { v4 as uuidv4 } from 'uuid';
 
   // Form fields
@@ -31,20 +30,7 @@
     message = '';
     messageType = '';
     try {
-      // 1. Validate signup code
-      const { data: codeData, error: codeError } = await supabase
-        .from('signup_codes')
-        .select('*')
-        .eq('code', signupCode)
-        .eq('used', false)
-        .single();
-      if (codeError || !codeData) {
-        message = 'Invalid or already used signup code.';
-        messageType = 'error';
-        isSubmitting = false;
-        return;
-      }
-
+      // 1. Validate signup code (client-side, optional, or move to server)
       // 2. Check password match
       if (password !== confirmPassword) {
         message = 'Passwords do not match.';
@@ -59,53 +45,34 @@
         return;
       }
 
-      // 3. Hash password
-      const password_hash = await bcrypt.hash(password, 10);
-
-      // 4. Generate user_uuid
-      const user_uuid = uuidv4();
-
-      // 5. Insert user into users table
-      const { error: userError } = await supabase.from('users').insert({
-        user_uuid,
-        user_firstname: firstName,
-        user_lastname: lastName,
-        user_email: email,
-        user_gender: gender,
-        user_language: language,
-        user_search_regions: userSearchRegions,
-        user_search_industries: userSearchIndustries,
-        user_street: userStreet,
-        user_zip: userZip,
-        user_city: userCity,
-        user_country: userCountry,
-        user_phone: userPhone,
-        password_hash
+      // 3. Send signup data to server endpoint
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          gender,
+          language,
+          userSearchRegions,
+          userSearchIndustries,
+          userStreet,
+          userZip,
+          userCity,
+          userCountry,
+          userPhone,
+          password,
+          signupCode
+        })
       });
-      if (userError) {
-        message = userError.message;
+      const result = await response.json();
+      if (!response.ok) {
+        message = result.message || 'Signup failed.';
         messageType = 'error';
         isSubmitting = false;
         return;
       }
-
-      // 5b. Create questionnaire session for the new user
-      const { error: sessionError } = await supabase
-        .from('questionnaire_sessions')
-        .insert({ user_id: user_uuid, status: 'in-progress', created_at: new Date().toISOString() });
-      if (sessionError) {
-        message = 'User created, but failed to create session.';
-        messageType = 'error';
-        isSubmitting = false;
-        return;
-      }
-
-      // 6. Mark code as used
-      await supabase
-        .from('signup_codes')
-        .update({ used: true, used_by: email, used_at: new Date().toISOString() })
-        .eq('code', signupCode);
-
       message = 'Signup successful!';
       messageType = 'success';
       setTimeout(() => goto('/'), 2000);

@@ -16,6 +16,117 @@
 	let applicationLetters: any[] = [];
 	let loading = true;
 	let error = '';
+	let selectedVersions: Record<string, string> = {};
+
+	// Main document types to show
+	const mainDocumentTypes = ['reflection_letter', 'career_themes', 'ideal_companies', 'matching_companies'];
+
+	// Group documents by type and get latest version for each
+	function getDocumentsByType() {
+		const grouped: Record<string, any[]> = {};
+		
+		// Group generated documents
+		documents.forEach(doc => {
+			if (mainDocumentTypes.includes(doc.document_type)) {
+				if (!grouped[doc.document_type]) {
+					grouped[doc.document_type] = [];
+				}
+				grouped[doc.document_type].push(doc);
+			}
+		});
+
+		// Group application letters
+		if (applicationLetters.length > 0) {
+			grouped['application_letters'] = applicationLetters;
+		}
+
+		return grouped;
+	}
+
+	function getLatestDocument(type: string) {
+		const docs = getDocumentsByType()[type];
+		if (!docs || docs.length === 0) return null;
+		
+		// Sort by created_at descending and return the latest
+		return docs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+	}
+
+	function getDocumentVersions(type: string) {
+		const docs = getDocumentsByType()[type];
+		if (!docs) return [];
+		
+		return docs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+			.map((doc, index) => ({
+				id: doc.id,
+				version: `v${index + 1}`,
+				date: new Date(doc.created_at).toLocaleDateString() + ' ' + new Date(doc.created_at).toLocaleTimeString(),
+				document: doc
+			}));
+	}
+
+	function getSelectedDocument(type: string) {
+		const versions = getDocumentVersions(type);
+		const selectedId = selectedVersions[type];
+		
+		if (selectedId) {
+			return versions.find(v => v.document.id === selectedId)?.document;
+		}
+		
+		// Default to latest
+		return getLatestDocument(type);
+	}
+
+	function viewDocument(type: string) {
+		const doc = getSelectedDocument(type);
+		if (!doc) return;
+		
+		if (type === 'application_letters') {
+			// For application letters, we need to handle differently
+			const letter = doc;
+			window.open(`/results/${sessions[0]?.id}/application_letter?company=${letter.company_name}`, '_blank');
+		} else {
+			window.open(`/results/${sessions[0]?.id}/${type}`, '_blank');
+		}
+	}
+
+	function copyDocument(type: string) {
+		const doc = getSelectedDocument(type);
+		if (!doc) return;
+		
+		// For now, just copy the URL
+		let url = '';
+		if (type === 'application_letters') {
+			url = `${window.location.origin}/results/${sessions[0]?.id}/application_letter?company=${doc.company_name}`;
+		} else {
+			url = `${window.location.origin}/results/${sessions[0]?.id}/${type}`;
+		}
+		
+		navigator.clipboard.writeText(url).then(() => {
+			alert('Document URL copied to clipboard!');
+		}).catch(() => {
+			alert('Failed to copy URL. Please copy manually: ' + url);
+		});
+	}
+
+	function printDocument(type: string) {
+		const doc = getSelectedDocument(type);
+		if (!doc) return;
+		
+		// Open in new window for printing
+		let url = '';
+		if (type === 'application_letters') {
+			url = `/results/${sessions[0]?.id}/application_letter?company=${doc.company_name}`;
+		} else {
+			url = `/results/${sessions[0]?.id}/${type}`;
+		}
+		
+		const printWindow = window.open(url, '_blank');
+		if (printWindow) {
+			printWindow.onload = () => {
+				printWindow.print();
+			};
+		}
+	}
 
 	onMount(async () => {
 		await loadClientData();
@@ -272,52 +383,115 @@
 						</div>
 					{:else}
 						<div class="divide-y divide-gray-200">
-							<!-- Generated Documents -->
-							{#each documents as document}
-								<div class="p-6">
-									<div class="flex items-center justify-between">
-										<div class="flex items-center space-x-3">
-											<span class="text-2xl">{getDocumentIcon(document.document_type)}</span>
-											<div>
-												<h4 class="font-medium text-gray-900">{getDocumentTitle(document.document_type)}</h4>
-												<p class="text-sm text-gray-500">{formatDate(document.created_at)}</p>
+							{#each mainDocumentTypes as type}
+								{#if getLatestDocument(type)}
+									<div class="p-6">
+										<div class="flex items-center justify-between">
+											<div class="flex items-center space-x-3">
+												<span class="text-2xl">{getDocumentIcon(type)}</span>
+												<div>
+													<h4 class="font-medium text-gray-900">{getDocumentTitle(type)}</h4>
+													{#if getDocumentVersions(type).length > 1}
+														<div class="flex items-center space-x-2 mt-1">
+															<select 
+																bind:value={selectedVersions[type]}
+																class="text-xs border border-gray-300 rounded px-2 py-1"
+															>
+																{#each getDocumentVersions(type) as version}
+																	<option value={version.document.id}>
+																		{version.version} - {version.date}
+																	</option>
+																{/each}
+															</select>
+															<span class="text-xs text-gray-500">
+																{getDocumentVersions(type).length} versions
+															</span>
+														</div>
+													{:else}
+														<p class="text-sm text-gray-500">
+															Latest: {formatDate(getLatestDocument(type).created_at)}
+														</p>
+													{/if}
+												</div>
+											</div>
+											<div class="flex space-x-2">
+												<button
+													on:click={() => viewDocument(type)}
+													class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+												>
+													View
+												</button>
+												<button
+													on:click={() => copyDocument(type)}
+													class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+												>
+													Copy URL
+												</button>
+												<button
+													on:click={() => printDocument(type)}
+													class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+												>
+													Print
+												</button>
 											</div>
 										</div>
-										<div class="flex space-x-2">
-											<button
-												on:click={() => window.open(`/results/${sessions[0]?.id}/${document.document_type}`, '_blank')}
-												class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
-											>
-												View
-											</button>
-										</div>
 									</div>
-								</div>
+								{/if}
 							{/each}
 
-							<!-- Application Letters -->
-							{#each applicationLetters as letter}
+							{#if applicationLetters.length > 0}
 								<div class="p-6">
 									<div class="flex items-center justify-between">
 										<div class="flex items-center space-x-3">
 											<span class="text-2xl">📄</span>
 											<div>
-												<h4 class="font-medium text-gray-900">Application Letter</h4>
-												<p class="text-sm text-gray-500">{letter.company_name || 'Unknown Company'}</p>
-												<p class="text-xs text-gray-400">{formatDate(letter.created_at)}</p>
+												<h4 class="font-medium text-gray-900">Application Letters</h4>
+												{#if applicationLetters.length > 1}
+													<div class="flex items-center space-x-2 mt-1">
+														<select 
+															bind:value={selectedVersions['application_letters']}
+															class="text-xs border border-gray-300 rounded px-2 py-1"
+														>
+															{#each getDocumentVersions('application_letters') as version}
+																<option value={version.document.id}>
+																	{version.version} - {version.document.company_name || 'Unknown'} - {version.date}
+																</option>
+															{/each}
+														</select>
+														<span class="text-xs text-gray-500">
+															{applicationLetters.length} letters
+														</span>
+													</div>
+												{:else}
+													<p class="text-sm text-gray-500">
+														{applicationLetters[0]?.company_name || 'Unknown Company'} - {formatDate(applicationLetters[0]?.created_at)}
+													</p>
+												{/if}
 											</div>
 										</div>
 										<div class="flex space-x-2">
 											<button
-												on:click={() => window.open(`/results/${sessions[0]?.id}/application_letter?company=${letter.company_name}`, '_blank')}
+												on:click={() => viewDocument('application_letters')}
 												class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
 											>
 												View
 											</button>
+											<button
+												on:click={() => copyDocument('application_letters')}
+												class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+											>
+												Copy URL
+											</button>
+											<button
+												on:click={() => printDocument('application_letters')}
+												class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+											>
+												Print
+											</button>
 										</div>
 									</div>
 								</div>
-							{/each}
+							{/if}
 						</div>
 					{/if}
 				</div>

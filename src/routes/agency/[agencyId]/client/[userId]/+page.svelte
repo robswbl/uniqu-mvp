@@ -120,12 +120,38 @@
 			url = `/results/${sessions[0]?.id}/${type}`;
 		}
 		
+		// Open in new window and trigger print after load
 		const printWindow = window.open(url, '_blank');
 		if (printWindow) {
-			printWindow.onload = () => {
+			// Wait for the page to load, then print
+			setTimeout(() => {
 				printWindow.print();
-			};
+			}, 1000);
 		}
+	}
+
+	function getApplicationStatusColor(status: string): string {
+		const statusColors: Record<string, string> = {
+			'draft': 'bg-gray-100 text-gray-700',
+			'sent': 'bg-blue-100 text-blue-700',
+			'responded': 'bg-yellow-100 text-yellow-700',
+			'interview': 'bg-green-100 text-green-700',
+			'rejected': 'bg-red-100 text-red-700',
+			'accepted': 'bg-purple-100 text-purple-700'
+		};
+		return statusColors[status] || 'bg-gray-100 text-gray-700';
+	}
+
+	function getApplicationStatusLabel(status: string): string {
+		const statusLabels: Record<string, string> = {
+			'draft': 'Draft',
+			'sent': 'Sent',
+			'responded': 'Response Received',
+			'interview': 'Interview Scheduled',
+			'rejected': 'Rejected',
+			'accepted': 'Offer Received'
+		};
+		return statusLabels[status] || status;
 	}
 
 	onMount(async () => {
@@ -454,7 +480,7 @@
 														>
 															{#each getDocumentVersions('application_letters') as version}
 																<option value={version.document.id}>
-																	{version.version} - {version.document.company_name || 'Unknown'} - {version.date}
+																	{version.version} - {version.document.company_name || 'Unknown'} - {getApplicationStatusLabel(version.document.status)} - {version.date}
 																</option>
 															{/each}
 														</select>
@@ -463,9 +489,14 @@
 														</span>
 													</div>
 												{:else}
-													<p class="text-sm text-gray-500">
-														{applicationLetters[0]?.company_name || 'Unknown Company'} - {formatDate(applicationLetters[0]?.created_at)}
-													</p>
+													<div class="flex items-center space-x-2 mt-1">
+														<p class="text-sm text-gray-500">
+															{applicationLetters[0]?.company_name || 'Unknown Company'} - {formatDate(applicationLetters[0]?.created_at)}
+														</p>
+														<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {getApplicationStatusColor(applicationLetters[0]?.status)}">
+															{getApplicationStatusLabel(applicationLetters[0]?.status)}
+														</span>
+													</div>
 												{/if}
 											</div>
 										</div>

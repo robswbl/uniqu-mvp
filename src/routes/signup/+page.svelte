@@ -2,6 +2,8 @@
   import { supabase } from '$lib/supabaseClient';
   import { goto } from '$app/navigation';
   import { t } from 'svelte-i18n';
+  import bcrypt from 'bcryptjs';
+  import { v4 as uuidv4 } from 'uuid';
 
   // Form fields
   let firstName = '';
@@ -17,6 +19,7 @@
   let userCountry = '';
   let userPhone = '';
   let password = '';
+  let confirmPassword = '';
   let signupCode = '';
 
   let isSubmitting = false;
@@ -42,40 +45,68 @@
         return;
       }
 
-      // 2. Register user (Supabase Auth)
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            user_firstname: firstName,
-            user_lastname: lastName,
-            user_gender: gender,
-            user_language: language,
-            user_search_regions: userSearchRegions,
-            user_search_industries: userSearchIndustries,
-            user_street: userStreet,
-            user_zip: userZip,
-            user_city: userCity,
-            user_country: userCountry,
-            user_phone: userPhone
-          }
-        }
-      });
-      if (signUpError) {
-        message = signUpError.message;
+      // 2. Check password match
+      if (password !== confirmPassword) {
+        message = 'Passwords do not match.';
+        messageType = 'error';
+        isSubmitting = false;
+        return;
+      }
+      if (password.length < 6) {
+        message = 'Password must be at least 6 characters.';
         messageType = 'error';
         isSubmitting = false;
         return;
       }
 
-      // 3. Mark code as used
+      // 3. Hash password
+      const password_hash = await bcrypt.hash(password, 10);
+
+      // 4. Generate user_uuid
+      const user_uuid = uuidv4();
+
+      // 5. Insert user into users table
+      const { error: userError } = await supabase.from('users').insert({
+        user_uuid,
+        user_firstname: firstName,
+        user_lastname: lastName,
+        user_email: email,
+        user_gender: gender,
+        user_language: language,
+        user_search_regions: userSearchRegions,
+        user_search_industries: userSearchIndustries,
+        user_street: userStreet,
+        user_zip: userZip,
+        user_city: userCity,
+        user_country: userCountry,
+        user_phone: userPhone,
+        password_hash
+      });
+      if (userError) {
+        message = userError.message;
+        messageType = 'error';
+        isSubmitting = false;
+        return;
+      }
+
+      // 5b. Create questionnaire session for the new user
+      const { error: sessionError } = await supabase
+        .from('questionnaire_sessions')
+        .insert({ user_id: user_uuid, status: 'in-progress', created_at: new Date().toISOString() });
+      if (sessionError) {
+        message = 'User created, but failed to create session.';
+        messageType = 'error';
+        isSubmitting = false;
+        return;
+      }
+
+      // 6. Mark code as used
       await supabase
         .from('signup_codes')
         .update({ used: true, used_by: email, used_at: new Date().toISOString() })
         .eq('code', signupCode);
 
-      message = 'Signup successful! Please check your email to confirm your account.';
+      message = 'Signup successful!';
       messageType = 'success';
       setTimeout(() => goto('/'), 2000);
     } catch (err: any) {
@@ -122,6 +153,7 @@
         </div>
         <div class="grid md:grid-cols-2 gap-6">
           <div><label for="password" class="block text-sm font-medium text-gray-700 mb-2">{$t('signup.password_label')} *</label><input id="password" type="password" bind:value={password} required class="w-full px-4 py-3 border border-gray-300 rounded-lg" /></div>
+          <div><label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label><input id="confirmPassword" type="password" bind:value={confirmPassword} required class="w-full px-4 py-3 border border-gray-300 rounded-lg" /></div>
           <div><label for="signupCode" class="block text-sm font-medium text-gray-700 mb-2">{$t('signup.signup_code_label')} *</label><input id="signupCode" type="text" bind:value={signupCode} required class="w-full px-4 py-3 border border-gray-300 rounded-lg" /></div>
         </div>
         <div class="flex justify-end pt-4">

@@ -12,6 +12,8 @@
 	let client: any = null;
 	let sessions: any[] = [];
 	let activities: any[] = [];
+	let documents: any[] = [];
+	let applicationLetters: any[] = [];
 	let loading = true;
 	let error = '';
 
@@ -53,6 +55,28 @@
 
 			if (activitiesError) throw activitiesError;
 			activities = activitiesData || [];
+
+			// Load all generated documents for this client
+			const { data: documentsData, error: documentsError } = await supabase
+				.from('generated_documents')
+				.select('*')
+				.eq('session_id', sessions[0]?.id) // Get documents for the most recent session
+				.order('created_at', { ascending: false });
+
+			if (!documentsError && documentsData) {
+				documents = documentsData;
+			}
+
+			// Load application letters for this client
+			const { data: lettersData, error: lettersError } = await supabase
+				.from('application_letters')
+				.select('*')
+				.eq('session_id', sessions[0]?.id) // Get letters for the most recent session
+				.order('created_at', { ascending: false });
+
+			if (!lettersError && lettersData) {
+				applicationLetters = lettersData;
+			}
 
 		} catch (err: any) {
 			error = err.message;
@@ -125,6 +149,32 @@
 			'login': '🔑'
 		};
 		return icons[activityType] || '📋';
+	}
+
+	function getDocumentIcon(documentType: string): string {
+		const icons: Record<string, string> = {
+			'reflection_letter': '📝',
+			'career_themes': '🎯',
+			'ideal_companies': '🏢',
+			'matching_companies': '🔍',
+			'application_letter': '📄'
+		};
+		return icons[documentType] || '📋';
+	}
+
+	function getDocumentTitle(documentType: string): string {
+		const titles: Record<string, string> = {
+			'reflection_letter': 'Reflection Letter',
+			'career_themes': 'Career Themes',
+			'ideal_companies': 'Ideal Companies',
+			'matching_companies': 'Matching Companies',
+			'application_letter': 'Application Letter'
+		};
+		return titles[documentType] || documentType.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+	}
+
+	function getDocumentCount(): number {
+		return documents.length + applicationLetters.length;
 	}
 
 	function formatActivityMetadata(metadata: any): string {
@@ -200,13 +250,78 @@
 						</div>
 					</div>
 					<div class="text-right">
-						<div class="text-2xl font-bold text-indigo-600">{sessions.length}</div>
-						<div class="text-sm text-gray-500">Sessions</div>
+						<div class="text-2xl font-bold text-indigo-600">{getDocumentCount()}</div>
+						<div class="text-sm text-gray-500">Documents</div>
 					</div>
 				</div>
 			</div>
 
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+				<!-- Documents Section -->
+				<div class="bg-white rounded-lg shadow-sm">
+					<div class="px-6 py-4 border-b border-gray-200">
+						<h2 class="text-xl font-semibold text-gray-900">Generated Documents</h2>
+						<p class="text-gray-600 mt-1">All career analysis documents and application letters</p>
+					</div>
+
+					{#if documents.length === 0 && applicationLetters.length === 0}
+						<div class="p-8 text-center">
+							<div class="text-gray-400 text-4xl mb-4">📄</div>
+							<h3 class="text-lg font-medium text-gray-900 mb-2">No documents yet</h3>
+							<p class="text-gray-600">Documents will appear here once generated.</p>
+						</div>
+					{:else}
+						<div class="divide-y divide-gray-200">
+							<!-- Generated Documents -->
+							{#each documents as document}
+								<div class="p-6">
+									<div class="flex items-center justify-between">
+										<div class="flex items-center space-x-3">
+											<span class="text-2xl">{getDocumentIcon(document.document_type)}</span>
+											<div>
+												<h4 class="font-medium text-gray-900">{getDocumentTitle(document.document_type)}</h4>
+												<p class="text-sm text-gray-500">{formatDate(document.created_at)}</p>
+											</div>
+										</div>
+										<div class="flex space-x-2">
+											<button
+												on:click={() => window.open(`/results/${sessions[0]?.id}/${document.document_type}`, '_blank')}
+												class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+											>
+												View
+											</button>
+										</div>
+									</div>
+								</div>
+							{/each}
+
+							<!-- Application Letters -->
+							{#each applicationLetters as letter}
+								<div class="p-6">
+									<div class="flex items-center justify-between">
+										<div class="flex items-center space-x-3">
+											<span class="text-2xl">📄</span>
+											<div>
+												<h4 class="font-medium text-gray-900">Application Letter</h4>
+												<p class="text-sm text-gray-500">{letter.company_name || 'Unknown Company'}</p>
+												<p class="text-xs text-gray-400">{formatDate(letter.created_at)}</p>
+											</div>
+										</div>
+										<div class="flex space-x-2">
+											<button
+												on:click={() => window.open(`/results/${sessions[0]?.id}/application_letter?company=${letter.company_name}`, '_blank')}
+												class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+											>
+												View
+											</button>
+										</div>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</div>
+
 				<!-- Sessions Section -->
 				<div class="bg-white rounded-lg shadow-sm">
 					<div class="px-6 py-4 border-b border-gray-200">

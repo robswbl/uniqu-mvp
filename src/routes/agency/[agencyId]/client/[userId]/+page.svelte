@@ -412,32 +412,34 @@
 							{#each mainDocumentTypes as type}
 								{#if getLatestDocument(type)}
 									<div class="p-6">
-										<div class="flex items-center justify-between">
-											<div class="flex items-center space-x-3">
-												<span class="text-2xl">{getDocumentIcon(type)}</span>
-												<div>
-													<h4 class="font-medium text-gray-900">{getDocumentTitle(type)}</h4>
-													{#if getDocumentVersions(type).length > 1}
-														<div class="flex items-center space-x-2 mt-1">
-															<select 
-																bind:value={selectedVersions[type]}
-																class="text-xs border border-gray-300 rounded px-2 py-1"
-															>
-																{#each getDocumentVersions(type) as version}
-																	<option value={version.document.id}>
-																		{version.version} - {version.date}
-																	</option>
-																{/each}
-															</select>
-															<span class="text-xs text-gray-500">
-																{getDocumentVersions(type).length} versions
-															</span>
-														</div>
-													{:else}
-														<p class="text-sm text-gray-500">
-															Latest: {formatDate(getLatestDocument(type).created_at)}
-														</p>
-													{/if}
+										<div class="space-y-3">
+											<div class="flex items-center justify-between">
+												<div class="flex items-center space-x-3">
+													<span class="text-2xl">{getDocumentIcon(type)}</span>
+													<div>
+														<h4 class="font-medium text-gray-900">{getDocumentTitle(type)}</h4>
+														{#if getDocumentVersions(type).length > 1}
+															<div class="flex items-center space-x-2 mt-1">
+																<select 
+																	bind:value={selectedVersions[type]}
+																	class="text-xs border border-gray-300 rounded px-2 py-1"
+																>
+																	{#each getDocumentVersions(type) as version}
+																		<option value={version.document.id}>
+																			{version.version} - {version.date}
+																		</option>
+																	{/each}
+																</select>
+																<span class="text-xs text-gray-500">
+																	{getDocumentVersions(type).length} versions
+																</span>
+															</div>
+														{:else}
+															<p class="text-sm text-gray-500">
+																Latest: {formatDate(getLatestDocument(type).created_at)}
+															</p>
+														{/if}
+													</div>
 												</div>
 											</div>
 											<div class="flex space-x-2">
@@ -467,54 +469,56 @@
 
 							{#if applicationLetters.length > 0}
 								<div class="p-6">
-									<div class="flex items-center justify-between">
-										<div class="flex items-center space-x-3">
-											<span class="text-2xl">📄</span>
-											<div>
-												<h4 class="font-medium text-gray-900">Application Letters</h4>
-												{#if applicationLetters.length > 1}
-													<div class="flex items-center space-x-2 mt-1">
-														<select 
-															bind:value={selectedVersions['application_letters']}
-															class="text-xs border border-gray-300 rounded px-2 py-1"
-														>
-															{#each getDocumentVersions('application_letters') as version}
-																<option value={version.document.id}>
-																	{version.version} - {version.document.company_name || 'Unknown'} - {version.date}
-																</option>
-															{/each}
-														</select>
-														<span class="text-xs text-gray-500">
-															{applicationLetters.length} letters
-														</span>
-														<!-- Status badge for selected letter -->
-														{#if selectedVersions['application_letters']}
-															{@const selectedLetter = applicationLetters.find(l => l.id === selectedVersions['application_letters'])}
-															{#if selectedLetter}
-																<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {getApplicationStatusColor(selectedLetter.status)}">
-																	{getApplicationStatusLabel(selectedLetter.status)}
-																</span>
+									<div class="space-y-3">
+										<div class="flex items-center justify-between">
+											<div class="flex items-center space-x-3">
+												<span class="text-2xl">📄</span>
+												<div>
+													<h4 class="font-medium text-gray-900">Application Letters</h4>
+													{#if applicationLetters.length > 1}
+														<div class="flex items-center space-x-2 mt-1">
+															<select 
+																bind:value={selectedVersions['application_letters']}
+																class="text-xs border border-gray-300 rounded px-2 py-1"
+															>
+																{#each getDocumentVersions('application_letters') as version}
+																	<option value={version.document.id}>
+																		{version.version} - {version.document.company_name || 'Unknown'} - {version.date}
+																	</option>
+																{/each}
+															</select>
+															<span class="text-xs text-gray-500">
+																{applicationLetters.length} letters
+															</span>
+															<!-- Status badge for selected letter -->
+															{#if selectedVersions['application_letters']}
+																{@const selectedLetter = applicationLetters.find(l => l.id === selectedVersions['application_letters'])}
+																{#if selectedLetter}
+																	<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {getApplicationStatusColor(selectedLetter.status)}">
+																		{getApplicationStatusLabel(selectedLetter.status)}
+																	</span>
+																{/if}
+															{:else}
+																<!-- Status badge for latest letter -->
+																{@const latestLetter = applicationLetters[0]}
+																{#if latestLetter}
+																	<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {getApplicationStatusColor(latestLetter.status)}">
+																		{getApplicationStatusLabel(latestLetter.status)}
+																	</span>
+																{/if}
 															{/if}
-														{:else}
-															<!-- Status badge for latest letter -->
-															{@const latestLetter = applicationLetters[0]}
-															{#if latestLetter}
-																<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {getApplicationStatusColor(latestLetter.status)}">
-																	{getApplicationStatusLabel(latestLetter.status)}
-																</span>
-															{/if}
-														{/if}
-													</div>
-												{:else}
-													<div class="flex items-center space-x-2 mt-1">
-														<p class="text-sm text-gray-500">
-															{applicationLetters[0]?.company_name || 'Unknown Company'} - {formatDate(applicationLetters[0]?.created_at)}
-														</p>
-														<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {getApplicationStatusColor(applicationLetters[0]?.status)}">
-															{getApplicationStatusLabel(applicationLetters[0]?.status)}
-														</span>
-													</div>
-												{/if}
+														</div>
+													{:else}
+														<div class="flex items-center space-x-2 mt-1">
+															<p class="text-sm text-gray-500">
+																{applicationLetters[0]?.company_name || 'Unknown Company'} - {formatDate(applicationLetters[0]?.created_at)}
+															</p>
+															<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {getApplicationStatusColor(applicationLetters[0]?.status)}">
+																{getApplicationStatusLabel(applicationLetters[0]?.status)}
+															</span>
+														</div>
+													{/if}
+												</div>
 											</div>
 										</div>
 										<div class="flex space-x-2">

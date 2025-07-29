@@ -37,18 +37,12 @@
 				.from('user_agencies')
 				.select(`
 					*,
-					users:user_id (
+					users!user_id (
 						user_uuid,
 						user_firstname,
 						user_lastname,
 						user_email,
 						user_phone
-					),
-					questionnaire_sessions:users.questionnaire_sessions (
-						id,
-						status,
-						created_at,
-						completed_at
 					)
 				`)
 				.eq('agency_id', agencyId)
@@ -56,6 +50,21 @@
 
 			if (clientsError) throw clientsError;
 			clients = clientsData || [];
+
+			// Load questionnaire sessions separately for each client
+			for (let client of clients) {
+				const { data: sessionsData, error: sessionsError } = await supabase
+					.from('questionnaire_sessions')
+					.select('id, status, created_at, completed_at')
+					.eq('user_id', client.user_id)
+					.order('created_at', { ascending: false });
+
+				if (!sessionsError && sessionsData) {
+					client.questionnaire_sessions = sessionsData;
+				} else {
+					client.questionnaire_sessions = [];
+				}
+			}
 
 		} catch (err: any) {
 			error = err.message;

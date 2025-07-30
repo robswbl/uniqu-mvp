@@ -300,7 +300,7 @@
               <div class="text-2xl font-bold text-indigo-600">{completionPercentage}%</div>
               <div class="text-sm text-gray-600">{$t('dashboard.profile_complete_label')}</div>
             </div>
-            <div class="text-center p-4 bg-green-50 rounded-lg cursor-pointer hover:bg-green-100 transition-colors" on:click={viewAllDocuments} title="{$t('dashboard.view_all_documents')}" role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, viewAllDocuments)}>
+            <div class="text-center p-4 bg-green-50 rounded-lg cursor-pointer hover:bg-green-100 transition-colors" on:click={viewAllDocuments} title="{$t('dashboard.view_all_documents')}" role="button" on:keydown={(e) => handleA11yClick(e, viewAllDocuments)}>
               <div class="text-2xl font-bold text-green-600 underline">{documentCount}</div>
               <div class="text-sm text-gray-600">{$t('dashboard.documents_generated')}</div>
             </div>
@@ -434,8 +434,6 @@
                   type="button"
                   class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
                   on:click={() => toggleSection('cv')} 
-                  role="button" 
-                  tabindex="0" 
                   on:keydown={(e) => handleA11yClick(e, () => toggleSection('cv'))}
                 >
                   {expandedSections['cv'] ? sessionData.cv_text : (sessionData.cv_text && sessionData.cv_text.length > 150 ? sessionData.cv_text.substring(0, 150) + '...' : sessionData.cv_text)}
@@ -470,8 +468,6 @@
                   type="button"
                   class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
                   on:click={() => toggleSection('love')} 
-                  role="button" 
-                  tabindex="0" 
                   on:keydown={(e) => handleA11yClick(e, () => toggleSection('love'))}
                 >
                   {expandedSections['love'] ? sessionData.ikigai_love : (sessionData.ikigai_love && sessionData.ikigai_love.length > 120 ? sessionData.ikigai_love.substring(0, 120) + '...' : sessionData.ikigai_love)}
@@ -506,8 +502,6 @@
                   type="button"
                   class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
                   on:click={() => toggleSection('inspires')} 
-                  role="button" 
-                  tabindex="0" 
                   on:keydown={(e) => handleA11yClick(e, () => toggleSection('inspires'))}
                 >
                   {expandedSections['inspires'] ? sessionData.ikigai_inspires : (sessionData.ikigai_inspires && sessionData.ikigai_inspires.length > 120 ? sessionData.ikigai_inspires.substring(0, 120) + '...' : sessionData.ikigai_inspires)}
@@ -545,8 +539,6 @@
                   type="button"
                   class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
                   on:click={() => toggleSection('good')} 
-                  role="button" 
-                  tabindex="0" 
                   on:keydown={(e) => handleA11yClick(e, () => toggleSection('good'))}
                 >
                   {expandedSections['good'] ? sessionData.ikigai_good_at : (sessionData.ikigai_good_at && sessionData.ikigai_good_at.length > 120 ? sessionData.ikigai_good_at.substring(0, 120) + '...' : sessionData.ikigai_good_at)}
@@ -581,8 +573,6 @@
                   type="button"
                   class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
                   on:click={() => toggleSection('goals')} 
-                  role="button" 
-                  tabindex="0" 
                   on:keydown={(e) => handleA11yClick(e, () => toggleSection('goals'))}
                 >
                   {expandedSections['goals'] ? sessionData.goals : (sessionData.goals && sessionData.goals.length > 120 ? sessionData.goals.substring(0, 120) + '...' : sessionData.goals)}
@@ -617,8 +607,6 @@
                   type="button"
                   class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
                   on:click={() => toggleSection('values')} 
-                  role="button" 
-                  tabindex="0" 
                   on:keydown={(e) => handleA11yClick(e, () => toggleSection('values'))}
                 >
                   {expandedSections['values'] ? sessionData.personality_values : (sessionData.personality_values && sessionData.personality_values.length > 120 ? sessionData.personality_values.substring(0, 120) + '...' : sessionData.personality_values)}
@@ -657,8 +645,6 @@
                 type="button"
                 class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
                 on:click={() => toggleSection('life_context')} 
-                role="button" 
-                tabindex="0" 
                 on:keydown={(e) => handleA11yClick(e, () => toggleSection('life_context'))}
               >
                 {expandedSections['life_context'] ? sessionData.life_context : (sessionData.life_context && sessionData.life_context.length > 120 ? sessionData.life_context.substring(0, 120) + '...' : sessionData.life_context)}
@@ -693,8 +679,6 @@
                 type="button"
                 class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
                 on:click={() => toggleSection('doubts')} 
-                role="button" 
-                tabindex="0" 
                 on:keydown={(e) => handleA11yClick(e, () => toggleSection('doubts'))}
               >
                 {expandedSections['doubts'] ? sessionData.doubts_barriers : (sessionData.doubts_barriers && sessionData.doubts_barriers.length > 120 ? sessionData.doubts_barriers.substring(0, 120) + '...' : sessionData.doubts_barriers)}
@@ -732,8 +716,6 @@
                 type="button"
                 class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
                 on:click={() => toggleSection('emotional')} 
-                role="button" 
-                tabindex="0" 
                 on:keydown={(e) => handleA11yClick(e, () => toggleSection('emotional'))}
               >
                 {expandedSections['emotional'] ? sessionData.emotional_landscape : (sessionData.emotional_landscape && sessionData.emotional_landscape.length > 120 ? sessionData.emotional_landscape.substring(0, 120) + '...' : sessionData.emotional_landscape)}
@@ -768,8 +750,6 @@
                 type="button"
                 class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
                 on:click={() => toggleSection('core_summary')} 
-                role="button" 
-                tabindex="0" 
                 on:keydown={(e) => handleA11yClick(e, () => toggleSection('core_summary'))}
               >
                 {expandedSections['core_summary'] ? sessionData.core_summary : (sessionData.core_summary && sessionData.core_summary.length > 120 ? sessionData.core_summary.substring(0, 120) + '...' : sessionData.core_summary)}

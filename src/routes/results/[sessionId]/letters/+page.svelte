@@ -19,6 +19,7 @@
 	let painPoints = '';
 	let address = '';
 	let editingNotes = {};
+	let jobUrl = '';
 	
 	// Modal variables
 	let showLetterModal = false;
@@ -135,20 +136,35 @@
 	}
 
 	async function generateLetter() {
-		const companyName = selectedCompany || customCompany;
-		if (!companyName.trim()) {
-			alert('Please select or enter a company name');
-			return;
-		}
-
-		if (!painPoints.trim()) {
-			alert('Please enter key pain points for the company');
-			return;
-		}
-
-		if (!address.trim()) {
-			alert('Please enter the company address');
-			return;
+		if (newLetterType === 'job') {
+			// Handle job opening letter
+			if (!jobUrl.trim()) {
+				alert('Please enter a job URL');
+				return;
+			}
+			
+			// Validate URL format
+			try {
+				new URL(jobUrl);
+			} catch {
+				alert('Please enter a valid URL');
+				return;
+			}
+		} else if (newLetterType === 'spontaneous') {
+			// Handle spontaneous application letter
+			const companyName = selectedCompany || customCompany;
+			if (!companyName.trim()) {
+				alert('Please select or enter a company name');
+				return;
+			}
+			if (!painPoints.trim()) {
+				alert('Please enter key pain points for the company');
+				return;
+			}
+			if (!address.trim()) {
+				alert('Please enter the company address');
+				return;
+			}
 		}
 
 		try {
@@ -165,17 +181,38 @@
 				throw new Error('Could not find session: ' + sessionError.message);
 			}
 
-			// Create initial record with pain points and address
+			let letterData = {
+				session_id: sessionId,
+				status: 'draft',
+				notes: null,
+				language: newLetterLanguage
+			};
+
+			if (newLetterType === 'job') {
+				// For job opening, we need to analyze the job URL first
+				letterData = {
+					...letterData,
+					company_name: 'Job Analysis in Progress...',
+					pain_points: null,
+					address: null,
+					job_url: jobUrl.trim()
+				};
+			} else {
+				// For spontaneous application
+				const companyName = selectedCompany || customCompany;
+				letterData = {
+					...letterData,
+					company_name: companyName.trim(),
+					pain_points: painPoints.trim(),
+					address: address.trim(),
+					job_url: null
+				};
+			}
+
+			// Create initial record
 			const { data: newLetter, error: insertError } = await supabase
 				.from('application_letters')
-				.insert({
-					session_id: sessionId,
-					company_name: companyName.trim(),
-					status: 'draft',
-					notes: null,
-					pain_points: painPoints.trim(),
-					address: address.trim()
-				})
+				.insert(letterData)
 				.select()
 				.single();
 
@@ -191,25 +228,33 @@
 			customCompany = '';
 			painPoints = '';
 			address = '';
+			jobUrl = '';
 			showNewLetterForm = false;
 
-			// Call n8n webhook to generate letter content
+			// Call appropriate n8n webhook based on type
 			try {
-				console.log('Calling n8n webhook with data:', {
+				const webhookData = {
 					user_id: sessionData.user_id,
 					session_id: sessionId,
-					application_letter_id: newLetter.id
-				});
+					application_letter_id: newLetter.id,
+					generation_id: sessionData.generation_id,
+					language: newLetterLanguage
+				};
 
-				const webhookResponse = await fetch('/api/proxy-applicationletter', {
+				let webhookUrl;
+				if (newLetterType === 'job') {
+					webhookUrl = '/api/proxy-job-analysis';
+					webhookData.job_url = jobUrl.trim();
+				} else {
+					webhookUrl = '/api/proxy-applicationletter';
+				}
+
+				console.log('Calling n8n webhook with data:', webhookData);
+
+				const webhookResponse = await fetch(webhookUrl, {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						user_id: sessionData.user_id,
-						session_id: sessionId,
-						application_letter_id: newLetter.id,
-						generation_id: sessionData.generation_id
-					})
+					body: JSON.stringify(webhookData)
 				});
 
 				if (!webhookResponse.ok) {
@@ -219,12 +264,12 @@
 				const webhookResult = await webhookResponse.json();
 				console.log('n8n webhook response:', webhookResult);
 
-				// No alert here! Start polling for generated document
+				// Start polling for generated document
 				pollForGeneratedDocument(newLetter.id);
 
 			} catch (webhookError) {
 				console.error('n8n webhook error:', webhookError);
-				alert(`Letter record created for ${companyName}, but AI generation failed.\n\nError: ${webhookError.message}\n\nYou can try regenerating later.`);
+				alert(`Letter record created, but AI generation failed.\n\nError: ${webhookError.message}\n\nYou can try regenerating later.`);
 			}
 
 		} catch (err) {
@@ -638,77 +683,101 @@
 							</select>
 						</div>
 						
-						{#if matchedCompanies.length > 0}
+						<!-- Job URL Field (only for job opening type) -->
+						{#if newLetterType === 'job'}
 							<div>
-								<label for="company-select" class="block text-sm font-medium text-gray-700 mb-2">
-									{$t('letters.select_matched_company')}
+								<label for="job-url" class="block text-sm font-medium text-gray-700 mb-2">
+									<span class="text-red-500">*</span> {$t('letters.job_url_label')}
 								</label>
-								<select 
-									id="company-select"
-									bind:value={selectedCompany}
+								<input
+									id="job-url"
+									type="url"
+									bind:value={jobUrl}
+									placeholder="{$t('letters.job_url_placeholder')}"
 									class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-								>
-									<option value="">-- {$t('letters.select_company_placeholder')} --</option>
-									{#each matchedCompanies as company}
-										<option value={company}>{company}</option>
-									{/each}
-								</select>
-							</div>
-							
-							<div class="text-center text-gray-500 text-sm">
-								{$t('letters.or')}
+									required
+								/>
+								<p class="text-xs text-gray-500 mt-1">{$t('letters.job_url_hint')}</p>
 							</div>
 						{/if}
 						
-						<div>
-							<label for="custom-company" class="block text-sm font-medium text-gray-700 mb-2">
-								{$t('letters.enter_different_company')}
-							</label>
-							<input
-								id="custom-company"
-								type="text"
-								bind:value={customCompany}
-								placeholder="{$t('letters.enter_company_placeholder')}"
-								class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-							/>
-						</div>
-						
-						<!-- Pain Points Field -->
-						<div>
-							<label for="pain-points" class="block text-sm font-medium text-gray-700 mb-2">
-								<span class="text-red-500">*</span> {$t('letters.key_pain_points')}
-							</label>
-							<textarea
-								id="pain-points"
-								bind:value={painPoints}
-								placeholder="{$t('letters.pain_points_placeholder')}"
-								class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-								rows="3"
-								required
-							></textarea>
-							<p class="text-xs text-gray-500 mt-1">{$t('letters.pain_points_hint')}</p>
-						</div>
-						
-						<!-- Address Field -->
-						<div>
-							<label for="address" class="block text-sm font-medium text-gray-700 mb-2">
-								<span class="text-red-500">*</span> {$t('letters.company_address')}
-							</label>
-							<textarea
-								id="address"
-								bind:value={address}
-								placeholder="{$t('letters.address_placeholder')}"
-								class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-								rows="3"
-								required
-							></textarea>
-							<p class="text-xs text-gray-500 mt-1">{$t('letters.address_hint')}</p>
-						</div>
+						<!-- Existing company selection fields (only for spontaneous type) -->
+						{#if newLetterType === 'spontaneous'}
+							{#if matchedCompanies.length > 0}
+								<div>
+									<label for="company-select" class="block text-sm font-medium text-gray-700 mb-2">
+										{$t('letters.select_matched_company')}
+									</label>
+									<select 
+										id="company-select"
+										bind:value={selectedCompany}
+										class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+									>
+										<option value="">-- {$t('letters.select_company_placeholder')} --</option>
+										{#each matchedCompanies as company}
+											<option value={company}>{company}</option>
+										{/each}
+									</select>
+								</div>
+								
+								<div class="text-center text-gray-500 text-sm">
+									{$t('letters.or')}
+								</div>
+							{/if}
+							
+							<div>
+								<label for="custom-company" class="block text-sm font-medium text-gray-700 mb-2">
+									{$t('letters.enter_different_company')}
+								</label>
+								<input
+									id="custom-company"
+									type="text"
+									bind:value={customCompany}
+									placeholder="{$t('letters.enter_company_placeholder')}"
+									class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+								/>
+							</div>
+							
+							<!-- Pain Points Field -->
+							<div>
+								<label for="pain-points" class="block text-sm font-medium text-gray-700 mb-2">
+									<span class="text-red-500">*</span> {$t('letters.key_pain_points')}
+								</label>
+								<textarea
+									id="pain-points"
+									bind:value={painPoints}
+									placeholder="{$t('letters.pain_points_placeholder')}"
+									class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+									rows="3"
+									required
+								></textarea>
+								<p class="text-xs text-gray-500 mt-1">{$t('letters.pain_points_hint')}</p>
+							</div>
+							
+							<!-- Address Field -->
+							<div>
+								<label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+									<span class="text-red-500">*</span> {$t('letters.company_address')}
+								</label>
+								<textarea
+									id="address"
+									bind:value={address}
+									placeholder="{$t('letters.address_placeholder')}"
+									class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+									rows="3"
+									required
+								></textarea>
+								<p class="text-xs text-gray-500 mt-1">{$t('letters.address_hint')}</p>
+							</div>
+						{/if}
 						
 						<div class="flex items-center space-x-4 pt-4">
 							<button
 								on:click={generateLetter}
-								disabled={generating || (!selectedCompany && !customCompany.trim()) || !painPoints.trim() || !address.trim()}
+								disabled={generating || 
+									(newLetterType === 'job' && !jobUrl.trim()) ||
+									(newLetterType === 'spontaneous' && (!selectedCompany && !customCompany.trim()) || !painPoints.trim() || !address.trim())
+								}
 								class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 								type="button"
 								aria-label="Generate Letter"

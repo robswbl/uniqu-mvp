@@ -209,6 +209,9 @@
 				};
 			}
 
+			// Capture job URL before resetting form
+			const capturedJobUrl = jobUrl.trim();
+
 			// Create initial record
 			const { data: newLetter, error: insertError } = await supabase
 				.from('application_letters')
@@ -244,7 +247,7 @@
 				let webhookUrl;
 				if (newLetterType === 'job') {
 					webhookUrl = '/api/proxy-job-analysis';
-					webhookData.job_url = jobUrl.trim();
+					webhookData.job_url = capturedJobUrl;
 				} else {
 					webhookUrl = '/api/proxy-applicationletter';
 				}

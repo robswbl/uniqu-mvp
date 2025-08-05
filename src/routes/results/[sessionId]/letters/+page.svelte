@@ -228,8 +228,19 @@
 				throw new Error(`Pain points analysis failed: ${webhookResponse.status} ${webhookResponse.statusText}`);
 			}
 
-			const webhookResult = await webhookResponse.json();
-			console.log('Pain points analysis webhook response:', webhookResult);
+			// Handle incomplete JSON responses (timeout scenarios)
+			let webhookResult;
+			try {
+				const responseText = await webhookResponse.text();
+				if (!responseText.trim()) {
+					throw new Error('Empty response from webhook - possible timeout');
+				}
+				webhookResult = JSON.parse(responseText);
+				console.log('Pain points analysis webhook response:', webhookResult);
+			} catch (parseError) {
+				console.error('Failed to parse webhook response:', parseError);
+				throw new Error(`Webhook response error: ${parseError.message}. This may be due to a timeout in the scraping process.`);
+			}
 
 			// Start polling for completion
 			pollForPainPointsAnalysis(newLetter.id);
@@ -237,7 +248,20 @@
 		} catch (err) {
 			error = err && err.message ? err.message : 'Error analyzing pain points';
 			console.error('Error analyzing pain points:', err);
-			alert('Error: ' + (err.message || 'Unknown error occurred'));
+			
+			// Provide more helpful error messages based on the error type
+			let userMessage = 'Error analyzing pain points. ';
+			if (err.message.includes('timeout')) {
+				userMessage += 'The scraping process timed out. This can happen with complex websites. Please try again or use a different company URL.';
+			} else if (err.message.includes('JSON')) {
+				userMessage += 'The webhook returned an invalid response. This may be due to a timeout in the scraping process. Please try again.';
+			} else if (err.message.includes('network') || err.message.includes('fetch')) {
+				userMessage += 'Network error occurred. Please check your connection and try again.';
+			} else {
+				userMessage += err.message || 'Unknown error occurred';
+			}
+			
+			alert(userMessage);
 		} finally {
 			analyzingPainPoints = false;
 		}
@@ -247,31 +271,43 @@
 	function pollForPainPointsAnalysis(letterId) {
 		let elapsed = 0;
 		const interval = 2000; // 2 seconds
-		const maxTime = 60000; // 60 seconds
+		const maxTime = 120000; // 2 minutes (increased timeout)
 
 		function poll() {
 			setTimeout(async () => {
-				const { data: letterData, error } = await supabase
-					.from('application_letters')
-					.select('pain_points, status')
-					.eq('id', letterId)
-					.single();
+				try {
+					const { data: letterData, error } = await supabase
+						.from('application_letters')
+						.select('pain_points, status')
+						.eq('id', letterId)
+						.single();
 
-				if (!error && letterData && letterData.pain_points) {
-					console.log('Pain points analysis completed for letter:', letterId, letterData);
-					painPointsAnalysisComplete = true;
-					spontaneousStep = 2;
-					// Update the pain points field
-					painPoints = letterData.pain_points;
-					return;
-				}
+					if (!error && letterData && letterData.pain_points) {
+						console.log('Pain points analysis completed for letter:', letterId, letterData);
+						painPointsAnalysisComplete = true;
+						spontaneousStep = 2;
+						// Update the pain points field
+						painPoints = letterData.pain_points;
+						return;
+					}
 
-				elapsed += interval;
-				if (elapsed < maxTime) {
-					poll();
-				} else {
-					console.error('Pain points analysis timed out');
-					alert('Pain points analysis timed out. Please try again.');
+					// Check if there was an error in the analysis
+					if (!error && letterData && letterData.status === 'error') {
+						console.error('Pain points analysis failed on server side');
+						alert('Pain points analysis failed due to a timeout or error. Please try again with a different company URL.');
+						return;
+					}
+
+					elapsed += interval;
+					if (elapsed < maxTime) {
+						poll();
+					} else {
+						console.error('Pain points analysis timed out');
+						alert('Pain points analysis timed out after 2 minutes. This may be due to:\n\n• The company website being slow to load\n• The scraper encountering complex content\n• Network connectivity issues\n\nPlease try again or use a different company URL.');
+					}
+				} catch (pollError) {
+					console.error('Error during polling:', pollError);
+					alert('Error checking analysis status. Please try again.');
 				}
 			}, interval);
 		}

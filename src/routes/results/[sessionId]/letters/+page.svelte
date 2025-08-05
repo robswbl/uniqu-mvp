@@ -1064,7 +1064,7 @@
 							<button
 								on:click={generateLetter}
 								disabled={generating || 
-									(newLetterType === 'job' && !jobUrl.trim()) ||
+									(newLetterType === 'job' && (!jobUrl.trim() || linkedinUrlWarning)) ||
 									(newLetterType === 'spontaneous' && ((!selectedCompany && !customCompany.trim()) || !painPoints.trim() || !address.trim()))
 								}
 								class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"

@@ -135,6 +135,8 @@
     "notes_placeholder": "Ajouter des notes sur cette candidature...",
     "no_notes_added": "Aucune note ajoutée pour l'instant.",
     "address": "Adresse :",
+    "job_title": "Titre du poste :",
+    "update_company_name": "Mettre à jour le nom de l'entreprise",
     "modal_title": "Lettre de candidature",
     "copy": "Copier",
     "download_pdf": "Télécharger en PDF",
@@ -146,7 +148,8 @@
       "interview": "Entretien programmé",
       "rejected": "Rejeté",
       "accepted": "Offre reçue"
-    }
+    },
+    "update_title": "Mettre à jour le titre"
   },
   "all_documents": {
     "title": "Tous les documents générés",

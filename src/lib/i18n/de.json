@@ -135,6 +135,8 @@
     "notes_placeholder": "Notizen zu dieser Bewerbung hinzufügen...",
     "no_notes_added": "Noch keine Notizen hinzugefügt.",
     "address": "Adresse:",
+    "job_title": "Stellenbezeichnung:",
+    "update_company_name": "Firmenname aktualisieren",
     "modal_title": "Bewerbungsschreiben",
     "copy": "Kopieren",
     "download_pdf": "Als PDF herunterladen",
@@ -146,7 +148,8 @@
       "interview": "Vorstellungsgespräch geplant",
       "rejected": "Abgelehnt",
       "accepted": "Angebot erhalten"
-    }
+    },
+    "update_title": "Titel aktualisieren"
   },
   "all_documents": {
     "title": "Alle generierten Dokumente",

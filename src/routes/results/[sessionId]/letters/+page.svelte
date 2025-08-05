@@ -46,6 +46,28 @@
 		return option ? option.label : status;
 	}
 
+	function getStatusTimeline(letter) {
+		const timeline = [];
+		
+		if (letter.sent_at) {
+			timeline.push({ label: 'Sent', date: letter.sent_at, color: 'text-blue-600' });
+		}
+		if (letter.response_received_at) {
+			timeline.push({ label: 'Response', date: letter.response_received_at, color: 'text-yellow-600' });
+		}
+		if (letter.interview_scheduled_at) {
+			timeline.push({ label: 'Interview', date: letter.interview_scheduled_at, color: 'text-green-600' });
+		}
+		if (letter.offer_received_at) {
+			timeline.push({ label: 'Offer', date: letter.offer_received_at, color: 'text-purple-600' });
+		}
+		if (letter.rejected_at) {
+			timeline.push({ label: 'Rejected', date: letter.rejected_at, color: 'text-red-600' });
+		}
+		
+		return timeline;
+	}
+
 	// Track which letters have generated documents
 	let generatedLetterIds = new Set();
 
@@ -80,14 +102,17 @@
 				console.warn('No matching companies document found:', companiesError);
 			}
 
-			// Fetch generated application_letter documents
-			const { data: generatedDocs, error: generatedDocsError } = await supabase
-				.from('generated_documents')
-				.select('document_id')
-				.eq('session_id', sessionId)
-				.eq('document_type', 'application_letter');
-			if (!generatedDocsError && generatedDocs) {
-				generatedLetterIds = new Set(generatedDocs.map(doc => doc.document_id.toString()));
+			// Check which letters have generated content
+			const { data: allLetters, error: contentCheckError } = await supabase
+				.from('application_letters')
+				.select('id, content_html, content_text')
+				.eq('session_id', sessionId);
+			
+			if (!contentCheckError && allLetters) {
+				const lettersWithContent = allLetters.filter(letter => 
+					letter.content_html || letter.content_text
+				);
+				generatedLetterIds = new Set(lettersWithContent.map(letter => letter.id.toString()));
 			} else {
 				generatedLetterIds = new Set();
 			}
@@ -292,23 +317,48 @@
 	function pollForGeneratedDocument(letterId) {
 	  let elapsed = 0;
 	  const interval = 2000; // 2 seconds
-	  const maxTime = 120000; // 2 minutes
+	  const maxTime = 60000; // 60 seconds
 	  pollingErrors[letterId] = false;
 	  function poll() {
 	    setTimeout(async () => {
-	      const { data, error } = await supabase
-	        .from('generated_documents')
-	        .select('document_id')
-	        .eq('session_id', sessionId)
-	        .eq('document_type', 'application_letter')
-	        .eq('document_id', letterId.toString());
-	      if (!error && data && data.length > 0) {
+	      // First, check if the letter's company name has been updated (for job analysis)
+	      const { data: letterData, error: letterError } = await supabase
+	        .from('application_letters')
+	        .select('company_name, job_title')
+	        .eq('id', letterId)
+	        .single();
+	      
+	      if (!letterError && letterData && letterData.company_name !== 'Job Analysis in Progress...') {
+	        // Company name has been updated, refresh the letters list
+	        applicationLetters = applicationLetters.map(letter =>
+	          letter.id === letterId 
+	            ? { ...letter, company_name: letterData.company_name, job_title: letterData.job_title }
+	            : letter
+	        );
+	      }
+	      
+	      // Then check for generated content in application_letters table
+	      const { data: letterContent, error: contentError } = await supabase
+	        .from('application_letters')
+	        .select('content_html, content_text, status, company_name')
+	        .eq('id', letterId)
+	        .single();
+	      
+	      if (!contentError && letterContent && (letterContent.content_html || letterContent.content_text)) {
+	        console.log('Content detected for letter:', letterId, letterContent);
 	        generatedLetterIds.add(letterId.toString());
 	        pollingErrors[letterId] = false;
 	        delete localLetterCreatedAt[letterId];
 	        justGenerated[letterId] = true;
+	        
+	        // Update the letter in the local state with the new content
+	        applicationLetters = applicationLetters.map(letter =>
+	          letter.id === letterId 
+	            ? { ...letter, content_html: letterContent.content_html, content_text: letterContent.content_text, status: letterContent.status }
+	            : letter
+	        );
+	        
 	        setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
-	        applicationLetters = [...applicationLetters];
 	        return;
 	      }
 	      elapsed += interval;
@@ -334,8 +384,14 @@
 			// Add timestamp for specific status changes
 			if (newStatus === 'sent') {
 				updates.sent_at = new Date().toISOString();
-			} else if (newStatus === 'responded' || newStatus === 'interview' || newStatus === 'rejected' || newStatus === 'accepted') {
+			} else if (newStatus === 'responded') {
 				updates.response_received_at = new Date().toISOString();
+			} else if (newStatus === 'interview') {
+				updates.interview_scheduled_at = new Date().toISOString();
+			} else if (newStatus === 'accepted') {
+				updates.offer_received_at = new Date().toISOString();
+			} else if (newStatus === 'rejected') {
+				updates.rejected_at = new Date().toISOString();
 			}
 
 			const { error: updateError } = await supabase
@@ -454,14 +510,12 @@
 	// Modal-based viewLetter function
 	async function viewLetter(letterId) {
 		try {
-			console.log('Looking for generated document with document_id:', letterId);
+			console.log('Looking for letter content in application_letters table:', letterId);
 
-			const { data: generatedDoc, error } = await supabase
-				.from('generated_documents')
-				.select('*')
-				.eq('session_id', sessionId)
-				.eq('document_type', 'application_letter')
-				.eq('document_id', letterId.toString())
+			const { data: letterData, error } = await supabase
+				.from('application_letters')
+				.select('content_html, content_text, company_name')
+				.eq('id', letterId)
 				.single();
 
 			if (error) {
@@ -474,14 +528,14 @@
 				return;
 			}
 
-			if (!generatedDoc || !generatedDoc.content_html) {
+			if (!letterData || (!letterData.content_html && !letterData.content_text)) {
 				alert('Letter content not yet generated or is empty.');
 				return;
 			}
 
 			// Show in modal
-			currentLetterContent = generatedDoc.content_html;
-			currentLetterTitle = generatedDoc.title || `Letter for ${applicationLetters.find(l => l.id == letterId)?.company_name || 'Company'}`;
+			currentLetterContent = letterData.content_html || letterData.content_text;
+			currentLetterTitle = `Letter for ${letterData.company_name || 'Company'}`;
 			showLetterModal = true;
 
 		} catch (err) {
@@ -510,12 +564,50 @@
 		updateNotes(letterId, notes);
 	}
 
+	// Function to manually update letters stuck with placeholder
+	async function updatePlaceholderLetter(letter) {
+		if (!confirm(`Update the placeholder title for this letter? This will allow you to manually set the company name.`)) {
+			return;
+		}
+
+		const newCompanyName = prompt('Enter the company name for this letter:', letter.company_name === 'Job Analysis in Progress...' ? '' : letter.company_name);
+		
+		if (!newCompanyName || newCompanyName.trim() === '') {
+			return;
+		}
+
+		try {
+			const { error: updateError } = await supabase
+				.from('application_letters')
+				.update({
+					company_name: newCompanyName.trim(),
+					updated_at: new Date().toISOString()
+				})
+				.eq('id', letter.id);
+
+			if (updateError) throw updateError;
+
+			// Update local state
+			applicationLetters = applicationLetters.map(l =>
+				l.id === letter.id 
+					? { ...l, company_name: newCompanyName.trim() }
+					: l
+			);
+
+			alert(`✅ Letter updated successfully! Company name changed to: ${newCompanyName.trim()}`);
+
+		} catch (err) {
+			console.error('Error updating letter:', err);
+			alert('Error updating letter: ' + (err.message || 'Unknown error'));
+		}
+	}
+
 	// Add timer state for progress bar
 	import { tick } from 'svelte';
 
 	// Track progress for each generating letter by id
 	let letterProgress = {};
-	const GENERATION_TIME = 20000; // 20 seconds in ms
+	const GENERATION_TIME = 60000; // 60 seconds in ms
 
 	// Helper: Start progress bar for a letter
 	function startLetterProgress(letterId) {
@@ -853,6 +945,9 @@
 							<div class="flex items-start justify-between mb-4">
 								<div class="flex-1">
 									<h3 class="text-xl font-semibold text-gray-900 mb-1">{letter.company_name}</h3>
+									{#if letter.job_title}
+										<p class="text-lg font-bold text-gray-800 mb-2">{letter.job_title}</p>
+									{/if}
 									<p class="text-sm text-gray-500">
 										{$t('letters.created_at')}: {new Date(letter.created_at).toLocaleDateString()}
 										{#if letter.updated_at !== letter.created_at}
@@ -960,6 +1055,22 @@
 												</svg>
 												<span class="ml-1">{$t('buttons.delete')}</span>
 											</button>
+											
+											<!-- Update Placeholder Button (only show for job letters with placeholder) -->
+											{#if letter.company_name === 'Job Analysis in Progress...' && letter.job_url}
+												<button 
+													on:click={() => updatePlaceholderLetter(letter)}
+													class="flex items-center space-x-1 p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+													type="button"
+													aria-label="Update company name"
+													title="Update Company Name"
+												>
+													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+													</svg>
+													<span class="ml-1">{$t('letters.update_company_name')}</span>
+												</button>
+											{/if}
 										</div>
 									{/if}
 								</div>
@@ -970,17 +1081,30 @@
 								<div class="flex items-center space-x-2 text-xs text-gray-600">
 									<span>{$t('letters.status_label')}:</span>
 									<span class="font-medium">{getStatusLabel(letter.status)}</span>
-									{#if letter.sent_at}
-										<span>{$t('letters.sent')} {new Date(letter.sent_at).toLocaleDateString()}</span>
-									{/if}
-									{#if letter.response_received_at}
-										<span>{$t('letters.response')} {new Date(letter.response_received_at).toLocaleDateString()}</span>
-									{/if}
 								</div>
+								{#if getStatusTimeline(letter).length > 0}
+									<div class="flex flex-wrap items-center gap-2 mt-2">
+										{#each getStatusTimeline(letter) as event}
+											<span class="text-xs px-2 py-1 rounded-full bg-gray-100 {event.color} font-medium">
+												{event.label} {new Date(event.date).toLocaleDateString()}
+											</span>
+										{/each}
+									</div>
+								{/if}
 							</div>
 
 							<!-- Letter Details -->
 							<div class="mb-4 space-y-2">
+								{#if letter.job_url}
+									<div>
+										<span class="text-xs font-medium text-gray-600">Job URL:</span>
+										<p class="text-sm text-gray-700 mt-1 bg-gray-50 p-2 rounded break-all">
+											<a href="{letter.job_url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline" title="{letter.job_url}">
+												{letter.job_url.length > 50 ? letter.job_url.substring(0, 47) + '...' : letter.job_url}
+											</a>
+										</p>
+									</div>
+								{/if}
 								{#if letter.pain_points}
 									<div>
 										<span class="text-xs font-medium text-gray-600">{$t('letters.key_pain_points')}</span>

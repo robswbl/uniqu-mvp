@@ -107,20 +107,39 @@
           console.log('No user_id found in session:', session);
         }
 
-        // Check if results exist
+        // Check if results exist (generated_documents + application_letters)
         const { data: results, error: resultsError } = await supabase
           .from('generated_documents')
           .select('document_type, created_at')
           .eq('session_id', sessionId);
 
-        console.log('Results fetch result:', { results, resultsError });
+        // Also count application letters
+        const { data: applicationLetters, error: lettersError } = await supabase
+          .from('application_letters')
+          .select('created_at')
+          .eq('session_id', sessionId);
 
-        if (!resultsError && results && results.length > 0) {
+        console.log('Results fetch result:', { results, resultsError, applicationLetters, lettersError });
+
+        let totalDocuments = 0;
+        let allDocuments: any[] = [];
+
+        if (!resultsError && results) {
+          totalDocuments += results.length;
+          allDocuments = [...results];
+        }
+
+        if (!lettersError && applicationLetters) {
+          totalDocuments += applicationLetters.length;
+          allDocuments = [...allDocuments, ...applicationLetters];
+        }
+
+        if (totalDocuments > 0) {
           hasResults = true;
-          documentCount = results.length;
+          documentCount = totalDocuments;
           
           // Get most recent document creation time
-          const latestDoc = results.reduce((latest: any, current: any) => 
+          const latestDoc = allDocuments.reduce((latest: any, current: any) => 
             new Date(current.created_at) > new Date(latest.created_at) ? current : latest
           );
           lastUpdated = new Date(latestDoc.created_at).toLocaleDateString();
@@ -300,7 +319,7 @@
               <div class="text-2xl font-bold text-indigo-600">{completionPercentage}%</div>
               <div class="text-sm text-gray-600">{$t('dashboard.profile_complete_label')}</div>
             </div>
-            <div class="text-center p-4 bg-green-50 rounded-lg cursor-pointer hover:bg-green-100 transition-colors" on:click={viewAllDocuments} title="{$t('dashboard.view_all_documents')}" role="button" on:keydown={(e) => handleA11yClick(e, viewAllDocuments)}>
+            <div class="text-center p-4 bg-green-50 rounded-lg cursor-pointer hover:bg-green-100 transition-colors" on:click={viewAllDocuments} title="{$t('dashboard.view_all_documents')}" role="button" tabindex="0" on:keydown={(e) => handleA11yClick(e, viewAllDocuments)}>
               <div class="text-2xl font-bold text-green-600 underline">{documentCount}</div>
               <div class="text-sm text-gray-600">{$t('dashboard.documents_generated')}</div>
             </div>

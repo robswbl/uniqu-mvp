@@ -135,6 +135,8 @@
     "notes_placeholder": "Agregar notas sobre esta solicitud...",
     "no_notes_added": "Aún no se han agregado notas.",
     "address": "Dirección:",
+    "job_title": "Título del trabajo:",
+    "update_company_name": "Actualizar nombre de empresa",
     "modal_title": "Carta de presentación",
     "copy": "Copiar",
     "download_pdf": "Descargar como PDF",
@@ -146,7 +148,8 @@
       "interview": "Entrevista programada",
       "rejected": "Rechazado",
       "accepted": "Oferta recibida"
-    }
+    },
+    "update_title": "Actualizar título"
   },
   "all_documents": {
     "title": "Todos los documentos generados",

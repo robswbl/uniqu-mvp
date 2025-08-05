@@ -135,6 +135,8 @@
     "notes_placeholder": "Aggiungi note su questa candidatura...",
     "no_notes_added": "Nessuna nota aggiunta ancora.",
     "address": "Indirizzo:",
+    "job_title": "Titolo del lavoro:",
+    "update_company_name": "Aggiorna nome azienda",
     "modal_title": "Lettera di candidatura",
     "copy": "Copia",
     "download_pdf": "Scarica come PDF",
@@ -146,7 +148,8 @@
       "interview": "Colloquio programmato",
       "rejected": "Rifiutato",
       "accepted": "Offerta ricevuta"
-    }
+    },
+    "update_title": "Aggiorna titolo"
   },
   "all_documents": {
     "title": "Tutti i documenti generati",

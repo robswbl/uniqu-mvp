@@ -143,6 +143,8 @@
     "notes_placeholder": "Add notes about this application...",
     "no_notes_added": "No notes added yet.",
     "address": "Address:",
+    "job_title": "Job Title:",
+    "update_company_name": "Update Company Name",
     "modal_title": "Application Letter",
     "copy": "Copy",
     "download_pdf": "Download as PDF",
@@ -154,7 +156,8 @@
       "interview": "Interview Scheduled",
       "rejected": "Rejected",
       "accepted": "Offer Received"
-    }
+    },
+    "update_title": "Update Title"
   },
   "all_documents": {
     "title": "All Generated Documents",

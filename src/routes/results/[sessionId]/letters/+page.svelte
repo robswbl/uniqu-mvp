@@ -827,7 +827,7 @@
 	  if (newLetterType === 'job' && jobUrl.trim()) {
 	    const url = jobUrl.trim();
 	    if (url.includes('linkedin.com/jobs/search/')) {
-	      linkedinUrlWarning = 'Please make sure to paste the direct link of the LinkedIn Job Posting (Starting with https://www.linkedin.com/jobs/view/ - you can get there by clicking on the Job Title in the Search results list) and NOT post the link to the search results page (Starting with https://www.linkedin.com/jobs/search/? ...)';
+	      linkedinUrlWarning = $t('letters.linkedin_url_warning');
 	    } else {
 	      linkedinUrlWarning = '';
 	    }

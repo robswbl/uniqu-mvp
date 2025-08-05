@@ -149,7 +149,8 @@
       "rejected": "Rejeté",
       "accepted": "Offre reçue"
     },
-    "update_title": "Mettre à jour le titre"
+    "update_title": "Mettre à jour le titre",
+    "linkedin_url_warning": "Assurez-vous de coller le lien direct de la page d'offre d'emploi (commençant par https://www.linkedin.com/jobs/view/...), et non la page de résultats de recherche.\n\nVous pouvez accéder à l'offre d'emploi en cliquant sur le titre du poste (ex. \"Managing Director, 100%\") dans les résultats de recherche."
   },
   "all_documents": {
     "title": "Tous les documents générés",

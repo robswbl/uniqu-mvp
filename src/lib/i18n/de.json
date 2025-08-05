@@ -149,7 +149,8 @@
       "rejected": "Abgelehnt",
       "accepted": "Angebot erhalten"
     },
-    "update_title": "Titel aktualisieren"
+    "update_title": "Titel aktualisieren",
+    "linkedin_url_warning": "Bitte stelle sicher, dass du den direkten Link der Stellenausschreibung (beginnt mit https://www.linkedin.com/jobs/view/...) einfügst, nicht die Suchergebnisseite.\n\nDu gelangst zur Stellenausschreibung, indem du auf den Jobtitel (z.B. \"Managing Director, 100%\") in den Suchergebnissen klickst."
   },
   "all_documents": {
     "title": "Alle generierten Dokumente",

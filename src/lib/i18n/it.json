@@ -149,7 +149,8 @@
       "rejected": "Rifiutato",
       "accepted": "Offerta ricevuta"
     },
-    "update_title": "Aggiorna titolo"
+    "update_title": "Aggiorna titolo",
+    "linkedin_url_warning": "Assicurati di incollare il link diretto della pagina dell'offerta di lavoro (che inizia con https://www.linkedin.com/jobs/view/...), non la pagina dei risultati di ricerca.\n\nPuoi accedere all'offerta di lavoro cliccando sul titolo del lavoro (es. \"Managing Director, 100%\") nei risultati di ricerca."
   },
   "all_documents": {
     "title": "Tutti i documenti generati",

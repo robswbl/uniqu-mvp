@@ -1,7 +1,7 @@
 <!-- /results/[sessionId]/letters/+page.svelte -->
 <script>
 	// @ts-nocheck
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { supabase } from '$lib/supabaseClient.js';
@@ -105,12 +105,12 @@
 			// Check which letters have generated content
 			const { data: allLetters, error: contentCheckError } = await supabase
 				.from('application_letters')
-				.select('id, content_html, content_text')
+				.select('id, content_html, content_text, letter_content_html')
 				.eq('session_id', sessionId);
 			
 			if (!contentCheckError && allLetters) {
 				const lettersWithContent = allLetters.filter(letter => 
-					letter.content_html || letter.content_text
+					letter.content_html || letter.content_text || letter.letter_content_html
 				);
 				generatedLetterIds = new Set(lettersWithContent.map(letter => letter.id.toString()));
 			} else {
@@ -340,11 +340,13 @@
 	      // Then check for generated content in application_letters table
 	      const { data: letterContent, error: contentError } = await supabase
 	        .from('application_letters')
-	        .select('content_html, content_text, status, company_name')
+	        .select('content_html, content_text, letter_content_html, status, company_name')
 	        .eq('id', letterId)
 	        .single();
 	      
-	      if (!contentError && letterContent && (letterContent.content_html || letterContent.content_text)) {
+	      console.log('Polling check for letter:', letterId, 'Content:', letterContent, 'Error:', contentError);
+	      
+	      if (!contentError && letterContent && (letterContent.content_html || letterContent.content_text || letterContent.letter_content_html)) {
 	        console.log('Content detected for letter:', letterId, letterContent);
 	        generatedLetterIds.add(letterId.toString());
 	        pollingErrors[letterId] = false;
@@ -354,7 +356,55 @@
 	        // Update the letter in the local state with the new content
 	        applicationLetters = applicationLetters.map(letter =>
 	          letter.id === letterId 
-	            ? { ...letter, content_html: letterContent.content_html, content_text: letterContent.content_text, status: letterContent.status }
+	            ? { ...letter, content_html: letterContent.content_html || letterContent.letter_content_html, content_text: letterContent.content_text, status: letterContent.status }
+	            : letter
+	        );
+	        
+	        setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
+	        return;
+	      }
+	      
+	      // Also check if the status has changed to indicate completion
+	      if (!contentError && letterContent && letterContent.status === 'completed') {
+	        console.log('Status completed detected for letter:', letterId, letterContent);
+	        generatedLetterIds.add(letterId.toString());
+	        pollingErrors[letterId] = false;
+	        delete localLetterCreatedAt[letterId];
+	        justGenerated[letterId] = true;
+	        
+	        // Update the letter in the local state
+	        applicationLetters = applicationLetters.map(letter =>
+	          letter.id === letterId 
+	            ? { ...letter, status: letterContent.status }
+	            : letter
+	        );
+	        
+	        setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
+	        return;
+	      }
+	      
+	      // Check if content is stored in generated_documents table
+	      const { data: generatedDoc, error: docError } = await supabase
+	        .from('generated_documents')
+	        .select('content_html, content_text')
+	        .eq('session_id', sessionId)
+	        .eq('document_type', 'application_letter')
+	        .eq('application_letter_id', letterId)
+	        .maybeSingle();
+	      
+	      console.log('Checking generated_documents for letter:', letterId, 'Doc:', generatedDoc, 'Error:', docError);
+	      
+	      if (!docError && generatedDoc && (generatedDoc.content_html || generatedDoc.content_text)) {
+	        console.log('Content found in generated_documents for letter:', letterId, generatedDoc);
+	        generatedLetterIds.add(letterId.toString());
+	        pollingErrors[letterId] = false;
+	        delete localLetterCreatedAt[letterId];
+	        justGenerated[letterId] = true;
+	        
+	        // Update the letter in the local state with content from generated_documents
+	        applicationLetters = applicationLetters.map(letter =>
+	          letter.id === letterId 
+	            ? { ...letter, content_html: generatedDoc.content_html, content_text: generatedDoc.content_text }
 	            : letter
 	        );
 	        
@@ -656,14 +706,111 @@
 	  { code: 'es', label: 'Español' }
 	];
 
+	// Real-time subscription for application letters
+	let subscription = null;
+
 	function openNewLetterForm(type) {
 	  newLetterType = type;
 	  showNewLetterForm = true;
 	  showNewLetterDropdown = false;
 	}
 
+	// Set up real-time subscription for application letters
+	function setupRealtimeSubscription() {
+		console.log('[Realtime] Setting up subscription for application letters, session:', sessionId);
+		if (subscription) {
+			console.log('[Realtime] Unsubscribing from previous subscription');
+			subscription.unsubscribe();
+		}
+		subscription = supabase
+			.channel('application_letters_updates')
+			.on('postgres_changes', 
+				{ 
+					event: 'INSERT', 
+					schema: 'uniqu', 
+					table: 'application_letters',
+					filter: `session_id=eq.${sessionId}`
+				}, 
+				(payload) => {
+					console.log('[Realtime] Application letter event received:', payload);
+					// Refresh the data when a new letter is added
+					fetchData();
+				}
+			)
+			.on('postgres_changes', 
+				{ 
+					event: 'UPDATE', 
+					schema: 'uniqu', 
+					table: 'application_letters',
+					filter: `session_id=eq.${sessionId}`
+				}, 
+				(payload) => {
+					console.log('[Realtime] Application letter update received:', payload);
+					// Update the specific letter in local state
+					applicationLetters = applicationLetters.map(letter =>
+						letter.id === payload.new.id 
+							? { 
+								...letter, 
+								...payload.new,
+								content_html: payload.new.content_html || payload.new.letter_content_html
+							}
+							: letter
+					);
+					
+					// If content was generated, update the generatedLetterIds
+					if (payload.new.content_html || payload.new.content_text || payload.new.letter_content_html || payload.new.status === 'completed') {
+						generatedLetterIds.add(payload.new.id.toString());
+						// Remove from local creation tracking
+						delete localLetterCreatedAt[payload.new.id];
+						// Show success message
+						justGenerated[payload.new.id] = true;
+						setTimeout(() => { 
+							delete justGenerated[payload.new.id]; 
+							applicationLetters = [...applicationLetters]; 
+						}, 5000);
+					}
+				}
+			)
+			.on('postgres_changes', 
+				{ 
+					event: 'INSERT', 
+					schema: 'uniqu', 
+					table: 'generated_documents',
+					filter: `session_id=eq.${sessionId}`
+				}, 
+				(payload) => {
+					console.log('[Realtime] Generated document event received:', payload);
+					if (payload.new.document_type === 'application_letter' && payload.new.application_letter_id) {
+						// Update the corresponding application letter
+						applicationLetters = applicationLetters.map(letter =>
+							letter.id === payload.new.application_letter_id 
+								? { ...letter, content_html: payload.new.content_html, content_text: payload.new.content_text }
+								: letter
+						);
+						generatedLetterIds.add(payload.new.application_letter_id.toString());
+						delete localLetterCreatedAt[payload.new.application_letter_id];
+						justGenerated[payload.new.application_letter_id] = true;
+						setTimeout(() => { 
+							delete justGenerated[payload.new.application_letter_id]; 
+							applicationLetters = [...applicationLetters]; 
+						}, 5000);
+					}
+				}
+			)
+			.subscribe((status) => {
+				console.log('[Realtime] Application letters subscription status:', status);
+			});
+	}
+
 	onMount(() => {
 		fetchData();
+		setupRealtimeSubscription();
+	});
+
+	onDestroy(() => {
+		if (subscription) {
+			subscription.unsubscribe();
+		}
 	});
 
 	// Add debugging for button state

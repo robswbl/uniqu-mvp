@@ -218,7 +218,7 @@
 
 			console.log('Calling pain points analysis webhook with data:', webhookData);
 
-			const webhookResponse = await fetch('https://manage.app.n8n.cloud/webhook/clients/uniqu/painpoint-analysis', {
+			const webhookResponse = await fetch('/api/proxy-painpoint-analysis', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(webhookData)
@@ -228,19 +228,9 @@
 				throw new Error(`Pain points analysis failed: ${webhookResponse.status} ${webhookResponse.statusText}`);
 			}
 
-			// Handle incomplete JSON responses (timeout scenarios)
-			let webhookResult;
-			try {
-				const responseText = await webhookResponse.text();
-				if (!responseText.trim()) {
-					throw new Error('Empty response from webhook - possible timeout');
-				}
-				webhookResult = JSON.parse(responseText);
-				console.log('Pain points analysis webhook response:', webhookResult);
-			} catch (parseError) {
-				console.error('Failed to parse webhook response:', parseError);
-				throw new Error(`Webhook response error: ${parseError.message}. This may be due to a timeout in the scraping process.`);
-			}
+			// Parse the response (proxy handles JSON parsing)
+			const webhookResult = await webhookResponse.json();
+			console.log('Pain points analysis webhook response:', webhookResult);
 
 			// Start polling for completion
 			pollForPainPointsAnalysis(newLetter.id);

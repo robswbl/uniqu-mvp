@@ -1,3 +1,67 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+/* Custom prose styles for pain points */
+.prose-sm {
+  font-size: 0.875rem;
+  line-height: 1.7142857;
+}
+
+.prose-sm p {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.prose-sm p:last-child {
+  margin-bottom: 0;
+}
+
+.prose-sm strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.prose-sm em {
+  font-style: italic;
+}
+
+.prose-sm ul {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.prose-sm ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.prose-sm li {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.5;
+}
+
+.prose-sm li > p {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Specific styles for pain points headings */
+.prose-sm p strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+/* Better spacing for pain points sections */
+.prose-sm div {
+  margin-bottom: 1rem;
+}
+
+.prose-sm div:last-child {
+  margin-bottom: 0;
+}

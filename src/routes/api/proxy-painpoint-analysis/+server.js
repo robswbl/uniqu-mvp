@@ -31,9 +31,27 @@ export async function POST({ request }) {
     return json(result, { status: webhookResponse.status });
   } catch (error) {
     console.error('Proxy pain points analysis error:', error);
+    
+    // Provide more detailed error information
+    let errorDetails = 'Pain points analysis failed. This may be due to a timeout or network issue.';
+    let errorType = 'proxy_error';
+    
+    if (error.message.includes('timeout')) {
+      errorType = 'timeout';
+      errorDetails = 'The webhook request timed out. This could be due to the scraping service being slow or overloaded.';
+    } else if (error.message.includes('network') || error.message.includes('fetch')) {
+      errorType = 'network_error';
+      errorDetails = 'Network error occurred while calling the webhook service.';
+    } else if (error.message.includes('500')) {
+      errorType = 'workflow_failure';
+      errorDetails = 'The workflow service returned a 500 Internal Server Error. This indicates a server-side issue.';
+    }
+    
     return json({ 
       error: error.message || 'Proxy error',
-      details: 'Pain points analysis failed. This may be due to a timeout or network issue.'
+      errorType: errorType,
+      details: errorDetails,
+      timestamp: new Date().toISOString()
     }, { status: 500 });
   }
 } 

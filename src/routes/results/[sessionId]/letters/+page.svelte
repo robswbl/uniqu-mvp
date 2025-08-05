@@ -77,6 +77,59 @@
 	// Track which letters just finished generating for success message
 	let justGenerated = {};
 
+	// Track current letter being edited/continued
+	let currentLetterId = null;
+
+	// Track expanded pain points sections
+	let expandedPainPoints = new Set();
+
+	// Function to clear errors
+	function clearError() {
+		error = null;
+	}
+
+	// Function to continue letter generation for letters with pain points but no content
+	async function continueLetterGeneration(letter) {
+		try {
+			// Open the spontaneous form with the existing letter data
+			newLetterType = 'spontaneous';
+			showNewLetterForm = true;
+			showNewLetterDropdown = false;
+			
+			// Set the form state to step 2 with existing data
+			spontaneousStep = 2;
+			painPointsAnalysisComplete = true;
+			analyzingPainPoints = false;
+			painPoints = letter.pain_points;
+			customCompany = letter.company_name;
+			newLetterLanguage = letter.language || 'en';
+			address = letter.address || ''; // Use existing address if available
+			
+			// Set the current letter ID for generation
+			currentLetterId = letter.id;
+			
+			console.log('Continuing letter generation for:', letter);
+			
+			// If the letter already has an address, automatically trigger generation
+			if (letter.address && letter.address.trim()) {
+				console.log('Letter has address, auto-triggering generation...');
+				// Small delay to ensure form is rendered
+				setTimeout(() => {
+					generateLetter();
+				}, 100);
+			}
+		} catch (err) {
+			console.error('Error continuing letter generation:', err);
+			error = {
+				type: 'continue_error',
+				message: 'Error continuing letter generation',
+				details: err.message || 'Failed to continue letter generation',
+				timestamp: new Date().toISOString(),
+				originalError: err.message
+			};
+		}
+	}
+
 	async function fetchData() {
 		try {
 			loading = true;
@@ -125,8 +178,14 @@
 			}
 
 		} catch (err) {
-			error = err && err.message ? err.message : 'An unknown error occurred';
 			console.error('Error fetching data:', err);
+			error = {
+				type: 'fetch_error',
+				message: 'Error loading letters',
+				details: err.message || 'An unknown error occurred while loading your application letters.',
+				timestamp: new Date().toISOString(),
+				originalError: err.message
+			};
 		} finally {
 			loading = false;
 		}
@@ -171,6 +230,12 @@
 			return;
 		}
 
+		// Reset form state for new analysis
+		spontaneousStep = 1;
+		painPointsAnalysisComplete = false;
+		analyzingPainPoints = true;
+		painPoints = '';
+
 		try {
 			analyzingPainPoints = true;
 
@@ -213,7 +278,8 @@
 				generation_id: sessionData.generation_id,
 				language: newLetterLanguage,
 				job_portal: 'jobs.ch',
-				company_portal_url: companyPortalUrl.trim()
+				company_portal_url: companyPortalUrl.trim(),
+				company_name: customCompany || selectedCompany
 			};
 
 			console.log('Calling pain points analysis webhook with data:', webhookData);
@@ -225,7 +291,19 @@
 			});
 
 			if (!webhookResponse.ok) {
-				throw new Error(`Pain points analysis failed: ${webhookResponse.status} ${webhookResponse.statusText}`);
+				// Try to get detailed error information from the response
+				let errorDetails = '';
+				try {
+					const errorResponse = await webhookResponse.json();
+					if (errorResponse.details) {
+						errorDetails = errorResponse.details;
+					}
+				} catch (parseError) {
+					// If we can't parse the error response, use the status text
+					errorDetails = webhookResponse.statusText;
+				}
+				
+				throw new Error(`Pain points analysis failed: ${webhookResponse.status} ${webhookResponse.statusText}${errorDetails ? ` - ${errorDetails}` : ''}`);
 			}
 
 			// Parse the response (proxy handles JSON parsing)
@@ -236,22 +314,55 @@
 			pollForPainPointsAnalysis(newLetter.id);
 
 		} catch (err) {
-			error = err && err.message ? err.message : 'Error analyzing pain points';
+			// Enhanced error handling for workflow failures
 			console.error('Error analyzing pain points:', err);
 			
-			// Provide more helpful error messages based on the error type
+			// Determine the type of error and provide appropriate messaging
+			let errorType = 'unknown';
 			let userMessage = 'Error analyzing pain points. ';
-			if (err.message.includes('timeout')) {
+			let errorDetails = '';
+			
+			if (err.message.includes('500')) {
+				errorType = 'workflow_failure';
+				userMessage = 'Pain points analysis failed: 500 Internal Server Error';
+				errorDetails = 'The workflow service encountered an internal error. This could be due to:\n\n• The company website being temporarily unavailable\n• The scraping service being overloaded\n• A configuration issue with the workflow\n\nPlease try again in a few minutes or use a different company URL.';
+			} else if (err.message.includes('timeout')) {
+				errorType = 'timeout';
 				userMessage += 'The scraping process timed out. This can happen with complex websites. Please try again or use a different company URL.';
 			} else if (err.message.includes('JSON')) {
+				errorType = 'parse_error';
 				userMessage += 'The webhook returned an invalid response. This may be due to a timeout in the scraping process. Please try again.';
 			} else if (err.message.includes('network') || err.message.includes('fetch')) {
+				errorType = 'network_error';
 				userMessage += 'Network error occurred. Please check your connection and try again.';
+			} else if (err.message.includes('404')) {
+				errorType = 'not_found';
+				userMessage = 'Company website not found or inaccessible';
+				errorDetails = 'The provided URL could not be reached. Please check the URL and try again.';
 			} else {
+				errorType = 'unknown';
 				userMessage += err.message || 'Unknown error occurred';
 			}
 			
-			alert(userMessage);
+			// Set the error for display in the UI
+			error = {
+				type: errorType,
+				message: userMessage,
+				details: errorDetails,
+				timestamp: new Date().toISOString(),
+				originalError: err.message
+			};
+			
+			// Log detailed error information for debugging
+			console.error('Detailed error info:', {
+				type: errorType,
+				message: userMessage,
+				details: errorDetails,
+				originalError: err.message,
+				stack: err.stack
+			});
+			
+			// Don't use alert for better UX - let the UI handle error display
 		} finally {
 			analyzingPainPoints = false;
 		}
@@ -266,25 +377,34 @@
 		function poll() {
 			setTimeout(async () => {
 				try {
-					const { data: letterData, error } = await supabase
+					const { data: letterData, error: dbError } = await supabase
 						.from('application_letters')
 						.select('pain_points, status')
 						.eq('id', letterId)
 						.single();
 
-					if (!error && letterData && letterData.pain_points) {
+					if (!dbError && letterData && letterData.pain_points) {
 						console.log('Pain points analysis completed for letter:', letterId, letterData);
 						painPointsAnalysisComplete = true;
 						spontaneousStep = 2;
+						analyzingPainPoints = false;
 						// Update the pain points field
 						painPoints = letterData.pain_points;
+						// Force UI update
+						applicationLetters = [...applicationLetters];
 						return;
 					}
 
 					// Check if there was an error in the analysis
-					if (!error && letterData && letterData.status === 'error') {
+					if (!dbError && letterData && letterData.status === 'error') {
 						console.error('Pain points analysis failed on server side');
-						alert('Pain points analysis failed due to a timeout or error. Please try again with a different company URL.');
+						error = {
+							type: 'workflow_failure',
+							message: 'Pain points analysis failed due to a timeout or error',
+							details: 'The server-side analysis process encountered an error. This could be due to:\n\n• The company website being temporarily unavailable\n• The scraping service being overloaded\n• A configuration issue with the workflow\n\nPlease try again with a different company URL.',
+							timestamp: new Date().toISOString(),
+							originalError: 'Server-side analysis failed'
+						};
 						return;
 					}
 
@@ -293,11 +413,23 @@
 						poll();
 					} else {
 						console.error('Pain points analysis timed out');
-						alert('Pain points analysis timed out after 2 minutes. This may be due to:\n\n• The company website being slow to load\n• The scraper encountering complex content\n• Network connectivity issues\n\nPlease try again or use a different company URL.');
+						error = {
+							type: 'timeout',
+							message: 'Pain points analysis timed out after 2 minutes',
+							details: 'The analysis process took longer than expected. This may be due to:\n\n• The company website being slow to load\n• The scraper encountering complex content\n• Network connectivity issues\n\nPlease try again or use a different company URL.',
+							timestamp: new Date().toISOString(),
+							originalError: 'Analysis timeout'
+						};
 					}
 				} catch (pollError) {
 					console.error('Error during polling:', pollError);
-					alert('Error checking analysis status. Please try again.');
+					error = {
+						type: 'polling_error',
+						message: 'Error checking analysis status',
+						details: 'Failed to check the status of the pain points analysis. This could be due to:\n\n• Network connectivity issues\n• Database connection problems\n• Server-side errors\n\nPlease try again.',
+						timestamp: new Date().toISOString(),
+						originalError: pollError.message
+					};
 				}
 			}, interval);
 		}
@@ -357,43 +489,72 @@
 				language: newLetterLanguage
 			};
 
-			if (newLetterType === 'job') {
-				// For job opening, we need to analyze the job URL first
-				letterData = {
-					...letterData,
-					company_name: 'Job Analysis in Progress...',
-					pain_points: null,
-					address: null,
-					job_url: jobUrl.trim()
-				};
-			} else {
-				// For spontaneous application
-				const companyName = selectedCompany || customCompany;
-				letterData = {
-					...letterData,
-					company_name: companyName.trim(),
-					pain_points: painPoints.trim(),
+			let letterId = null;
+			let isContinuing = false;
+
+			if (currentLetterId) {
+				// We're continuing an existing letter
+				letterId = currentLetterId;
+				isContinuing = true;
+				
+				// Update the existing letter with the new data
+				const updateData = {
 					address: address.trim(),
-					job_url: null
+					language: newLetterLanguage
 				};
+
+				const { data: updatedLetter, error: updateError } = await supabase
+					.from('application_letters')
+					.update(updateData)
+					.eq('id', letterId)
+					.select()
+					.single();
+
+				if (updateError) throw updateError;
+				
+				console.log('Updated existing letter for generation:', updatedLetter);
+			} else {
+				// Creating a new letter
+				if (newLetterType === 'job') {
+					// For job opening, we need to analyze the job URL first
+					letterData = {
+						...letterData,
+						company_name: 'Job Analysis in Progress...',
+						pain_points: null,
+						address: null,
+						job_url: jobUrl.trim()
+					};
+				} else {
+					// For spontaneous application
+					const companyName = selectedCompany || customCompany;
+					letterData = {
+						...letterData,
+						company_name: companyName.trim(),
+						pain_points: painPoints.trim(),
+						address: address.trim(),
+						job_url: null
+					};
+				}
+
+				// Create initial record
+				const { data: newLetter, error: insertError } = await supabase
+					.from('application_letters')
+					.insert(letterData)
+					.select()
+					.single();
+
+				if (insertError) throw insertError;
+
+				letterId = newLetter.id;
+				
+				// Add to local state immediately
+				applicationLetters = [newLetter, ...applicationLetters];
+				// Track local creation time for progress bar
+				localLetterCreatedAt[newLetter.id] = Date.now();
 			}
 
 			// Capture job URL before resetting form
 			const capturedJobUrl = jobUrl.trim();
-
-			// Create initial record
-			const { data: newLetter, error: insertError } = await supabase
-				.from('application_letters')
-				.insert(letterData)
-				.select()
-				.single();
-
-			if (insertError) throw insertError;
-
-			// Add to local state immediately
-			applicationLetters = [newLetter, ...applicationLetters];
-			// Track local creation time for progress bar
-			localLetterCreatedAt[newLetter.id] = Date.now();
 			
 			// Reset form
 			selectedCompany = '';
@@ -402,13 +563,14 @@
 			address = '';
 			jobUrl = '';
 			showNewLetterForm = false;
+			currentLetterId = null;
 
 			// Call appropriate n8n webhook based on type
 			try {
 				const webhookData = {
 					user_id: sessionData.user_id,
 					session_id: sessionId,
-					application_letter_id: newLetter.id,
+					application_letter_id: letterId,
 					generation_id: sessionData.generation_id,
 					language: newLetterLanguage
 				};
@@ -437,7 +599,7 @@
 				console.log('n8n webhook response:', webhookResult);
 
 				// Start polling for generated document
-				pollForGeneratedDocument(newLetter.id);
+				pollForGeneratedDocument(letterId);
 
 			} catch (webhookError) {
 				console.error('n8n webhook error:', webhookError);
@@ -866,6 +1028,53 @@
 		return language ? language.label : languageCode;
 	}
 
+	// Function to parse markdown-like text (improved implementation)
+	function parseMarkdown(text) {
+		if (!text) return '';
+		
+		// Convert **text** to <strong>text</strong>
+		text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+		
+		// Convert *text* to <em>text</em>
+		text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+		
+		// Remove numbered list formatting and convert to regular paragraphs with proper spacing
+		text = text.replace(/^\d+\.\s+(.*?)$/gm, '<div class="mb-4"><p class="font-semibold text-gray-800 mb-2">$1</p>');
+		
+		// Convert bullet points (- text or * text) to proper list items
+		text = text.replace(/^[-*]\s+(.*?)$/gm, '<li class="list-disc ml-4 mb-2">$1</li>');
+		
+		// Convert line breaks to <br> (but not within list items)
+		text = text.replace(/\n(?!<li)/g, '<br>');
+		
+		// Wrap bullet point lists in <ul> tags
+		text = text.replace(/(<li class="list-disc ml-4 mb-2">.*?<\/li>)+/g, '<ul class="list-disc ml-4 space-y-2 mb-4">$&</ul>');
+		
+		// Clean up any double <br> tags
+		text = text.replace(/<br><br>/g, '<br>');
+		
+		// Close any open div tags
+		text = text.replace(/<div class="mb-4"><p class="font-semibold text-gray-800 mb-2">(.*?)<\/p>/g, '<div class="mb-4"><p class="font-semibold text-gray-800 mb-2">$1</p></div>');
+		
+		return text;
+	}
+
+	// Function to truncate text for preview
+	function truncateText(text, maxLength = 300) {
+		if (!text || text.length <= maxLength) return text;
+		return text.substring(0, maxLength) + '...';
+	}
+
+	// Function to toggle pain points expansion
+	function togglePainPointsExpansion(letterId) {
+		if (expandedPainPoints.has(letterId)) {
+			expandedPainPoints.delete(letterId);
+		} else {
+			expandedPainPoints.add(letterId);
+		}
+		expandedPainPoints = expandedPainPoints; // Trigger reactivity
+	}
+
 	// Real-time subscription for application letters
 	let subscription = null;
 
@@ -873,6 +1082,16 @@
 	  newLetterType = type;
 	  showNewLetterForm = true;
 	  showNewLetterDropdown = false;
+	  
+	  // Reset form state for new letter
+	  if (type === 'spontaneous') {
+		spontaneousStep = 1;
+		painPointsAnalysisComplete = false;
+		analyzingPainPoints = false;
+		painPoints = '';
+		companyPortalUrl = '';
+		error = null;
+	  }
 	}
 
 	// Set up real-time subscription for application letters
@@ -928,6 +1147,17 @@
 							delete justGenerated[payload.new.id]; 
 							applicationLetters = [...applicationLetters]; 
 						}, 5000);
+					}
+					
+					// Handle pain points analysis completion
+					if (payload.new.pain_points && !payload.old?.pain_points) {
+						console.log('[Realtime] Pain points analysis completed for letter:', payload.new.id);
+						// Update the pain points field in the form
+						painPoints = payload.new.pain_points;
+						// Move to step 2 of the spontaneous form
+						spontaneousStep = 2;
+						painPointsAnalysisComplete = true;
+						analyzingPainPoints = false;
 					}
 				}
 			)
@@ -1006,8 +1236,13 @@
 	  if (showNewLetterForm) {
 	    console.log('Form state:', {
 	      newLetterType,
+	      spontaneousStep,
+	      painPointsAnalysisComplete,
+	      analyzingPainPoints,
 	      jobUrl: jobUrl.trim(),
 	      generating,
+	      address: address,
+	      painPoints: painPoints ? painPoints.substring(0, 50) + '...' : '',
 	      disabled: generating || 
 	        (newLetterType === 'job' && !jobUrl.trim()) ||
 	        (newLetterType === 'spontaneous' && ((!selectedCompany && !customCompany.trim()) || !painPoints.trim() || !address.trim()))
@@ -1085,16 +1320,45 @@
 			</div>
 		{:else if error}
 			<div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-				<h3 class="text-lg font-semibold text-red-800 mb-2">{$t('letters.error_loading')}</h3>
-				<p class="text-red-600">{error}</p>
-				<button 
-					on:click={fetchData}
-					class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-					type="button"
-					aria-label="Try Again"
-				>
-					{$t('letters.try_again')}
-				</button>
+				<h3 class="text-lg font-semibold text-red-800 mb-2">
+					{typeof error === 'string' ? $t('letters.error_loading') : 'Error Loading Letters'}
+				</h3>
+				<p class="text-red-600 font-medium mb-3">
+					{typeof error === 'string' ? error : error.message}
+				</p>
+				{#if typeof error === 'object' && error.details}
+					<div class="text-sm text-red-600 bg-red-100 p-3 rounded-lg mb-4 text-left">
+						<pre class="whitespace-pre-wrap">{error.details}</pre>
+					</div>
+				{/if}
+				<div class="flex justify-center space-x-3">
+					<button 
+						on:click={() => {
+							clearError();
+							fetchData();
+						}}
+						class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+						type="button"
+						aria-label="Try Again"
+					>
+						{$t('letters.try_again')}
+					</button>
+					{#if typeof error === 'object' && error.type === 'workflow_failure'}
+						<button 
+							on:click={clearError}
+							class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+							type="button"
+							aria-label="Clear Error"
+						>
+							Clear Error
+						</button>
+					{/if}
+				</div>
+				{#if typeof error === 'object' && error.timestamp}
+					<p class="text-xs text-gray-500 mt-3">
+						Error occurred at: {new Date(error.timestamp).toLocaleString()}
+					</p>
+				{/if}
 			</div>
 		{:else}
 			
@@ -1157,6 +1421,10 @@
 						
 						<!-- Two-step spontaneous application form -->
 						{#if newLetterType === 'spontaneous'}
+							<!-- Debug info -->
+							<div class="text-xs text-gray-500 mb-2">
+								Debug: Step {spontaneousStep}, Pain Points Complete: {painPointsAnalysisComplete}, Address: {address ? 'Set' : 'Not set'}
+							</div>
 							<!-- Step 1: Company and URL -->
 							{#if spontaneousStep === 1}
 								<!-- Company Name Field -->
@@ -1205,15 +1473,41 @@
 									<label for="pain-points" class="block text-sm font-medium text-gray-700 mb-2">
 										<span class="text-green-500">✓</span> {$t('letters.key_pain_points')}
 									</label>
-									<textarea
-										id="pain-points"
-										bind:value={painPoints}
-										placeholder="{$t('letters.pain_points_placeholder')}"
-										class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-green-50"
-										rows="3"
-										required
-										readonly
-									></textarea>
+									<div class="border border-gray-300 rounded-lg bg-green-50 p-3">
+										{#if painPoints}
+											{#if expandedPainPoints.has('form')}
+												<!-- Show full content when expanded -->
+												<div class="text-sm text-gray-700 prose prose-sm max-w-none">
+													{@html parseMarkdown(painPoints)}
+												</div>
+												<button 
+													on:click={() => togglePainPointsExpansion('form')}
+													class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+													type="button"
+													aria-label="Show less"
+												>
+													Show less
+												</button>
+											{:else}
+												<!-- Show truncated content when collapsed -->
+												<div class="text-sm text-gray-700 prose prose-sm max-w-none">
+													{@html parseMarkdown(truncateText(painPoints))}
+												</div>
+												{#if painPoints.length > 300}
+													<button 
+														on:click={() => togglePainPointsExpansion('form')}
+														class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+														type="button"
+														aria-label="Show more"
+													>
+														Show more
+													</button>
+												{/if}
+											{/if}
+										{:else}
+											<p class="text-sm text-gray-500 italic">Pain points will appear here after analysis...</p>
+										{/if}
+									</div>
 									<p class="text-xs text-green-600 mt-1">✓ Pain points analyzed from company portal</p>
 								</div>
 								
@@ -1285,6 +1579,10 @@
 									spontaneousStep = 1;
 									companyPortalUrl = '';
 									painPointsAnalysisComplete = false;
+									analyzingPainPoints = false;
+									painPoints = '';
+									error = null;
+									currentLetterId = null;
 								}}
 								class="px-4 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
 								type="button"
@@ -1364,7 +1662,24 @@
 									
 									<!-- Direct Action Buttons or Generating State -->
 									{#if letter.status === 'draft' && !isLetterGenerated(letter)}
-										{#if pollingErrors[letter.id]}
+										{#if letter.pain_points && !letter.content_html && !letter.content_text && !letter.letter_content_html}
+											<!-- Letter has pain points but no content - show Delete button only in header -->
+											<div class="flex items-center space-x-2">
+												<!-- Delete Button -->
+												<button 
+													on:click={() => deleteLetter(letter.id, letter.company_name)}
+													class="flex items-center space-x-1 p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+													type="button"
+													aria-label="Delete letter"
+													title="Delete Letter"
+												>
+													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+													</svg>
+													<span class="ml-1">{$t('buttons.delete')}</span>
+												</button>
+											</div>
+										{:else if pollingErrors[letter.id]}
 											<div class="flex flex-col items-end min-w-[180px]">
 												<div class="flex items-center space-x-2 mb-1">
 													<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1500,7 +1815,55 @@
 								{#if letter.pain_points}
 									<div>
 										<span class="text-xs font-medium text-gray-600">{$t('letters.key_pain_points')}</span>
-										<p class="text-sm text-gray-700 mt-1 bg-gray-50 p-2 rounded">{letter.pain_points}</p>
+										<div class="mt-1 bg-gray-50 p-3 rounded">
+											{#if expandedPainPoints.has(letter.id)}
+												<!-- Show full content when expanded -->
+												<div class="text-sm text-gray-700 prose prose-sm max-w-none">
+													{@html parseMarkdown(letter.pain_points)}
+												</div>
+												<button 
+													on:click={() => togglePainPointsExpansion(letter.id)}
+													class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+													type="button"
+													aria-label="Show less"
+												>
+													Show less
+												</button>
+											{:else}
+												<!-- Show truncated content when collapsed -->
+												<div class="text-sm text-gray-700 prose prose-sm max-w-none">
+													{@html parseMarkdown(truncateText(letter.pain_points))}
+												</div>
+												{#if letter.pain_points.length > 300}
+													<button 
+														on:click={() => togglePainPointsExpansion(letter.id)}
+														class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+														type="button"
+														aria-label="Show more"
+													>
+														Show more
+													</button>
+												{/if}
+											{/if}
+										</div>
+										
+										<!-- Continue Letter Generation Button (only for letters with pain points but no content) -->
+										{#if letter.status === 'draft' && !letter.content_html && !letter.content_text && !letter.letter_content_html}
+											<div class="mt-3 flex justify-center">
+												<button 
+													on:click={() => continueLetterGeneration(letter)}
+													class="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-base shadow-md border border-blue-700"
+													type="button"
+													aria-label="Continue letter generation"
+													title="Continue letter generation"
+												>
+													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+													</svg>
+													<span>{letter.address && letter.address.trim() ? 'Generate Letter Now' : 'Continue Letter Generation'}</span>
+												</button>
+											</div>
+										{/if}
 									</div>
 								{/if}
 								{#if letter.address}

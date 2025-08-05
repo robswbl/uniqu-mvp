@@ -698,6 +698,9 @@
 	let showNewLetterDropdown = false;
 	let newLetterType = null; // 'job' or 'spontaneous'
 	let newLetterLanguage = 'en';
+	
+	// LinkedIn URL validation
+	let linkedinUrlWarning = '';
 	const availableLetterLanguages = [
 	  { code: 'en', label: 'English' },
 	  { code: 'de', label: 'Deutsch' },
@@ -705,6 +708,12 @@
 	  { code: 'it', label: 'Italiano' },
 	  { code: 'es', label: 'Español' }
 	];
+
+	// Function to get language display name
+	function getLanguageDisplayName(languageCode) {
+		const language = availableLetterLanguages.find(lang => lang.code === languageCode);
+		return language ? language.label : languageCode;
+	}
 
 	// Real-time subscription for application letters
 	let subscription = null;
@@ -812,6 +821,20 @@
 			subscription.unsubscribe();
 		}
 	});
+
+	// LinkedIn URL validation
+	$: {
+	  if (newLetterType === 'job' && jobUrl.trim()) {
+	    const url = jobUrl.trim();
+	    if (url.includes('linkedin.com/jobs/search/')) {
+	      linkedinUrlWarning = 'Please make sure to paste the direct link of the LinkedIn Job Posting (Starting with https://www.linkedin.com/jobs/view/ - you can get there by clicking on the Job Title in the Search results list) and NOT post the link to the search results page (Starting with https://www.linkedin.com/jobs/search/? ...)';
+	    } else {
+	      linkedinUrlWarning = '';
+	    }
+	  } else {
+	    linkedinUrlWarning = '';
+	  }
+	}
 
 	// Add debugging for button state
 	$: {
@@ -954,6 +977,16 @@
 									required
 								/>
 								<p class="text-xs text-gray-500 mt-1">{$t('letters.job_url_hint')}</p>
+								{#if linkedinUrlWarning}
+									<div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+										<div class="flex items-start">
+											<svg class="w-5 h-5 text-red-400 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+											</svg>
+											<p class="text-sm text-red-800">{linkedinUrlWarning}</p>
+										</div>
+									</div>
+								{/if}
 							</div>
 						{/if}
 						
@@ -1095,12 +1128,22 @@
 									{#if letter.job_title}
 										<p class="text-lg font-bold text-gray-800 mb-2">{letter.job_title}</p>
 									{/if}
-									<p class="text-sm text-gray-500">
-										{$t('letters.created_at')}: {new Date(letter.created_at).toLocaleDateString()}
-										{#if letter.updated_at !== letter.created_at}
-											{$t('letters.updated_at')}: {new Date(letter.updated_at).toLocaleDateString()}
+									<div class="flex items-center space-x-4 text-sm text-gray-500">
+										<span>
+											{$t('letters.created_at')}: {new Date(letter.created_at).toLocaleDateString()}
+											{#if letter.updated_at !== letter.created_at}
+												{$t('letters.updated_at')}: {new Date(letter.updated_at).toLocaleDateString()}
+											{/if}
+										</span>
+										{#if letter.language}
+											<span class="flex items-center">
+												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+												</svg>
+												{getLanguageDisplayName(letter.language)}
+											</span>
 										{/if}
-									</p>
+									</div>
 								</div>
 								
 								<div class="flex items-center space-x-3">

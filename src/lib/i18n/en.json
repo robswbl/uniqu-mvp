@@ -158,7 +158,8 @@
       "accepted": "Offer Received"
     },
     "update_title": "Update Title",
-    "linkedin_url_warning": "Please make sure to paste the direct link of the job posting page (starting with https://www.linkedin.com/jobs/view/...), not the search results page.\n\nYou can get to the job posting by clicking on the job title (e.g. \"Managing Director, 100%\") in the search results."
+    "linkedin_url_warning": "Please make sure to paste the direct link of the job posting page (starting with https://www.linkedin.com/jobs/view/...), not the search results page.\n\nYou can get to the job posting by clicking on the job title (e.g. \"Managing Director, 100%\") in the search results.",
+    "enter_company_name": "Enter the company name"
   },
   "all_documents": {
     "title": "All Generated Documents",

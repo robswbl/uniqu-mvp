@@ -160,6 +160,124 @@
 		return Array.from(companies).slice(0, 10); // Limit to 10 companies
 	}
 
+	async function analyzePainPoints() {
+		if (!companyPortalUrl.trim()) {
+			alert('Please enter a company portal URL');
+			return;
+		}
+
+		if (jobsChWarning) {
+			alert('Please enter a valid jobs.ch URL');
+			return;
+		}
+
+		try {
+			analyzingPainPoints = true;
+
+			// Get user_id from questionnaire_sessions
+			const { data: sessionData, error: sessionError } = await supabase
+				.from('questionnaire_sessions')
+				.select('user_id, generation_id')
+				.eq('id', sessionId)
+				.single();
+
+			if (sessionError) {
+				throw new Error('Could not find session: ' + sessionError.message);
+			}
+
+			// Create initial application letter record
+			const letterData = {
+				session_id: sessionId,
+				status: 'draft',
+				notes: null,
+				language: newLetterLanguage,
+				company_name: customCompany || selectedCompany,
+				pain_points: null,
+				address: null,
+				job_url: null
+			};
+
+			const { data: newLetter, error: insertError } = await supabase
+				.from('application_letters')
+				.insert(letterData)
+				.select()
+				.single();
+
+			if (insertError) throw insertError;
+
+			// Call pain points analysis webhook
+			const webhookData = {
+				user_id: sessionData.user_id,
+				session_id: sessionId,
+				application_letter_id: newLetter.id,
+				generation_id: sessionData.generation_id,
+				language: newLetterLanguage,
+				job_portal: 'jobs.ch',
+				company_portal_url: companyPortalUrl.trim()
+			};
+
+			console.log('Calling pain points analysis webhook with data:', webhookData);
+
+			const webhookResponse = await fetch('https://manage.app.n8n.cloud/webhook/clients/uniqu/painpoint-analysis', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(webhookData)
+			});
+
+			if (!webhookResponse.ok) {
+				throw new Error(`Pain points analysis failed: ${webhookResponse.status} ${webhookResponse.statusText}`);
+			}
+
+			const webhookResult = await webhookResponse.json();
+			console.log('Pain points analysis webhook response:', webhookResult);
+
+			// Start polling for completion
+			pollForPainPointsAnalysis(newLetter.id);
+
+		} catch (err) {
+			error = err && err.message ? err.message : 'Error analyzing pain points';
+			console.error('Error analyzing pain points:', err);
+			alert('Error: ' + (err.message || 'Unknown error occurred'));
+		} finally {
+			analyzingPainPoints = false;
+		}
+	}
+
+	// Polling for pain points analysis completion
+	function pollForPainPointsAnalysis(letterId) {
+		let elapsed = 0;
+		const interval = 2000; // 2 seconds
+		const maxTime = 60000; // 60 seconds
+
+		function poll() {
+			setTimeout(async () => {
+				const { data: letterData, error } = await supabase
+					.from('application_letters')
+					.select('pain_points, status')
+					.eq('id', letterId)
+					.single();
+
+				if (!error && letterData && letterData.pain_points) {
+					console.log('Pain points analysis completed for letter:', letterId, letterData);
+					painPointsAnalysisComplete = true;
+					spontaneousStep = 2;
+					// Update the pain points field
+					painPoints = letterData.pain_points;
+					return;
+				}
+
+				elapsed += interval;
+				if (elapsed < maxTime) {
+					poll();
+				} else {
+					console.error('Pain points analysis timed out');
+					alert('Pain points analysis timed out. Please try again.');
+				}
+			}, interval);
+		}
+		poll();
+	}
+
 	async function generateLetter() {
 		if (newLetterType === 'job') {
 			// Handle job opening letter
@@ -701,6 +819,13 @@
 	
 	// LinkedIn URL validation
 	let linkedinUrlWarning = '';
+	
+	// Two-step process for spontaneous letters
+	let spontaneousStep = 1; // 1 or 2
+	let companyPortalUrl = '';
+	let jobsChWarning = '';
+	let analyzingPainPoints = false;
+	let painPointsAnalysisComplete = false;
 	const availableLetterLanguages = [
 	  { code: 'en', label: 'English' },
 	  { code: 'de', label: 'Deutsch' },
@@ -833,6 +958,20 @@
 	    }
 	  } else {
 	    linkedinUrlWarning = '';
+	  }
+	}
+
+	// Jobs.ch URL validation
+	$: {
+	  if (newLetterType === 'spontaneous' && companyPortalUrl.trim()) {
+	    const url = companyPortalUrl.trim();
+	    if (!url.includes('jobs.ch/')) {
+	      jobsChWarning = 'Functionality only active for jobs.ch!';
+	    } else {
+	      jobsChWarning = '';
+	    }
+	  } else {
+	    jobsChWarning = '';
 	  }
 	}
 
@@ -990,100 +1129,137 @@
 							</div>
 						{/if}
 						
-						<!-- Existing company selection fields (only for spontaneous type) -->
+						<!-- Two-step spontaneous application form -->
 						{#if newLetterType === 'spontaneous'}
-							{#if matchedCompanies.length > 0}
+							<!-- Step 1: Company and URL -->
+							{#if spontaneousStep === 1}
+								<!-- Company Name Field -->
 								<div>
-									<label for="company-select" class="block text-sm font-medium text-gray-700 mb-2">
-										{$t('letters.select_matched_company')}
+									<label for="custom-company" class="block text-sm font-medium text-gray-700 mb-2">
+										{$t('letters.enter_company_name')}
 									</label>
-									<select 
-										id="company-select"
-										bind:value={selectedCompany}
+									<input
+										id="custom-company"
+										type="text"
+										bind:value={customCompany}
+										placeholder="{$t('letters.enter_company_placeholder')}"
 										class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-									>
-										<option value="">-- {$t('letters.select_company_placeholder')} --</option>
-										{#each matchedCompanies as company}
-											<option value={company}>{company}</option>
-										{/each}
-									</select>
+									/>
 								</div>
 								
-								<div class="text-center text-gray-500 text-sm">
-									{$t('letters.or')}
+								<!-- Company Portal URL Field -->
+								<div>
+									<label for="company-portal-url" class="block text-sm font-medium text-gray-700 mb-2">
+										<span class="text-red-500">*</span> Company Portal URL
+									</label>
+									<input
+										id="company-portal-url"
+										type="url"
+										bind:value={companyPortalUrl}
+										placeholder="https://jobs.ch/..."
+										class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+										required
+									/>
+									<p class="text-xs text-gray-500 mt-1">Enter the jobs.ch URL for the company</p>
+									{#if jobsChWarning}
+										<div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+											<div class="flex items-start">
+												<svg class="w-5 h-5 text-red-400 mt-0.5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+												</svg>
+												<p class="text-sm text-red-800">{jobsChWarning}</p>
+											</div>
+										</div>
+									{/if}
+								</div>
+							{:else}
+								<!-- Step 2: Pain Points and Address -->
+								<!-- Pain Points Field (populated from analysis) -->
+								<div>
+									<label for="pain-points" class="block text-sm font-medium text-gray-700 mb-2">
+										<span class="text-green-500">✓</span> {$t('letters.key_pain_points')}
+									</label>
+									<textarea
+										id="pain-points"
+										bind:value={painPoints}
+										placeholder="{$t('letters.pain_points_placeholder')}"
+										class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-green-50"
+										rows="3"
+										required
+										readonly
+									></textarea>
+									<p class="text-xs text-green-600 mt-1">✓ Pain points analyzed from company portal</p>
+								</div>
+								
+								<!-- Address Field -->
+								<div>
+									<label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+										<span class="text-red-500">*</span> {$t('letters.company_address')}
+									</label>
+									<textarea
+										id="address"
+										bind:value={address}
+										placeholder="{$t('letters.address_placeholder')}"
+										class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+										rows="3"
+										required
+									></textarea>
+									<p class="text-xs text-gray-500 mt-1">{$t('letters.address_hint')}</p>
 								</div>
 							{/if}
-							
-							<div>
-								<label for="custom-company" class="block text-sm font-medium text-gray-700 mb-2">
-									{$t('letters.enter_different_company')}
-								</label>
-								<input
-									id="custom-company"
-									type="text"
-									bind:value={customCompany}
-									placeholder="{$t('letters.enter_company_placeholder')}"
-									class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-								/>
-							</div>
-							
-							<!-- Pain Points Field -->
-							<div>
-								<label for="pain-points" class="block text-sm font-medium text-gray-700 mb-2">
-									<span class="text-red-500">*</span> {$t('letters.key_pain_points')}
-								</label>
-								<textarea
-									id="pain-points"
-									bind:value={painPoints}
-									placeholder="{$t('letters.pain_points_placeholder')}"
-									class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-									rows="3"
-									required
-								></textarea>
-								<p class="text-xs text-gray-500 mt-1">{$t('letters.pain_points_hint')}</p>
-							</div>
-							
-							<!-- Address Field -->
-							<div>
-								<label for="address" class="block text-sm font-medium text-gray-700 mb-2">
-									<span class="text-red-500">*</span> {$t('letters.company_address')}
-								</label>
-								<textarea
-									id="address"
-									bind:value={address}
-									placeholder="{$t('letters.address_placeholder')}"
-									class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-									rows="3"
-									required
-								></textarea>
-								<p class="text-xs text-gray-500 mt-1">{$t('letters.address_hint')}</p>
-							</div>
 						{/if}
 						
 						<div class="flex items-center space-x-4 pt-4">
-							<button
-								on:click={generateLetter}
-								disabled={generating || 
-									(newLetterType === 'job' && (!jobUrl.trim() || linkedinUrlWarning)) ||
-									(newLetterType === 'spontaneous' && ((!selectedCompany && !customCompany.trim()) || !painPoints.trim() || !address.trim()))
-								}
-								class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-								type="button"
-								aria-label="Generate Letter"
-							>
-								{#if generating}
-									<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-									<span>{$t('letters.generating')}</span>
-								{:else}
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-									</svg>
-									<span>{$t('letters.generate_letter')}</span>
-								{/if}
-							</button>
+							{#if newLetterType === 'spontaneous' && spontaneousStep === 1}
+								<!-- Step 1: Analyze Pain Points Button -->
+								<button
+									on:click={analyzePainPoints}
+									disabled={analyzingPainPoints || !customCompany.trim() || !companyPortalUrl.trim() || jobsChWarning}
+									class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+									type="button"
+									aria-label="Analyze Company Pain Points"
+								>
+									{#if analyzingPainPoints}
+										<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+										<span>Analyzing...</span>
+									{:else}
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+										</svg>
+										<span>Analyse Company Pain Points</span>
+									{/if}
+								</button>
+							{:else}
+								<!-- Generate Letter Button (for job type or step 2) -->
+								<button
+									on:click={generateLetter}
+									disabled={generating || 
+										(newLetterType === 'job' && (!jobUrl.trim() || linkedinUrlWarning)) ||
+										(newLetterType === 'spontaneous' && spontaneousStep === 2 && (!painPoints.trim() || !address.trim()))
+									}
+									class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+									type="button"
+									aria-label="Generate Letter"
+								>
+									{#if generating}
+										<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+										<span>{$t('letters.generating')}</span>
+									{:else}
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+										</svg>
+										<span>{$t('letters.generate_letter')}</span>
+									{/if}
+								</button>
+							{/if}
 							
 							<button
-								on:click={() => showNewLetterForm = false}
+								on:click={() => {
+									showNewLetterForm = false;
+									spontaneousStep = 1;
+									companyPortalUrl = '';
+									painPointsAnalysisComplete = false;
+								}}
 								class="px-4 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
 								type="button"
 								aria-label="Cancel"

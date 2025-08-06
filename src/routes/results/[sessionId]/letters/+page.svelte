@@ -80,6 +80,9 @@
 	// Track current letter being edited/continued
 	let currentLetterId = null;
 
+	// Track which letter is being continued (for inline address field)
+	let continuingLetterId = null;
+
 	// Track expanded pain points sections
 	let expandedPainPoints = new Set();
 
@@ -91,22 +94,12 @@
 	// Function to continue letter generation for letters with pain points but no content
 	async function continueLetterGeneration(letter) {
 		try {
-			// Open the spontaneous form with the existing letter data
-			newLetterType = 'spontaneous';
-			showNewLetterForm = true;
-			showNewLetterDropdown = false;
-			
-			// Set the form state to step 2 with existing data
-			spontaneousStep = 2;
-			painPointsAnalysisComplete = true;
-			analyzingPainPoints = false;
-			painPoints = letter.pain_points;
-			customCompany = letter.company_name;
-			newLetterLanguage = letter.language || 'en';
-			address = letter.address || ''; // Use existing address if available
-			
-			// Set the current letter ID for generation
+			// Set the continuing letter ID to show inline address field
+			continuingLetterId = letter.id;
 			currentLetterId = letter.id;
+			
+			// Set the form state with existing data
+			address = letter.address || ''; // Use existing address if available
 			
 			console.log('Continuing letter generation for:', letter);
 			
@@ -158,12 +151,12 @@
 			// Check which letters have generated content
 			const { data: allLetters, error: contentCheckError } = await supabase
 				.from('application_letters')
-				.select('id, content_html, content_text, letter_content_html')
+				.select('id, content_html, letter_content_html')
 				.eq('session_id', sessionId);
 			
 			if (!contentCheckError && allLetters) {
 				const lettersWithContent = allLetters.filter(letter => 
-					letter.content_html || letter.content_text || letter.letter_content_html
+					letter.content_html || letter.letter_content_html
 				);
 				generatedLetterIds = new Set(lettersWithContent.map(letter => letter.id.toString()));
 			} else {
@@ -491,16 +484,28 @@
 
 			let letterId = null;
 			let isContinuing = false;
+			let existingLetter = null;
 
 			if (currentLetterId) {
 				// We're continuing an existing letter
 				letterId = currentLetterId;
 				isContinuing = true;
 				
+				// Get the existing letter data to use its language
+				const { data: letterData, error: fetchError } = await supabase
+					.from('application_letters')
+					.select('language')
+					.eq('id', letterId)
+					.single();
+				
+				if (fetchError) throw fetchError;
+				
+				existingLetter = letterData;
+				
 				// Update the existing letter with the new data
 				const updateData = {
 					address: address.trim(),
-					language: newLetterLanguage
+					language: existingLetter.language || 'en'
 				};
 
 				const { data: updatedLetter, error: updateError } = await supabase
@@ -556,14 +561,14 @@
 			// Capture job URL before resetting form
 			const capturedJobUrl = jobUrl.trim();
 			
-			// Reset form
+			// Reset form (but keep continuing letter state for inline form)
 			selectedCompany = '';
 			customCompany = '';
 			painPoints = '';
 			address = '';
 			jobUrl = '';
 			showNewLetterForm = false;
-			currentLetterId = null;
+			// Don't clear currentLetterId here - it will be cleared when generation completes
 
 			// Call appropriate n8n webhook based on type
 			try {
@@ -572,7 +577,7 @@
 					session_id: sessionId,
 					application_letter_id: letterId,
 					generation_id: sessionData.generation_id,
-					language: newLetterLanguage
+					language: isContinuing ? (existingLetter.language || 'en') : newLetterLanguage
 				};
 
 				let webhookUrl;
@@ -643,28 +648,35 @@
 	        );
 	      }
 	      
-	      // Then check for generated content in application_letters table
-	      const { data: letterContent, error: contentError } = await supabase
-	        .from('application_letters')
-	        .select('content_html, content_text, letter_content_html, status, company_name')
-	        .eq('id', letterId)
-	        .single();
-	      
-	      console.log('Polling check for letter:', letterId, 'Content:', letterContent, 'Error:', contentError);
-	      
-	      if (!contentError && letterContent && (letterContent.content_html || letterContent.content_text || letterContent.letter_content_html)) {
+	      			// Then check for generated content in application_letters table
+			const { data: letterContent, error: contentError } = await supabase
+				.from('application_letters')
+				.select('content_html, letter_content_html, status, company_name')
+				.eq('id', letterId)
+				.single();
+			
+			console.log('Polling check for letter:', letterId, 'Content:', letterContent, 'Error:', contentError);
+			
+			if (!contentError && letterContent && (letterContent.content_html || letterContent.letter_content_html)) {
 	        console.log('Content detected for letter:', letterId, letterContent);
 	        generatedLetterIds.add(letterId.toString());
 	        pollingErrors[letterId] = false;
 	        delete localLetterCreatedAt[letterId];
 	        justGenerated[letterId] = true;
 	        
-	        // Update the letter in the local state with the new content
-	        applicationLetters = applicationLetters.map(letter =>
-	          letter.id === letterId 
-	            ? { ...letter, content_html: letterContent.content_html || letterContent.letter_content_html, content_text: letterContent.content_text, status: letterContent.status }
-	            : letter
-	        );
+	        			// Update the letter in the local state with the new content
+			applicationLetters = applicationLetters.map(letter =>
+			  letter.id === letterId 
+			    ? { ...letter, content_html: letterContent.content_html || letterContent.letter_content_html, letter_content_html: letterContent.letter_content_html, status: letterContent.status }
+			    : letter
+			);
+	        
+	        // Clear continuing letter state if this was the letter being continued
+	        if (continuingLetterId === letterId) {
+	          continuingLetterId = null;
+	          currentLetterId = null;
+	          address = '';
+	        }
 	        
 	        setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
 	        return;
@@ -689,28 +701,26 @@
 	        return;
 	      }
 	      
-	      // Check if content is stored in generated_documents table
-	      const { data: generatedDoc, error: docError } = await supabase
-	        .from('generated_documents')
-	        .select('content_html, content_text')
-	        .eq('session_id', sessionId)
-	        .eq('document_type', 'application_letter')
-	        .eq('application_letter_id', letterId)
-	        .maybeSingle();
+	      // Check if content is stored in application_letters table (letter_content_html)
+	      const { data: letterContentData, error: letterContentError } = await supabase
+	        .from('application_letters')
+	        .select('letter_content_html, content_html')
+	        .eq('id', letterId)
+	        .single();
 	      
-	      console.log('Checking generated_documents for letter:', letterId, 'Doc:', generatedDoc, 'Error:', docError);
+	      console.log('Checking application_letters for letter:', letterId, 'Data:', letterContentData, 'Error:', letterContentError);
 	      
-	      if (!docError && generatedDoc && (generatedDoc.content_html || generatedDoc.content_text)) {
-	        console.log('Content found in generated_documents for letter:', letterId, generatedDoc);
+	      if (!letterContentError && letterContentData && (letterContentData.letter_content_html || letterContentData.content_html)) {
+	        console.log('Content found in application_letters for letter:', letterId, letterContentData);
 	        generatedLetterIds.add(letterId.toString());
 	        pollingErrors[letterId] = false;
 	        delete localLetterCreatedAt[letterId];
 	        justGenerated[letterId] = true;
 	        
-	        // Update the letter in the local state with content from generated_documents
+	        // Update the letter in the local state with content from application_letters
 	        applicationLetters = applicationLetters.map(letter =>
 	          letter.id === letterId 
-	            ? { ...letter, content_html: generatedDoc.content_html, content_text: generatedDoc.content_text }
+	            ? { ...letter, letter_content_html: letterContentData.letter_content_html, content_html: letterContentData.content_html }
 	            : letter
 	        );
 	        
@@ -870,7 +880,7 @@
 
 			const { data: letterData, error } = await supabase
 				.from('application_letters')
-				.select('content_html, content_text, company_name')
+				.select('content_html, letter_content_html, company_name')
 				.eq('id', letterId)
 				.single();
 
@@ -884,13 +894,13 @@
 				return;
 			}
 
-			if (!letterData || (!letterData.content_html && !letterData.content_text)) {
+			if (!letterData || (!letterData.content_html && !letterData.letter_content_html)) {
 				alert('Letter content not yet generated or is empty.');
 				return;
 			}
 
 			// Show in modal
-			currentLetterContent = letterData.content_html || letterData.content_text;
+			currentLetterContent = letterData.content_html || letterData.letter_content_html;
 			currentLetterTitle = `Letter for ${letterData.company_name || 'Company'}`;
 			showLetterModal = true;
 
@@ -1038,23 +1048,51 @@
 		// Convert *text* to <em>text</em>
 		text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
 		
-		// Remove numbered list formatting and convert to regular paragraphs with proper spacing
-		text = text.replace(/^\d+\.\s+(.*?)$/gm, '<div class="mb-4"><p class="font-semibold text-gray-800 mb-2">$1</p>');
+		// Handle main title (lines starting with #)
+		text = text.replace(/^#\s+(.*?)$/gm, '<h2 class="text-xl font-bold text-gray-900 mb-4">$1</h2>');
 		
-		// Convert bullet points (- text or * text) to proper list items
-		text = text.replace(/^[-*]\s+(.*?)$/gm, '<li class="list-disc ml-4 mb-2">$1</li>');
+		// Handle numbered lists with bold subheadings
+		// First, split the text into sections
+		let sections = text.split(/(?=^\d+\.\s+)/gm);
 		
-		// Convert line breaks to <br> (but not within list items)
-		text = text.replace(/\n(?!<li)/g, '<br>');
-		
-		// Wrap bullet point lists in <ul> tags
-		text = text.replace(/(<li class="list-disc ml-4 mb-2">.*?<\/li>)+/g, '<ul class="list-disc ml-4 space-y-2 mb-4">$&</ul>');
-		
-		// Clean up any double <br> tags
-		text = text.replace(/<br><br>/g, '<br>');
-		
-		// Close any open div tags
-		text = text.replace(/<div class="mb-4"><p class="font-semibold text-gray-800 mb-2">(.*?)<\/p>/g, '<div class="mb-4"><p class="font-semibold text-gray-800 mb-2">$1</p></div>');
+		if (sections.length > 1) {
+			// Process each section
+			sections = sections.map((section, index) => {
+				if (index === 0) return section; // Skip the first section (before any numbered item)
+				
+				// Handle numbered items with bold subheadings
+				section = section.replace(/^(\d+)\.\s+\*\*(.*?)\*\*/gm, '<div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">$2</h3>');
+				
+				// Handle bullet points within each section
+				section = section.replace(/^[-*]\s+(.*?)$/gm, '<li class="list-disc ml-6 mb-2 text-gray-700">$1</li>');
+				
+				// Wrap bullet point lists in <ul> tags
+				section = section.replace(/(<li class="list-disc ml-6 mb-2 text-gray-700">.*?<\/li>)+/gs, '<ul class="list-disc ml-6 space-y-2 mb-4">$&</ul>');
+				
+				// Convert remaining line breaks to <br> (but not within list items)
+				section = section.replace(/\n(?!<li)/g, '<br>');
+				
+				// Clean up any double <br> tags
+				section = section.replace(/<br><br>/g, '<br>');
+				
+				return section;
+			});
+			
+			text = sections.join('');
+		} else {
+			// Fallback for non-numbered content
+			// Convert bullet points (- text or * text) to proper list items
+			text = text.replace(/^[-*]\s+(.*?)$/gm, '<li class="list-disc ml-4 mb-2">$1</li>');
+			
+			// Wrap bullet point lists in <ul> tags
+			text = text.replace(/(<li class="list-disc ml-4 mb-2">.*?<\/li>)+/g, '<ul class="list-disc ml-4 space-y-2 mb-4">$&</ul>');
+			
+			// Convert line breaks to <br> (but not within list items)
+			text = text.replace(/\n(?!<li)/g, '<br>');
+			
+			// Clean up any double <br> tags
+			text = text.replace(/<br><br>/g, '<br>');
+		}
 		
 		return text;
 	}
@@ -1137,7 +1175,7 @@
 					);
 					
 					// If content was generated, update the generatedLetterIds
-					if (payload.new.content_html || payload.new.content_text || payload.new.letter_content_html || payload.new.status === 'completed') {
+					if (payload.new.content_html || payload.new.letter_content_html || payload.new.status === 'completed') {
 						generatedLetterIds.add(payload.new.id.toString());
 						// Remove from local creation tracking
 						delete localLetterCreatedAt[payload.new.id];
@@ -1174,7 +1212,7 @@
 						// Update the corresponding application letter
 						applicationLetters = applicationLetters.map(letter =>
 							letter.id === payload.new.application_letter_id 
-								? { ...letter, content_html: payload.new.content_html, content_text: payload.new.content_text }
+								? { ...letter, content_html: payload.new.content_html, letter_content_html: payload.new.letter_content_html }
 								: letter
 						);
 						generatedLetterIds.add(payload.new.application_letter_id.toString());
@@ -1559,7 +1597,7 @@
 									}
 									class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 									type="button"
-									aria-label="Generate Letter"
+									aria-label="{$t('letters.generate_letter')}"
 								>
 									{#if generating}
 										<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -1662,7 +1700,7 @@
 									
 									<!-- Direct Action Buttons or Generating State -->
 									{#if letter.status === 'draft' && !isLetterGenerated(letter)}
-										{#if letter.pain_points && !letter.content_html && !letter.content_text && !letter.letter_content_html}
+										{#if letter.pain_points && !letter.content_html && !letter.letter_content_html}
 											<!-- Letter has pain points but no content - show Delete button only in header -->
 											<div class="flex items-center space-x-2">
 												<!-- Delete Button -->
@@ -1848,25 +1886,76 @@
 										</div>
 										
 										<!-- Continue Letter Generation Button (only for letters with pain points but no content) -->
-										{#if letter.status === 'draft' && !letter.content_html && !letter.content_text && !letter.letter_content_html}
+										{#if letter.status === 'draft' && !letter.content_html && !letter.letter_content_html}
 											<div class="mt-3 flex justify-center">
 												<button 
 													on:click={() => continueLetterGeneration(letter)}
 													class="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-base shadow-md border border-blue-700"
 													type="button"
-													aria-label="Continue letter generation"
-													title="Continue letter generation"
+													aria-label="{$t('letters.continue_letter_generation')}"
+													title="{$t('letters.continue_letter_generation')}"
 												>
 													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
 													</svg>
-													<span>{letter.address && letter.address.trim() ? 'Generate Letter Now' : 'Continue Letter Generation'}</span>
+													<span>{letter.address && letter.address.trim() ? $t('letters.generate_letter_now') : $t('letters.continue_letter_generation')}</span>
 												</button>
 											</div>
 										{/if}
 									</div>
 								{/if}
-								{#if letter.address}
+								<!-- Inline Address Field for Continuing Letter Generation -->
+								{#if continuingLetterId === letter.id}
+									<div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+										<div class="mb-3">
+											<label for="inline-address-{letter.id}" class="block text-sm font-medium text-gray-700 mb-2">
+												<span class="text-red-500">*</span> {$t('letters.company_recipient')}
+											</label>
+											<textarea
+												id="inline-address-{letter.id}"
+												bind:value={address}
+												placeholder="{$t('letters.address_placeholder')}"
+												class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+												rows="3"
+												required
+											></textarea>
+											<p class="text-xs text-gray-500 mt-1">{$t('letters.address_hint')}</p>
+										</div>
+										
+										<div class="flex items-center space-x-3">
+											<button
+												on:click={generateLetter}
+												disabled={generating || !address.trim()}
+												class="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+												type="button"
+												aria-label="{$t('letters.generate_letter')}"
+											>
+												{#if generating}
+													<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+													<span>{$t('letters.generating')}</span>
+												{:else}
+													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+													</svg>
+													<span>{$t('letters.generate_letter')}</span>
+												{/if}
+											</button>
+											
+											<button
+												on:click={() => {
+													continuingLetterId = null;
+													currentLetterId = null;
+													address = '';
+												}}
+												class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
+												type="button"
+												aria-label="{$t('letters.cancel')}"
+											>
+												{$t('letters.cancel')}
+											</button>
+										</div>
+									</div>
+								{:else if letter.address}
 									<div>
 										<span class="text-xs font-medium text-gray-600">{$t('letters.address')}</span>
 										<p class="text-sm text-gray-700 mt-1 bg-gray-50 p-2 rounded whitespace-pre-line">{letter.address}</p>

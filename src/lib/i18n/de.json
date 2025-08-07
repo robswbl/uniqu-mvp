@@ -153,7 +153,10 @@
       "accepted": "Angebot erhalten"
     },
     "update_title": "Titel aktualisieren",
-    "linkedin_url_warning": "Bitte stelle sicher, dass du den direkten Link der Stellenausschreibung (beginnt mit https://www.linkedin.com/jobs/view/...) einfügst, nicht die Suchergebnisseite.\n\nDu gelangst zur Stellenausschreibung, indem du auf den Jobtitel (z.B. \"Managing Director, 100%\") in den Suchergebnissen klickst."
+    "linkedin_url_warning": "Bitte stelle sicher, dass du den direkten Link der Stellenausschreibung (beginnt mit https://www.linkedin.com/jobs/view/...) einfügst, nicht die Suchergebnisseite.\n\nDu gelangst zur Stellenausschreibung, indem du auf den Jobtitel (z.B. \"Managing Director, 100%\") in den Suchergebnissen klickst.",
+    "enter_company_name": "Unternehmensname eingeben",
+    "generate_new_letter_aria": "Neues Schreiben generieren",
+    "clear_error": "Fehler löschen"
   },
   "all_documents": {
     "title": "Alle generierten Dokumente",
@@ -636,6 +639,7 @@
     "search_regions_label": "Suchregionen",
     "search_industries_label": "Branchen",
     "password_label": "Passwort",
+    "confirm_password_label": "Passwort bestätigen",
     "signup_code_label": "Registrierungscode",
     "sign_up": "Registrieren",
     "signing_up": "Registrierung..."

@@ -120,7 +120,7 @@
         </div>
         <div class="grid md:grid-cols-2 gap-6">
           <div><label for="password" class="block text-sm font-medium text-gray-700 mb-2">{$t('signup.password_label')} *</label><input id="password" type="password" bind:value={password} required class="w-full px-4 py-3 border border-gray-300 rounded-lg" /></div>
-          <div><label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password *</label><input id="confirmPassword" type="password" bind:value={confirmPassword} required class="w-full px-4 py-3 border border-gray-300 rounded-lg" /></div>
+          <div><label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">{$t('signup.confirm_password_label')} *</label><input id="confirmPassword" type="password" bind:value={confirmPassword} required class="w-full px-4 py-3 border border-gray-300 rounded-lg" /></div>
           <div><label for="signupCode" class="block text-sm font-medium text-gray-700 mb-2">{$t('signup.signup_code_label')} *</label><input id="signupCode" type="text" bind:value={signupCode} required class="w-full px-4 py-3 border border-gray-300 rounded-lg" /></div>
         </div>
         <div class="flex justify-end pt-4">

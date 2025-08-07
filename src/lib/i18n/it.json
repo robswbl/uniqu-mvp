@@ -153,7 +153,10 @@
       "accepted": "Offerta ricevuta"
     },
     "update_title": "Aggiorna titolo",
-    "linkedin_url_warning": "Assicurati di incollare il link diretto della pagina dell'offerta di lavoro (che inizia con https://www.linkedin.com/jobs/view/...), non la pagina dei risultati di ricerca.\n\nPuoi accedere all'offerta di lavoro cliccando sul titolo del lavoro (es. \"Managing Director, 100%\") nei risultati di ricerca."
+    "linkedin_url_warning": "Assicurati di incollare il link diretto della pagina dell'offerta di lavoro (che inizia con https://www.linkedin.com/jobs/view/...), non la pagina dei risultati di ricerca.\n\nPuoi accedere all'offerta di lavoro cliccando sul titolo del lavoro (es. \"Managing Director, 100%\") nei risultati di ricerca.",
+    "enter_company_name": "Inserisci il nome dell'azienda",
+    "generate_new_letter_aria": "Genera nuova lettera",
+    "clear_error": "Cancella errore"
   },
   "all_documents": {
     "title": "Tutti i documenti generati",
@@ -633,6 +636,7 @@
     "search_regions_label": "Regioni di ricerca",
     "search_industries_label": "Settori",
     "password_label": "Password",
+    "confirm_password_label": "Conferma password",
     "signup_code_label": "Codice di registrazione",
     "sign_up": "Registrati",
     "signing_up": "Registrazione..."

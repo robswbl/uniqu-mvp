@@ -57,10 +57,13 @@ waitLocale().then(() => {
 });
 
 onMount(async () => {
-  // Guard: If userId is missing and not on root, redirect to root
+  // Guard: If userId is missing and not on public routes, redirect to root
   if (typeof window !== 'undefined') {
     const userId = localStorage.getItem('userId');
-    if (!userId && window.location.pathname !== '/') {
+    const publicRoutes = ['/', '/signup'];
+    const currentPath = window.location.pathname;
+    
+    if (!userId && !publicRoutes.includes(currentPath)) {
       goto('/');
       return;
     }

@@ -1320,7 +1320,7 @@
 						on:click={() => showNewLetterDropdown = !showNewLetterDropdown}
 						class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
 						type="button"
-						aria-label="Generate New Letter"
+						aria-label="{$t('letters.generate_new_letter_aria')}"
 					>
 						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -1377,7 +1377,7 @@
 						}}
 						class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
 						type="button"
-						aria-label="Try Again"
+						aria-label="{$t('letters.try_again')}"
 					>
 						{$t('letters.try_again')}
 					</button>
@@ -1386,9 +1386,9 @@
 							on:click={clearError}
 							class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
 							type="button"
-							aria-label="Clear Error"
+							aria-label="{$t('letters.clear_error')}"
 						>
-							Clear Error
+							{$t('letters.clear_error')}
 						</button>
 					{/if}
 				</div>

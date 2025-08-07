@@ -162,7 +162,9 @@
     },
     "update_title": "Update Title",
     "linkedin_url_warning": "Please make sure to paste the direct link of the job posting page (starting with https://www.linkedin.com/jobs/view/...), not the search results page.\n\nYou can get to the job posting by clicking on the job title (e.g. \"Managing Director, 100%\") in the search results.",
-    "enter_company_name": "Enter the company name"
+    "enter_company_name": "Enter the company name",
+    "generate_new_letter_aria": "Generate New Letter",
+    "clear_error": "Clear Error"
   },
   "all_documents": {
     "title": "All Generated Documents",
@@ -676,6 +678,7 @@
     "search_regions_label": "Search Regions",
     "search_industries_label": "Search Industries",
     "password_label": "Password",
+    "confirm_password_label": "Confirm Password",
     "signup_code_label": "Signup Code",
     "sign_up": "Sign Up",
     "signing_up": "Signing up..."

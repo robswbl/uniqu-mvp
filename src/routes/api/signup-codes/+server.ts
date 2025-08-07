@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
     codes.push(code);
   }
   const { error } = await supabase.from('signup_codes').insert(
-    codes.map(code => ({ code, used: false }))
+    codes.map(code => ({ code, used: false, given_out: false }))
   );
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   return new Response(JSON.stringify({ codes }), { status: 201 });
@@ -21,4 +21,17 @@ export const GET: RequestHandler = async () => {
   const { data, error } = await supabase.from('signup_codes').select('*').order('created_at', { ascending: false });
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   return new Response(JSON.stringify({ codes: data }), { status: 200 });
+};
+
+// PUT: Mark code as given out
+export const PUT: RequestHandler = async ({ request }) => {
+  const { code, given_out } = await request.json();
+  
+  const { error } = await supabase
+    .from('signup_codes')
+    .update({ given_out })
+    .eq('code', code);
+    
+  if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  return new Response(JSON.stringify({ success: true }), { status: 200 });
 }; 

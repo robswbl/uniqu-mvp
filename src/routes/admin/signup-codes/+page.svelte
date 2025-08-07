@@ -7,6 +7,7 @@
   let count = 1;
   let message = '';
   let messageType = '';
+  let markingCode = '';
 
   async function fetchCodes() {
     isLoading = true;
@@ -61,6 +62,31 @@
     messageType = 'success';
   }
 
+  async function markAsGivenOut(code: string, given_out: boolean) {
+    markingCode = code;
+    try {
+      const res = await fetch('/api/signup-codes', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, given_out })
+      });
+      const data = await res.json();
+      if (data.success) {
+        message = `Code ${code} marked as ${given_out ? 'given out' : 'not given out'}.`;
+        messageType = 'success';
+        await fetchCodes();
+      } else {
+        message = data.error || 'Failed to update code status.';
+        messageType = 'error';
+      }
+    } catch (err: any) {
+      message = err.message || 'Failed to update code status.';
+      messageType = 'error';
+    } finally {
+      markingCode = '';
+    }
+  }
+
   onMount(fetchCodes);
 </script>
 
@@ -99,6 +125,7 @@
               <tr>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.code')}</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.status')}</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Given Out</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.used_by')}</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.used_at')}</th>
                 <th class="px-4 py-2"></th>
@@ -115,10 +142,26 @@
                       <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Unused</span>
                     {/if}
                   </td>
+                  <td class="px-4 py-2">
+                    {#if code.given_out}
+                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">Given Out</span>
+                    {:else}
+                      <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Available</span>
+                    {/if}
+                  </td>
                   <td class="px-4 py-2 text-sm">{code.used_by || '-'}</td>
                   <td class="px-4 py-2 text-sm">{code.used_at ? new Date(code.used_at).toLocaleString() : '-'}</td>
                   <td class="px-4 py-2">
-                    <button on:click={() => copyToClipboard(code.code)} class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-xs transition-colors">{$t('admin.signup_codes.copy')}</button>
+                    <div class="flex space-x-2">
+                      <button on:click={() => copyToClipboard(code.code)} class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-xs transition-colors">{$t('admin.signup_codes.copy')}</button>
+                      {#if !code.used}
+                        {#if code.given_out}
+                          <button on:click={() => markAsGivenOut(code.code, false)} disabled={markingCode === code.code} class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md text-xs transition-colors disabled:opacity-50">Mark Available</button>
+                        {:else}
+                          <button on:click={() => markAsGivenOut(code.code, true)} disabled={markingCode === code.code} class="text-orange-600 hover:text-orange-900 bg-orange-50 hover:bg-orange-100 px-3 py-1 rounded-md text-xs transition-colors disabled:opacity-50">Mark Given Out</button>
+                        {/if}
+                      {/if}
+                    </div>
                   </td>
                 </tr>
               {/each}

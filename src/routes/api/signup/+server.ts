@@ -18,9 +18,10 @@ export const POST: RequestHandler = async ({ request }) => {
       .select('*')
       .eq('code', signupCode)
       .eq('used', false)
+      .eq('given_out', true)
       .single();
     if (codeError || !codeData) {
-      return json({ message: 'Invalid or already used signup code.' }, { status: 400 });
+      return json({ message: 'Invalid, already used, or not given out signup code.' }, { status: 400 });
     }
 
     // 2. Hash password

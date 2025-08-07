@@ -118,7 +118,7 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 p-4">
-  <div class="max-w-4xl mx-auto">
+  <div class="max-w-6xl mx-auto">
     {#if !fromOnboarding}
     <!-- Header -->
     <div class="mb-6">
@@ -169,7 +169,7 @@
     {:else if documentData}
       <!-- Document Content -->
       <div class="bg-white rounded-xl shadow-lg overflow-hidden relative">
-        <div class="document-content px-12 py-10">
+        <div class="document-content px-16 py-12">
           {@html processHtmlContent(documentData.content_html)}
         </div>
         

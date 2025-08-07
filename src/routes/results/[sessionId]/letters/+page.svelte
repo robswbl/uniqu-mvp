@@ -26,14 +26,14 @@
 	let currentLetterContent = '';
 	let currentLetterTitle = '';
 
-	// Status options for dropdown
-	const statusOptions = [
-		{ value: 'draft', label: 'Draft', color: 'bg-gray-100 text-gray-700' },
-		{ value: 'sent', label: 'Sent', color: 'bg-blue-100 text-blue-700' },
-		{ value: 'responded', label: 'Response Received', color: 'bg-yellow-100 text-yellow-700' },
-		{ value: 'interview', label: 'Interview Scheduled', color: 'bg-green-100 text-green-700' },
-		{ value: 'rejected', label: 'Rejected', color: 'bg-red-100 text-red-700' },
-		{ value: 'accepted', label: 'Offer Received', color: 'bg-purple-100 text-purple-700' }
+	// Status options for dropdown (reactive)
+	$: statusOptions = [
+		{ value: 'draft', label: $t('letters.status.draft'), color: 'bg-gray-100 text-gray-700' },
+		{ value: 'sent', label: $t('letters.status.sent'), color: 'bg-blue-100 text-blue-700' },
+		{ value: 'responded', label: $t('letters.status.responded'), color: 'bg-yellow-100 text-yellow-700' },
+		{ value: 'interview', label: $t('letters.status.interview'), color: 'bg-green-100 text-green-700' },
+		{ value: 'rejected', label: $t('letters.status.rejected'), color: 'bg-red-100 text-red-700' },
+		{ value: 'accepted', label: $t('letters.status.accepted'), color: 'bg-purple-100 text-purple-700' }
 	];
 
 	function getStatusColor(status) {
@@ -50,19 +50,19 @@
 		const timeline = [];
 		
 		if (letter.sent_at) {
-			timeline.push({ label: 'Sent', date: letter.sent_at, color: 'text-blue-600' });
+			timeline.push({ label: $t('letters.status.sent'), date: letter.sent_at, color: 'text-blue-600' });
 		}
 		if (letter.response_received_at) {
-			timeline.push({ label: 'Response', date: letter.response_received_at, color: 'text-yellow-600' });
+			timeline.push({ label: $t('letters.status.responded'), date: letter.response_received_at, color: 'text-yellow-600' });
 		}
 		if (letter.interview_scheduled_at) {
-			timeline.push({ label: 'Interview', date: letter.interview_scheduled_at, color: 'text-green-600' });
+			timeline.push({ label: $t('letters.status.interview'), date: letter.interview_scheduled_at, color: 'text-green-600' });
 		}
 		if (letter.offer_received_at) {
-			timeline.push({ label: 'Offer', date: letter.offer_received_at, color: 'text-purple-600' });
+			timeline.push({ label: $t('letters.status.accepted'), date: letter.offer_received_at, color: 'text-purple-600' });
 		}
 		if (letter.rejected_at) {
-			timeline.push({ label: 'Rejected', date: letter.rejected_at, color: 'text-red-600' });
+			timeline.push({ label: $t('letters.status.rejected'), date: letter.rejected_at, color: 'text-red-600' });
 		}
 		
 		return timeline;

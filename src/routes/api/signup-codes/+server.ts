@@ -25,11 +25,16 @@ export const GET: RequestHandler = async () => {
 
 // PUT: Mark code as given out
 export const PUT: RequestHandler = async ({ request }) => {
-  const { code, given_out } = await request.json();
+  const { code, given_out, given_to } = await request.json();
+  
+  const updateData: any = { given_out };
+  if (given_to !== undefined) {
+    updateData.given_to = given_to;
+  }
   
   const { error } = await supabase
     .from('signup_codes')
-    .update({ given_out })
+    .update(updateData)
     .eq('code', code);
     
   if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });

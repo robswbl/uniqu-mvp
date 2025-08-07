@@ -1482,17 +1482,17 @@
 								<!-- Company Portal URL Field -->
 								<div>
 									<label for="company-portal-url" class="block text-sm font-medium text-gray-700 mb-2">
-										<span class="text-red-500">*</span> Company Portal URL
+										<span class="text-red-500">*</span> {$t('letters.company_portal_url_label')}
 									</label>
 									<input
 										id="company-portal-url"
 										type="url"
 										bind:value={companyPortalUrl}
-										placeholder="https://jobs.ch/..."
+										placeholder="{$t('letters.company_portal_url_placeholder')}"
 										class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
 										required
 									/>
-									<p class="text-xs text-gray-500 mt-1">Enter the jobs.ch URL for the company</p>
+									<p class="text-xs text-gray-500 mt-1">{$t('letters.company_portal_url_hint')}</p>
 									{#if jobsChWarning}
 										<div class="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
 											<div class="flex items-start">
@@ -1522,9 +1522,9 @@
 													on:click={() => togglePainPointsExpansion('form')}
 													class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
 													type="button"
-													aria-label="Show less"
+													aria-label="{$t('letters.show_less')}"
 												>
-													Show less
+													{$t('letters.show_less')}
 												</button>
 											{:else}
 												<!-- Show truncated content when collapsed -->
@@ -1536,17 +1536,17 @@
 														on:click={() => togglePainPointsExpansion('form')}
 														class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
 														type="button"
-														aria-label="Show more"
+														aria-label="{$t('letters.show_more')}"
 													>
-														Show more
+														{$t('letters.show_more')}
 													</button>
 												{/if}
 											{/if}
 										{:else}
-											<p class="text-sm text-gray-500 italic">Pain points will appear here after analysis...</p>
+											<p class="text-sm text-gray-500 italic">{$t('letters.pain_points_will_appear')}</p>
 										{/if}
 									</div>
-									<p class="text-xs text-green-600 mt-1">✓ Pain points analyzed from company portal</p>
+									<p class="text-xs text-green-600 mt-1">{$t('letters.pain_points_analyzed')}</p>
 								</div>
 								
 								<!-- Address Field -->
@@ -1579,12 +1579,12 @@
 								>
 									{#if analyzingPainPoints}
 										<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-										<span>Analyzing...</span>
+										<span>{$t('letters.analyzing')}</span>
 									{:else}
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
 										</svg>
-										<span>Analyse Company Pain Points</span>
+										<span>{$t('letters.analyze_company_pain_points')}</span>
 									{/if}
 								</button>
 							{:else}

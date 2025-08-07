@@ -158,7 +158,16 @@
     "generate_new_letter_aria": "Neues Schreiben generieren",
     "clear_error": "Fehler löschen",
     "generate_based_on_job_opening": "Neues Schreiben basierend auf Stellenausschreibung generieren",
-    "generate_spontaneous_application": "Neues spontanes Bewerbungsschreiben generieren"
+    "generate_spontaneous_application": "Neues spontanes Bewerbungsschreiben generieren",
+    "company_portal_url_label": "Unternehmensportal URL",
+    "company_portal_url_placeholder": "https://jobs.ch/...",
+    "company_portal_url_hint": "Gib die jobs.ch URL für das Unternehmen ein",
+    "analyzing": "Analysiere...",
+    "analyze_company_pain_points": "Unternehmens-Schwachstellen analysieren",
+    "show_less": "Weniger anzeigen",
+    "show_more": "Mehr anzeigen",
+    "pain_points_will_appear": "Schwachstellen werden hier nach der Analyse angezeigt...",
+    "pain_points_analyzed": "✓ Schwachstellen vom Unternehmensportal analysiert"
   },
   "all_documents": {
     "title": "Alle generierten Dokumente",

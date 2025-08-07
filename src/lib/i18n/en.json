@@ -164,7 +164,16 @@
     "linkedin_url_warning": "Please make sure to paste the direct link of the job posting page (starting with https://www.linkedin.com/jobs/view/...), not the search results page.\n\nYou can get to the job posting by clicking on the job title (e.g. \"Managing Director, 100%\") in the search results.",
     "enter_company_name": "Enter the company name",
     "generate_new_letter_aria": "Generate New Letter",
-    "clear_error": "Clear Error"
+    "clear_error": "Clear Error",
+    "company_portal_url_label": "Company Portal URL",
+    "company_portal_url_placeholder": "https://jobs.ch/...",
+    "company_portal_url_hint": "Enter the jobs.ch URL for the company",
+    "analyzing": "Analyzing...",
+    "analyze_company_pain_points": "Analyse Company Pain Points",
+    "show_less": "Show less",
+    "show_more": "Show more",
+    "pain_points_will_appear": "Pain points will appear here after analysis...",
+    "pain_points_analyzed": "✓ Pain points analyzed from company portal"
   },
   "all_documents": {
     "title": "All Generated Documents",

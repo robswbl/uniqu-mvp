@@ -158,7 +158,16 @@
     "generate_new_letter_aria": "Generar nueva carta",
     "clear_error": "Limpiar error",
     "generate_based_on_job_opening": "Generar nueva carta basada en oferta de trabajo",
-    "generate_spontaneous_application": "Generar nueva carta de aplicación espontánea"
+    "generate_spontaneous_application": "Generar nueva carta de aplicación espontánea",
+    "company_portal_url_label": "URL del portal de la empresa",
+    "company_portal_url_placeholder": "https://jobs.ch/...",
+    "company_portal_url_hint": "Ingresa la URL de jobs.ch para la empresa",
+    "analyzing": "Analizando...",
+    "analyze_company_pain_points": "Analizar puntos críticos de la empresa",
+    "show_less": "Mostrar menos",
+    "show_more": "Mostrar más",
+    "pain_points_will_appear": "Los puntos críticos aparecerán aquí después del análisis...",
+    "pain_points_analyzed": "✓ Puntos críticos analizados desde el portal de la empresa"
   },
   "all_documents": {
     "title": "Todos los documentos generados",

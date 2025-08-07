@@ -156,7 +156,9 @@
     "linkedin_url_warning": "Assicurati di incollare il link diretto della pagina dell'offerta di lavoro (che inizia con https://www.linkedin.com/jobs/view/...), non la pagina dei risultati di ricerca.\n\nPuoi accedere all'offerta di lavoro cliccando sul titolo del lavoro (es. \"Managing Director, 100%\") nei risultati di ricerca.",
     "enter_company_name": "Inserisci il nome dell'azienda",
     "generate_new_letter_aria": "Genera nuova lettera",
-    "clear_error": "Cancella errore"
+    "clear_error": "Cancella errore",
+    "generate_based_on_job_opening": "Genera nuova lettera basata sull'offerta di lavoro",
+    "generate_spontaneous_application": "Genera nuova lettera di candidatura spontanea"
   },
   "all_documents": {
     "title": "Tutti i documenti generati",

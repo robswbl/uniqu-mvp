@@ -25,11 +25,11 @@ export const GET: RequestHandler = async () => {
 
 // PUT: Mark code as given out
 export const PUT: RequestHandler = async ({ request }) => {
-  const { code, given_out, given_to } = await request.json();
+  const { code, given_out, given_by } = await request.json();
   
   const updateData: any = { given_out };
-  if (given_to !== undefined) {
-    updateData.given_to = given_to;
+  if (given_by !== undefined) {
+    updateData.given_by = given_by;
   }
   
   const { error } = await supabase

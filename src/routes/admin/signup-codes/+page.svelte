@@ -8,7 +8,7 @@
   let message = '';
   let messageType = '';
   let markingCode = '';
-  let bulkGivenTo = '';
+  let bulkGivenBy = '';
   let bulkGeneratedCodes: string[] = [];
   let showBulkActions = false;
 
@@ -100,8 +100,8 @@
   }
 
   async function markAllAsGivenOut() {
-    if (!bulkGivenTo.trim()) {
-      message = 'Please enter who the codes were given to.';
+    if (!bulkGivenBy.trim()) {
+      message = 'Please enter who gave out the codes.';
       messageType = 'error';
       return;
     }
@@ -116,7 +116,7 @@
           body: JSON.stringify({ 
             code, 
             given_out: true, 
-            given_to: bulkGivenTo.trim() || null 
+            given_by: bulkGivenBy.trim() || null 
           })
         });
         const data = await res.json();
@@ -127,11 +127,11 @@
         }
       }
 
-      message = `Marked ${bulkGeneratedCodes.length} codes as given out to: ${bulkGivenTo}`;
+      message = `Marked ${bulkGeneratedCodes.length} codes as given out by: ${bulkGivenBy}`;
       messageType = 'success';
       bulkGeneratedCodes = [];
       showBulkActions = false;
-      bulkGivenTo = '';
+      bulkGivenBy = '';
       await fetchCodes();
     } catch (err: any) {
       message = err.message || 'Failed to mark codes as given out.';
@@ -144,7 +144,7 @@
   function clearBulkActions() {
     bulkGeneratedCodes = [];
     showBulkActions = false;
-    bulkGivenTo = '';
+    bulkGivenBy = '';
     message = '';
   }
 
@@ -188,14 +188,14 @@
             </div>
           </div>
           <div>
-            <label for="bulk-given-to" class="block text-sm font-medium text-blue-700 mb-2">Given To (Optional)</label>
-            <input 
-              id="bulk-given-to"
-              type="text" 
-              bind:value={bulkGivenTo}
-              placeholder="e.g., John Doe, Marketing Team, etc."
-              class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+                         <label for="bulk-given-by" class="block text-sm font-medium text-blue-700 mb-2">Given By (Optional)</label>
+             <input 
+               id="bulk-given-by"
+               type="text" 
+               bind:value={bulkGivenBy}
+               placeholder="e.g., Rob, Sarah, Marketing Team, etc."
+               class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+             />
           </div>
           <div class="flex flex-col justify-end space-y-2">
             <button 
@@ -235,7 +235,7 @@
                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.code')}</th>
                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.status')}</th>
                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Given Out</th>
-                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Given To</th>
+                                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Given By</th>
                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.used_by')}</th>
                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.used_at')}</th>
                  <th class="px-4 py-2"></th>
@@ -259,7 +259,7 @@
                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Available</span>
                      {/if}
                    </td>
-                   <td class="px-4 py-2 text-sm">{code.given_to || '-'}</td>
+                                       <td class="px-4 py-2 text-sm">{code.given_by || '-'}</td>
                    <td class="px-4 py-2 text-sm">{code.used_by || '-'}</td>
                   <td class="px-4 py-2 text-sm">{code.used_at ? new Date(code.used_at).toLocaleString() : '-'}</td>
                   <td class="px-4 py-2">

@@ -177,10 +177,10 @@
     <!-- Bulk Actions Section -->
     {#if showBulkActions}
       <div class="bg-blue-50 rounded-xl shadow-lg border border-blue-200 p-6 mb-8">
-        <h3 class="text-lg font-semibold text-blue-900 mb-4">Bulk Actions for Generated Codes</h3>
+        <h3 class="text-lg font-semibold text-blue-900 mb-4">{$t('admin.signup_codes.bulk_actions_title')}</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
-            <label class="block text-sm font-medium text-blue-700 mb-2">Generated Codes ({bulkGeneratedCodes.length})</label>
+                         <label class="block text-sm font-medium text-blue-700 mb-2">{$t('admin.signup_codes.generated_codes')} ({bulkGeneratedCodes.length})</label>
             <div class="bg-white border border-blue-300 rounded-lg p-3 max-h-32 overflow-y-auto">
               {#each bulkGeneratedCodes as code}
                 <div class="font-mono text-sm text-blue-800">{code}</div>
@@ -188,12 +188,12 @@
             </div>
           </div>
           <div>
-                         <label for="bulk-given-by" class="block text-sm font-medium text-blue-700 mb-2">Given By (Optional)</label>
+                         <label for="bulk-given-by" class="block text-sm font-medium text-blue-700 mb-2">{$t('admin.signup_codes.given_by_label')}</label>
              <input 
                id="bulk-given-by"
                type="text" 
                bind:value={bulkGivenBy}
-               placeholder="e.g., Rob, Sarah, Marketing Team, etc."
+               placeholder="{$t('admin.signup_codes.given_by_placeholder')}"
                class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
              />
           </div>
@@ -202,20 +202,20 @@
               on:click={copyAllCodes}
               class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
             >
-              Copy All Codes
+                             {$t('admin.signup_codes.copy_all_codes')}
             </button>
             <button 
               on:click={markAllAsGivenOut}
               disabled={markingCode === 'bulk'}
               class="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50"
             >
-              {markingCode === 'bulk' ? 'Marking...' : 'Mark All as Given Out'}
+                             {markingCode === 'bulk' ? $t('admin.signup_codes.marking') : $t('admin.signup_codes.mark_all_given_out')}
             </button>
             <button 
               on:click={clearBulkActions}
               class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
             >
-              Clear
+                             {$t('admin.signup_codes.clear')}
             </button>
           </div>
         </div>
@@ -234,8 +234,8 @@
                <tr>
                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.code')}</th>
                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.status')}</th>
-                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Given Out</th>
-                                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Given By</th>
+                                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.given_out')}</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.given_by')}</th>
                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.used_by')}</th>
                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.used_at')}</th>
                  <th class="px-4 py-2"></th>
@@ -254,9 +254,9 @@
                   </td>
                                      <td class="px-4 py-2">
                      {#if code.given_out}
-                       <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">Given Out</span>
-                     {:else}
-                       <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Available</span>
+                                               <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">{$t('admin.signup_codes.given_out')}</span>
+                      {:else}
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">{$t('admin.signup_codes.available')}</span>
                      {/if}
                    </td>
                                        <td class="px-4 py-2 text-sm">{code.given_by || '-'}</td>
@@ -267,9 +267,9 @@
                       <button on:click={() => copyToClipboard(code.code)} class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-xs transition-colors">{$t('admin.signup_codes.copy')}</button>
                       {#if !code.used}
                         {#if code.given_out}
-                          <button on:click={() => markAsGivenOut(code.code, false)} disabled={markingCode === code.code} class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md text-xs transition-colors disabled:opacity-50">Mark Available</button>
-                        {:else}
-                          <button on:click={() => markAsGivenOut(code.code, true)} disabled={markingCode === code.code} class="text-orange-600 hover:text-orange-900 bg-orange-50 hover:bg-orange-100 px-3 py-1 rounded-md text-xs transition-colors disabled:opacity-50">Mark Given Out</button>
+                                                     <button on:click={() => markAsGivenOut(code.code, false)} disabled={markingCode === code.code} class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md text-xs transition-colors disabled:opacity-50">{$t('admin.signup_codes.mark_available')}</button>
+                         {:else}
+                           <button on:click={() => markAsGivenOut(code.code, true)} disabled={markingCode === code.code} class="text-orange-600 hover:text-orange-900 bg-orange-50 hover:bg-orange-100 px-3 py-1 rounded-md text-xs transition-colors disabled:opacity-50">{$t('admin.signup_codes.mark_given_out')}</button>
                         {/if}
                       {/if}
                     </div>

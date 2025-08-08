@@ -674,7 +674,15 @@
       "marked_bulk_given_out_message": "{count} codes marqués comme distribués par : {given_by}",
       "please_enter_given_by": "Veuillez indiquer qui a distribué les codes.",
       "failed_mark_given_out": "Échec du marquage du code {code} comme distribué.",
-      "failed_mark_codes_given_out": "Échec du marquage des codes comme distribués."
+      "failed_mark_codes_given_out": "Échec du marquage des codes comme distribués.",
+      "search_placeholder": "Rechercher codes, noms...",
+      "all_status": "Tous les statuts",
+      "used": "Utilisé",
+      "unused": "Non utilisé",
+      "all_distribution": "Toutes les distributions",
+      "clear_filters": "Effacer",
+      "showing_results": "Affichage de {filtered} sur {total} codes",
+      "no_codes_match": "Aucun code ne correspond à vos filtres."
     },
     "nav": {
       "heading": "Outils d'administration",

@@ -686,7 +686,15 @@
       "marked_bulk_given_out_message": "{count} Codes als verteilt markiert von: {given_by}",
       "please_enter_given_by": "Bitte gib ein, wer die Codes verteilt hat.",
       "failed_mark_given_out": "Fehler beim Markieren von Code {code} als verteilt.",
-      "failed_mark_codes_given_out": "Fehler beim Markieren der Codes als verteilt."
+      "failed_mark_codes_given_out": "Fehler beim Markieren der Codes als verteilt.",
+      "search_placeholder": "Codes, Namen suchen...",
+      "all_status": "Alle Status",
+      "used": "Verwendet",
+      "unused": "Nicht verwendet",
+      "all_distribution": "Alle Verteilung",
+      "clear_filters": "Löschen",
+      "showing_results": "Zeige {filtered} von {total} Codes",
+      "no_codes_match": "Keine Codes entsprechen Ihren Filtern."
     },
     "nav": {
       "heading": "Admin-Tools",

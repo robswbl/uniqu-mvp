@@ -723,7 +723,15 @@
       "marked_bulk_given_out_message": "Marked {count} codes as given out by: {given_by}",
       "please_enter_given_by": "Please enter who gave out the codes.",
       "failed_mark_given_out": "Failed to mark code {code} as given out.",
-      "failed_mark_codes_given_out": "Failed to mark codes as given out."
+      "failed_mark_codes_given_out": "Failed to mark codes as given out.",
+      "search_placeholder": "Search codes, names...",
+      "all_status": "All Status",
+      "used": "Used",
+      "unused": "Unused",
+      "all_distribution": "All Distribution",
+      "clear_filters": "Clear",
+      "showing_results": "Showing {filtered} of {total} codes",
+      "no_codes_match": "No codes match your filters."
     },
     "nav": {
       "heading": "Admin Tools",

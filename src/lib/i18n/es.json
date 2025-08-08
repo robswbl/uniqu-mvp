@@ -678,7 +678,15 @@
       "marked_bulk_given_out_message": "{count} códigos marcados como distribuidos por: {given_by}",
       "please_enter_given_by": "Por favor, ingresa quién distribuyó los códigos.",
       "failed_mark_given_out": "Error al marcar el código {code} como distribuido.",
-      "failed_mark_codes_given_out": "Error al marcar los códigos como distribuidos."
+      "failed_mark_codes_given_out": "Error al marcar los códigos como distribuidos.",
+      "search_placeholder": "Buscar códigos, nombres...",
+      "all_status": "Todos los estados",
+      "used": "Usado",
+      "unused": "No usado",
+      "all_distribution": "Todas las distribuciones",
+      "clear_filters": "Limpiar",
+      "showing_results": "Mostrando {filtered} de {total} códigos",
+      "no_codes_match": "Ningún código coincide con tus filtros."
     },
     "nav": {
       "heading": "Herramientas de administración",

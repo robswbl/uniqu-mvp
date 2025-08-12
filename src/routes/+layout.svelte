@@ -101,6 +101,24 @@ onMount(() => {
     }
   }
   document.addEventListener('mousedown', handleClickOutside);
+  
+  // Safari button visibility fix
+  function ensureButtonVisibility() {
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+      button.style.display = 'flex';
+      button.style.visibility = 'visible';
+      button.style.opacity = '1';
+      button.style.position = 'relative';
+      button.style.zIndex = '1';
+    });
+  }
+  
+  // Run immediately and after a short delay
+  ensureButtonVisibility();
+  setTimeout(ensureButtonVisibility, 100);
+  setTimeout(ensureButtonVisibility, 500);
+  
   return () => {
     document.removeEventListener('mousedown', handleClickOutside);
   };

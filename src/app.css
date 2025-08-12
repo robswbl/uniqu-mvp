@@ -2,6 +2,55 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+/* Safari-specific fixes for button visibility */
+@supports (-webkit-appearance: none) {
+  /* Force button display in Safari */
+  button {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    -webkit-appearance: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Ensure flexbox works properly in Safari */
+  .flex {
+    display: -webkit-flex !important;
+    display: flex !important;
+  }
+  
+  /* Fix button transitions in Safari */
+  button {
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+  }
+}
+
+/* Additional Safari compatibility */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  button {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
+/* Ensure buttons are always visible */
+button[type="button"],
+button[type="submit"] {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Force button content to be visible */
+button * {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 /* Custom prose styles for pain points */
 .prose-sm {
   font-size: 0.875rem;

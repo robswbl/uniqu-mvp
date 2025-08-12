@@ -283,6 +283,7 @@
           type="button"
           on:click={goToDashboard}
           class="flex items-center space-x-2 px-6 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
+          style="display: flex !important; visibility: visible !important; opacity: 1 !important;"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
@@ -299,6 +300,7 @@
             }
           }}
           class="flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-500 hover:from-indigo-700 hover:to-purple-600 text-white font-semibold rounded-lg transition-colors shadow-lg"
+          style="display: flex !important; visibility: visible !important; opacity: 1 !important;"
         >
           <span>{$t('step1.overview.continue_to_step2')}</span>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

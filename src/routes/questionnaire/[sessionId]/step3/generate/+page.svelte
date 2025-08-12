@@ -55,8 +55,10 @@
       <div class="flex justify-center">
         <button
           class="px-12 py-4 text-2xl font-bold rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white shadow-lg transition-all duration-200 flex items-center justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+          style="display: flex !important; visibility: visible !important; opacity: 1 !important;"
           on:click={handleGenerate}
           disabled={isGenerating}
+          type="button"
         >
           {isGenerating ? $t('step3.generate.generating') : $t('step3.generate.generate_now')}
         </button>

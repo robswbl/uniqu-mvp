@@ -18,12 +18,12 @@
 	let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	const situations = [
-		{ id: 'laid-off', titleKey: 'onboarding.option_laid_off', icon: '💔', tone: 'supportive', message: '' },
-		{ id: 'quit', titleKey: 'onboarding.option_quit', icon: '🦁', tone: 'encouraging', message: '' },
-		{ id: 'career-change', titleKey: 'onboarding.option_career_change', icon: '🔄', tone: 'inspiring', message: '' },
-		{ id: 'retirement', titleKey: 'onboarding.option_retirement', icon: '🌟', tone: 'celebratory', message: '' },
-		{ id: 'burnout', titleKey: 'onboarding.option_burnout', icon: '🕯️', tone: 'gentle', message: '' },
-		{ id: 'other', titleKey: 'onboarding.option_other', icon: '💭', tone: 'open', message: '' }
+		{ id: 'laid-off', titleKey: 'onboarding.option_laid_off', descKey: 'onboarding.option_laid_off_desc', icon: '💔', tone: 'supportive' },
+		{ id: 'quit', titleKey: 'onboarding.option_quit', descKey: 'onboarding.option_quit_desc', icon: '🦁', tone: 'encouraging' },
+		{ id: 'career-change', titleKey: 'onboarding.option_career_change', descKey: 'onboarding.option_career_change_desc', icon: '🔄', tone: 'inspiring' },
+		{ id: 'retirement', titleKey: 'onboarding.option_retirement', descKey: 'onboarding.option_retirement_desc', icon: '🌟', tone: 'celebratory' },
+		{ id: 'burnout', titleKey: 'onboarding.option_burnout', descKey: 'onboarding.option_burnout_desc', icon: '🕯️', tone: 'gentle' },
+		{ id: 'other', titleKey: 'onboarding.option_other', descKey: 'onboarding.option_other_desc', icon: '💭', tone: 'open' }
 	];
 
 	onMount(async () => {
@@ -190,7 +190,7 @@
 											{$t(situation.titleKey)}
 										</h3>
 										<p class="text-sm text-gray-600 mt-1">
-											{$t(situation.titleKey)}
+											{$t(situation.descKey)}
 										</p>
 									</div>
 								</div>

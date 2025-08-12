@@ -37,6 +37,11 @@ let availableLangs = [
   { code: 'es', label: 'Español' }
 ];
 
+// Reactive statement to fetch user data when userId changes
+$: if (userId && !userData) {
+  fetchUserData();
+}
+
 async function fetchUserLanguage() {
   if (userId) {
     const { data, error } = await supabase
@@ -59,24 +64,26 @@ waitLocale().then(() => {
 onMount(async () => {
   // Guard: If userId is missing and not on public routes, redirect to root
   if (typeof window !== 'undefined') {
-    const userId = localStorage.getItem('userId');
+    const currentUserId = localStorage.getItem('userId');
     const publicRoutes = ['/', '/signup'];
     const currentPath = window.location.pathname;
     
-    if (!userId && !publicRoutes.includes(currentPath)) {
+    if (!currentUserId && !publicRoutes.includes(currentPath)) {
       goto('/');
       return;
     }
-  }
-  // If userId is available, fetch language from DB and user data
-  if (userId) {
-    await fetchUserLanguage();
-    await fetchUserData();
-  } else if (typeof window !== 'undefined') {
-    userLang = localStorage.getItem('userLang') || '';
-    if (userLang) {
-      locale.set(userLang);
-      waitLocale();
+    
+    // Update the top-level userId variable
+    if (currentUserId) {
+      userId = currentUserId;
+      await fetchUserLanguage();
+      await fetchUserData();
+    } else {
+      userLang = localStorage.getItem('userLang') || '';
+      if (userLang) {
+        locale.set(userLang);
+        waitLocale();
+      }
     }
   }
 });
@@ -117,21 +124,12 @@ async function changeLang(lang: string) {
   if (typeof window !== 'undefined') {
     localStorage.setItem('userLang', lang);
   }
-  // Debug: log user info
-  console.log('[LANG PATCH DEBUG] userId:', userId, 'lang:', lang);
   // If userId is available, update in DB
   if (userId) {
-    // Debug: log userId and session
-    if (import.meta.env && import.meta.env.DEV) {
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('[LANG PATCH DEBUG] session:', session);
-    }
-    const { error, data, status } = await supabase
+    const { error } = await supabase
       .from('users')
       .update({ user_language: lang })
       .eq('user_uuid', userId);
-    // Debug: log full response
-    console.log('[LANG PATCH DEBUG] PATCH response:', { error, data, status });
     if (error) {
       errorMsg = 'Failed to update language in your profile. Please try again.';
     } else {
@@ -181,7 +179,7 @@ async function changeLang(lang: string) {
       </div>
       
       <!-- Profile Avatar -->
-      {#if userData && $page.params?.sessionId}
+      {#if userData}
         <div class="relative">
           <button
             bind:this={profileButtonRef}
@@ -204,14 +202,25 @@ async function changeLang(lang: string) {
           {#if showProfileMenu}
             <div bind:this={profileMenuRef} class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
               <a
-                href="/profile/{$page.params.sessionId}"
+                href={$page.params?.sessionId ? `/profile/${$page.params.sessionId}` : '/profile'}
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
               >
                 {$t('layout.profile_settings')}
               </a>
               <div class="border-t border-gray-200 my-1"></div>
               <button
-                on:click={() => { showProfileMenu = false; goto('/'); }}
+                on:click={() => { 
+                  showProfileMenu = false; 
+                  // Clear user data from localStorage
+                  if (typeof window !== 'undefined') {
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('userLang');
+                  }
+                  // Clear user data
+                  userData = null;
+                  userId = '';
+                  goto('/'); 
+                }}
                 class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                 type="button"
               >
@@ -225,6 +234,8 @@ async function changeLang(lang: string) {
       {#if errorMsg}
         <div class="text-red-600 text-xs mt-1">{errorMsg}</div>
       {/if}
+      
+
     </div>
   </header>
   <main class="flex-1">

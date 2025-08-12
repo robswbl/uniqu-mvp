@@ -27,17 +27,38 @@
 	];
 
 	onMount(async () => {
+		// Get current user ID from localStorage
+		const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+		console.log('Current user ID from localStorage:', currentUserId);
+		
 		// Fetch session data to get user info
+		console.log('Fetching session data for sessionId:', sessionId);
 		const { data: sessionData, error: sessionError } = await supabase
 			.from('questionnaire_sessions')
 			.select('user_id, where_now')
 			.eq('id', sessionId)
 			.single();
 
-		console.log('Session data:', sessionData, 'Error:', sessionError);
-
 		if (sessionData?.user_id) {
 			userId = sessionData.user_id;
+			
+			// Security check: ensure current user can access this session
+			if (currentUserId && currentUserId !== userId) {
+				// Redirect to current user's session if available
+				const { data: userSession } = await supabase
+					.from('questionnaire_sessions')
+					.select('id')
+					.eq('user_id', currentUserId)
+					.maybeSingle();
+				
+				if (userSession) {
+					goto(`/onboarding/${userSession.id}`);
+					return;
+				} else {
+					goto('/');
+					return;
+				}
+			}
 			
 			// Fetch user first name for personalization (robust, like dashboard)
 			const { data: user, error: userError } = await supabase
@@ -45,8 +66,6 @@
 				.select('user_firstname')
 				.eq('user_uuid', sessionData.user_id)
 				.single();
-
-			console.log('User data:', user, 'Error:', userError);
 			
 			if (user && user.user_firstname) {
 				userFirstName = user.user_firstname;
@@ -54,6 +73,8 @@
 				userFirstName = '';
 			}
 			userLoaded = true;
+		} else {
+			userLoaded = true; // Still set to true even if no user_id
 		}
 		if (sessionData?.where_now) whereNow = sessionData.where_now;
 	});
@@ -130,16 +151,22 @@
 		{#if currentStep === 0}
 			<!-- Step 1: Welcome and Situation Selection -->
 			<div class="text-center mb-12">
-				<div class="mb-8">
-					<h1 class="text-4xl font-bold text-gray-900 mb-4">
-						{userLoaded && userFirstName
-							? $t('onboarding.welcome', { name: userFirstName } as any)
-							: $t('onboarding.welcome', { name: '' } as any)}
-					</h1>
-					<p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-						{$t('app.subtitle')}
-					</p>
-				</div>
+				{#if !userLoaded}
+					<div class="mb-8">
+						<div class="animate-spin w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+						<p class="text-gray-600">Loading user data...</p>
+					</div>
+				{:else}
+					<div class="mb-8">
+						<h1 class="text-4xl font-bold text-gray-900 mb-4">
+							{userFirstName ? `Welcome to UniqU, ${userFirstName}!` : `Welcome to UniqU, ${$t('onboarding.generic_name')}!`}
+						</h1>
+
+						<p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+							{$t('app.subtitle')}
+						</p>
+					</div>
+				{/if}
 
 				<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
 					<h2 class="text-2xl font-semibold text-gray-800 mb-6">
@@ -196,10 +223,10 @@
 						<div class="mb-8">
 							<span class="text-6xl mb-4 block">{situation.icon}</span>
 							<h1 class="text-3xl font-bold text-gray-900 mb-4">
-								{situation.title}
+								{$t(situation.titleKey)}
 							</h1>
 							<p class="text-xl text-gray-600 leading-relaxed mb-8">
-								{situation.message}
+								{$t(situation.titleKey)}
 							</p>
 						</div>
 

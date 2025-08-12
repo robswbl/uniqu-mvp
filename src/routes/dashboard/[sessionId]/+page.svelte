@@ -84,6 +84,25 @@
           throw new Error('No session found with ID: ' + sessionId);
         }
 
+        // Security check: ensure current user can access this session
+        const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+        if (currentUserId && currentUserId !== session.user_id) {
+          // Redirect to current user's session if available
+          const { data: userSession } = await supabase
+            .from('questionnaire_sessions')
+            .select('id')
+            .eq('user_id', currentUserId)
+            .maybeSingle();
+          
+          if (userSession) {
+            goto(`/dashboard/${userSession.id}`);
+            return;
+          } else {
+            goto('/');
+            return;
+          }
+        }
+
         // Fetch user data to get first name and email
         if (session.user_id) {
           console.log('Fetching user data for user_id:', session.user_id);

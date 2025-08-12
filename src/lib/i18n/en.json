@@ -4,7 +4,7 @@
     "subtitle": "Your personalized career journey starts here."
   },
   "onboarding": {
-    "welcome": "Welcome to UniqU!",
+    "welcome": "Welcome to UniqU, {name}!",
     "question": "Where are you right now?",
     "option_laid_off": "I just got laid off",
     "option_quit": "I quit my job",
@@ -22,7 +22,8 @@
     "step2_point2": "Discover what truly motivates and energizes you",
     "step2_point3": "Create a clear roadmap for your next chapter",
     "starting_journey": "Starting your journey...",
-    "begin_journey": "Begin Journey"
+    "begin_journey": "Begin Journey",
+    "generic_name": "there"
   },
   "buttons": {
     "next": "Next",

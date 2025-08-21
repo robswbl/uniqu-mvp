@@ -5,11 +5,30 @@ export async function POST({ request }) {
     const body = await request.json();
     console.log('Proxying pain points analysis webhook with data:', body);
     
-    const webhookResponse = await fetch('https://manage.app.n8n.cloud/webhook/clients/uniqu/painpoint-analysis', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
+    // Set a longer timeout for pain point analysis (10+ minutes)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 660000); // 11 minutes (660 seconds)
+    
+    try {
+      const webhookResponse = await fetch('https://manage.app.n8n.cloud/webhook/clients/uniqu/painpoint-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!webhookResponse.ok) {
+        throw new Error(`Webhook failed: ${webhookResponse.status} ${webhookResponse.statusText}`);
+      }
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        throw new Error('Webhook request timed out after 11 minutes. Pain point analysis may still be processing in the background.');
+      }
+      throw fetchError;
+    }
 
     if (!webhookResponse.ok) {
       throw new Error(`Webhook failed: ${webhookResponse.status} ${webhookResponse.statusText}`);

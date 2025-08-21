@@ -315,7 +315,11 @@
 			let userMessage = 'Error analyzing pain points. ';
 			let errorDetails = '';
 			
-			if (err.message.includes('500')) {
+			if (err.message.includes('504')) {
+				errorType = 'gateway_timeout';
+				userMessage = 'Pain points analysis is taking longer than expected';
+				errorDetails = 'The analysis process is still running but taking longer than usual. This is normal when analyzing multiple companies or complex websites.\n\n• The analysis continues in the background\n• You can check back later to see results\n• This is not an error - just a longer processing time\n\nPlease wait a few more minutes or check back later.';
+			} else if (err.message.includes('500')) {
 				errorType = 'workflow_failure';
 				userMessage = 'Pain points analysis failed: 500 Internal Server Error';
 				errorDetails = 'The workflow service encountered an internal error. This could be due to:\n\n• The company website being temporarily unavailable\n• The scraping service being overloaded\n• A configuration issue with the workflow\n\nPlease try again in a few minutes or use a different company URL.';
@@ -364,8 +368,17 @@
 	// Polling for pain points analysis completion
 	function pollForPainPointsAnalysis(letterId) {
 		let elapsed = 0;
-		const interval = 2000; // 2 seconds
-		const maxTime = 120000; // 2 minutes (increased timeout)
+		const interval = 5000; // 5 seconds (reduced polling frequency)
+		const maxTime = 660000; // 11 minutes (matching proxy timeout)
+		
+		// Update UI to show progress
+		error = {
+			type: 'processing',
+			message: 'Pain points analysis in progress...',
+			details: 'Analyzing company websites and identifying pain points. This process can take 5-10 minutes depending on the number of companies being analyzed.\n\n• Please wait while the analysis continues\n• You can leave this page and check back later\n• Results will appear automatically when complete',
+			timestamp: new Date().toISOString(),
+			originalError: null
+		};
 
 		function poll() {
 			setTimeout(async () => {
@@ -402,14 +415,28 @@
 					}
 
 					elapsed += interval;
+					
+					// Update progress message with elapsed time
 					if (elapsed < maxTime) {
+						const minutes = Math.floor(elapsed / 60000);
+						const seconds = Math.floor((elapsed % 60000) / 1000);
+						const timeString = minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+						
+						error = {
+							type: 'processing',
+							message: `Pain points analysis in progress... (${timeString})`,
+							details: 'Analyzing company websites and identifying pain points. This process can take 5-10 minutes depending on the number of companies being analyzed.\n\n• Please wait while the analysis continues\n• You can leave this page and check back later\n• Results will appear automatically when complete',
+							timestamp: new Date().toISOString(),
+							originalError: null
+						};
+						
 						poll();
 					} else {
 						console.error('Pain points analysis timed out');
 						error = {
 							type: 'timeout',
-							message: 'Pain points analysis timed out after 2 minutes',
-							details: 'The analysis process took longer than expected. This may be due to:\n\n• The company website being slow to load\n• The scraper encountering complex content\n• Network connectivity issues\n\nPlease try again or use a different company URL.',
+							message: 'Pain points analysis timed out after 11 minutes',
+							details: 'The analysis process took longer than expected. This may be due to:\n\n• Multiple companies being analyzed simultaneously\n• Complex website structures requiring longer processing\n• High server load on the analysis service\n\nPlease note: The analysis may still be running in the background. You can check back later or try again.',
 							timestamp: new Date().toISOString(),
 							originalError: 'Analysis timeout'
 						};
@@ -1357,13 +1384,35 @@
 				<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
 			</div>
 		{:else if error}
-			<div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-				<h3 class="text-lg font-semibold text-red-800 mb-2">
-					{typeof error === 'string' ? $t('letters.error_loading') : 'Error Loading Letters'}
-				</h3>
-				<p class="text-red-600 font-medium mb-3">
-					{typeof error === 'string' ? error : error.message}
-				</p>
+			{#if typeof error === 'object' && error.type === 'processing'}
+				<!-- Processing/Progress Display -->
+				<div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
+					<div class="flex justify-center mb-4">
+						<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+					</div>
+					<h3 class="text-lg font-semibold text-blue-800 mb-2">
+						{error.message}
+					</h3>
+					<p class="text-blue-600 font-medium mb-3">
+						{error.details}
+					</p>
+					<!-- Progress Bar -->
+					<div class="w-full bg-blue-200 rounded-full h-2 mb-4">
+						<div class="bg-blue-600 h-2 rounded-full transition-all duration-1000" style="width: 100%"></div>
+					</div>
+					<p class="text-sm text-blue-500">
+						This process continues in the background. You can leave this page and check back later.
+					</p>
+				</div>
+			{:else}
+				<!-- Error Display -->
+				<div class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+					<h3 class="text-lg font-semibold text-red-800 mb-2">
+						{typeof error === 'string' ? $t('letters.error_loading') : 'Error Loading Letters'}
+					</h3>
+					<p class="text-red-600 font-medium mb-3">
+						{typeof error === 'string' ? error : error.message}
+					</p>
 				{#if typeof error === 'object' && error.details}
 					<div class="text-sm text-red-600 bg-red-100 p-3 rounded-lg mb-4 text-left">
 						<pre class="whitespace-pre-wrap">{error.details}</pre>
@@ -1398,6 +1447,7 @@
 					</p>
 				{/if}
 			</div>
+			{/if}
 		{:else}
 			
 			<!-- New Letter Form -->

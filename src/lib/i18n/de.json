@@ -166,6 +166,8 @@
     "clear_error": "Fehler löschen",
     "generate_based_on_job_opening": "Neues Schreiben basierend auf Stellenausschreibung generieren",
     "generate_spontaneous_application": "Neues spontanes Bewerbungsschreiben generieren",
+    "letter_language_label": "Briefsprache",
+    "letter_tone_label": "Briefton",
     "company_portal_url_label": "Unternehmensportal URL",
     "company_portal_url_placeholder": "https://jobs.ch/...",
     "company_portal_url_hint": "Gib die jobs.ch URL für das Unternehmen ein",

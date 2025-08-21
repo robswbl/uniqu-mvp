@@ -166,6 +166,8 @@
     "clear_error": "Limpiar error",
     "generate_based_on_job_opening": "Generar nueva carta basada en oferta de trabajo",
     "generate_spontaneous_application": "Generar nueva carta de aplicación espontánea",
+    "letter_language_label": "Idioma de la carta",
+    "letter_tone_label": "Tono de la carta",
     "company_portal_url_label": "URL del portal de la empresa",
     "company_portal_url_placeholder": "https://jobs.ch/...",
     "company_portal_url_hint": "Ingresa la URL de jobs.ch para la empresa",

@@ -249,6 +249,7 @@
 				status: 'draft',
 				notes: null,
 				language: newLetterLanguage,
+				tone: newLetterTone,
 				company_name: customCompany || selectedCompany,
 				pain_points: null,
 				address: null,
@@ -270,6 +271,7 @@
 				application_letter_id: newLetter.id,
 				generation_id: sessionData.generation_id,
 				language: newLetterLanguage,
+				tone: newLetterTone,
 				job_portal: 'jobs.ch',
 				company_portal_url: companyPortalUrl.trim(),
 				company_name: customCompany || selectedCompany
@@ -506,7 +508,8 @@
 				session_id: sessionId,
 				status: 'draft',
 				notes: null,
-				language: newLetterLanguage
+				language: newLetterLanguage,
+				tone: newLetterTone
 			};
 
 			let letterId = null;
@@ -518,10 +521,10 @@
 				letterId = currentLetterId;
 				isContinuing = true;
 				
-				// Get the existing letter data to use its language
+				// Get the existing letter data to use its language and tone
 				const { data: letterData, error: fetchError } = await supabase
 					.from('application_letters')
-					.select('language')
+					.select('language, tone')
 					.eq('id', letterId)
 					.single();
 				
@@ -595,6 +598,7 @@
 			address = '';
 			jobUrl = '';
 			showNewLetterForm = false;
+			newLetterTone = 'professional';
 			// Don't clear currentLetterId here - it will be cleared when generation completes
 
 			// Call appropriate n8n webhook based on type
@@ -604,7 +608,8 @@
 					session_id: sessionId,
 					application_letter_id: letterId,
 					generation_id: sessionData.generation_id,
-					language: isContinuing ? (existingLetter.language || 'en') : newLetterLanguage
+					language: isContinuing ? (existingLetter.language || 'en') : newLetterLanguage,
+					tone: isContinuing ? (existingLetter.tone || 'professional') : newLetterTone
 				};
 
 				let webhookUrl;
@@ -703,6 +708,7 @@
 	          continuingLetterId = null;
 	          currentLetterId = null;
 	          address = '';
+	          newLetterTone = 'professional';
 	        }
 	        
 	        setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
@@ -1041,6 +1047,7 @@
 	let showNewLetterDropdown = false;
 	let newLetterType = null; // 'job' or 'spontaneous'
 	let newLetterLanguage = 'en';
+	let newLetterTone = 'professional';
 	
 	// LinkedIn URL validation
 	let linkedinUrlWarning = '';
@@ -1057,6 +1064,14 @@
 	  { code: 'fr', label: 'Français' },
 	  { code: 'it', label: 'Italiano' },
 	  { code: 'es', label: 'Español' }
+	];
+
+	const availableLetterTones = [
+		{ value: 'professional', label: 'Professional' },
+		{ value: 'inspirational', label: 'Inspirational' },
+		{ value: 'creative', label: 'Creative' },
+		{ value: 'technical', label: 'Technical' },
+		{ value: 'casual', label: 'Casual' }
 	];
 
 	// Function to get language display name
@@ -1157,6 +1172,9 @@
 		companyPortalUrl = '';
 		error = null;
 	  }
+	  
+	  // Reset tone to default for new letters
+	  newLetterTone = 'professional';
 	}
 
 	// Set up real-time subscription for application letters
@@ -1479,6 +1497,22 @@
 							</select>
 						</div>
 						
+						<!-- Tone Selector -->
+						<div>
+							<label for="letter-tone" class="block text-sm font-medium text-gray-700 mb-2">
+								{$t('letters.letter_tone_label')}
+							</label>
+							<select
+								id="letter-tone"
+								bind:value={newLetterTone}
+								class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+							>
+								{#each availableLetterTones as tone}
+									<option value={tone.value}>{tone.label}</option>
+								{/each}
+							</select>
+						</div>
+						
 						<!-- Job URL Field (only for job opening type) -->
 						{#if newLetterType === 'job'}
 							<div>
@@ -1671,6 +1705,7 @@
 									painPoints = '';
 									error = null;
 									currentLetterId = null;
+									newLetterTone = 'professional';
 								}}
 								class="px-4 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
 								type="button"
@@ -1729,6 +1764,14 @@
 													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
 												</svg>
 												{getLanguageDisplayName(letter.language)}
+											</span>
+										{/if}
+										{#if letter.tone}
+											<span class="flex items-center">
+												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+												</svg>
+												{letter.tone.charAt(0).toUpperCase() + letter.tone.slice(1)}
 											</span>
 										{/if}
 									</div>
@@ -1996,6 +2039,7 @@
 													continuingLetterId = null;
 													currentLetterId = null;
 													address = '';
+													newLetterTone = 'professional';
 												}}
 												class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
 												type="button"

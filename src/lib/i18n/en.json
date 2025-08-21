@@ -110,6 +110,7 @@
     "generate_based_on_job_opening": "Generate new letter based on job opening",
     "generate_spontaneous_application": "Generate new spontaneous application letter",
     "letter_language_label": "Letter Language",
+    "letter_tone_label": "Letter Tone",
     "job_url_label": "Job URL",
     "job_url_placeholder": "https://www.jobs.ch/en/vacancies/?term=company&jobid=...",
     "job_url_hint": "Paste the URL of the job posting you want to apply for.",

@@ -26,12 +26,12 @@
         sessionData.ikigai_good_at,
         sessionData.ikigai_care_about,
         sessionData.ikigai_inspires,
+        sessionData.ikigai_want_to_be,
         sessionData.goals,
         sessionData.personality_values,
         sessionData.life_context,
         sessionData.doubts_barriers,
-        sessionData.emotional_landscape,
-        sessionData.core_summary
+        sessionData.emotional_landscape
       ];
       
       const completedFields = fields.filter(field => field && field.trim().length > 0).length;
@@ -69,7 +69,7 @@
         // Fetch session data for summary (using correct column names from schema)
         const { data: session, error: sessionError } = await supabase
           .from('questionnaire_sessions')
-          .select('user_id, status, cv_text, ikigai_love, ikigai_good_at, ikigai_care_about, ikigai_inspires, goals, personality_values, life_context, doubts_barriers, emotional_landscape, core_summary, created_at, onboarding_completed')
+          .select('user_id, status, cv_text, ikigai_love, ikigai_good_at, ikigai_care_about, ikigai_inspires, ikigai_want_to_be, goals, personality_values, life_context, doubts_barriers, emotional_landscape, created_at, onboarding_completed')
           .eq('id', sessionId)
           .single();
         
@@ -269,14 +269,15 @@
     // Helper function to get status for template
     function getCvStatus() { return getSectionStatus(sessionData?.cv_text); }
     function getLoveStatus() { return getSectionStatus(sessionData?.ikigai_love); }
+    function getCareAboutStatus() { return getSectionStatus(sessionData?.ikigai_care_about); }
     function getGoodStatus() { return getSectionStatus(sessionData?.ikigai_good_at); }
+    function getWantToBeStatus() { return getSectionStatus(sessionData?.ikigai_want_to_be); }
     function getGoalsStatus() { return getSectionStatus(sessionData?.goals); }
     function getInspiresStatus() { return getSectionStatus(sessionData?.ikigai_inspires); }
     function getValuesStatus() { return getSectionStatus(sessionData?.personality_values); }
     function getLifeContextStatus() { return getSectionStatus(sessionData?.life_context); }
     function getDoubtsStatus() { return getSectionStatus(sessionData?.doubts_barriers); }
     function getEmotionalStatus() { return getSectionStatus(sessionData?.emotional_landscape); }
-    function getCoreSummaryStatus() { return getSectionStatus(sessionData?.core_summary); }
 
     function viewAllDocuments() {
       goto(`/results/${sessionId}/all-documents`);
@@ -518,6 +519,40 @@
                 </button>
               </div>
 
+              <div class="bg-gradient-to-r from-orange-50 to-amber-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+                <div class="flex justify-between items-start mb-2">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-lg">🌍</span>
+                    <h3 class="font-semibold text-gray-700">{$t('dashboard.what_you_care_about')}</h3>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    {#if hasMoreContent(sessionData.ikigai_care_about, 120)}
+                      <button 
+                        type="button"
+                        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                        on:click={(e) => { e.stopPropagation(); toggleSection('care_about'); }}
+                      >
+                        {expandedSections['care_about'] ? '▼ Less' : '▶ More'}
+                      </button>
+                    {/if}
+                  </div>
+                </div>
+                <button 
+                  type="button"
+                  class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
+                  on:click={() => toggleSection('care_about')} 
+                  on:keydown={(e) => handleA11yClick(e, () => toggleSection('care_about'))}
+                >
+                  {expandedSections['care_about'] ? sessionData.ikigai_care_about : (sessionData.ikigai_care_about && sessionData.ikigai_care_about.length > 120 ? sessionData.ikigai_care_about.substring(0, 120) + '...' : sessionData.ikigai_care_about)}
+                </button>
+                <button 
+                  class="absolute bottom-2 right-2 text-xs bg-orange-100 hover:bg-orange-200 text-orange-700 px-2 py-1 rounded transition-colors"
+                  on:click={(e) => { e.stopPropagation(); goto(getEditUrl('care_about')); }}
+                >
+                  {$t('dashboard.edit')}
+                </button>
+              </div>
+
               <div class="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
@@ -547,6 +582,40 @@
                 <button 
                   class="absolute bottom-2 right-2 text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-700 px-2 py-1 rounded transition-colors"
                   on:click={(e) => { e.stopPropagation(); goto(getEditUrl('inspires')); }}
+                >
+                  {$t('dashboard.edit')}
+                </button>
+              </div>
+
+              <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+                <div class="flex justify-between items-start mb-2">
+                  <div class="flex items-center space-x-2">
+                    <span class="text-lg">🎭</span>
+                    <h3 class="font-semibold text-gray-700">{$t('dashboard.who_you_want_to_be')}</h3>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    {#if hasMoreContent(sessionData.ikigai_want_to_be, 120)}
+                      <button 
+                        type="button"
+                        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                        on:click={(e) => { e.stopPropagation(); toggleSection('want_to_be'); }}
+                      >
+                        {expandedSections['want_to_be'] ? '▼ Less' : '▶ More'}
+                      </button>
+                    {/if}
+                  </div>
+                </div>
+                <button 
+                  type="button"
+                  class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
+                  on:click={() => toggleSection('want_to_be')} 
+                  on:keydown={(e) => handleA11yClick(e, () => toggleSection('want_to_be'))}
+                >
+                  {expandedSections['want_to_be'] ? sessionData.ikigai_want_to_be : (sessionData.ikigai_want_to_be && sessionData.ikigai_want_to_be.length > 120 ? sessionData.ikigai_want_to_be.substring(0, 120) + '...' : sessionData.ikigai_want_to_be)}
+                </button>
+                <button 
+                  class="absolute bottom-2 right-2 text-xs bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2 py-1 rounded transition-colors"
+                  on:click={(e) => { e.stopPropagation(); goto(getEditUrl('want_to_be')); }}
                 >
                   {$t('dashboard.edit')}
                 </button>
@@ -766,39 +835,7 @@
               </button>
             </div>
 
-            <div class="bg-gradient-to-r from-slate-50 to-gray-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
-              <div class="flex justify-between items-start mb-2">
-                <div class="flex items-center space-x-2">
-                  <span class="text-lg">📋</span>
-                  <h3 class="font-semibold text-gray-700">{$t('dashboard.core_summary')}</h3>
-                </div>
-                <div class="flex items-center space-x-2">
-                  {#if hasMoreContent(sessionData.core_summary, 120)}
-                    <button 
-                      type="button"
-                      class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
-                      on:click={(e) => { e.stopPropagation(); toggleSection('core_summary'); }}
-                    >
-                      {expandedSections['core_summary'] ? '▼ Less' : '▶ More'}
-                    </button>
-                  {/if}
-                </div>
-              </div>
-              <button 
-                type="button"
-                class="text-gray-600 text-sm leading-relaxed cursor-pointer" 
-                on:click={() => toggleSection('core_summary')} 
-                on:keydown={(e) => handleA11yClick(e, () => toggleSection('core_summary'))}
-              >
-                {expandedSections['core_summary'] ? sessionData.core_summary : (sessionData.core_summary && sessionData.core_summary.length > 120 ? sessionData.core_summary.substring(0, 120) + '...' : sessionData.core_summary)}
-              </button>
-              <button 
-                class="absolute bottom-2 right-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded transition-colors"
-                on:click={(e) => { e.stopPropagation(); goto(getEditUrl('core_summary')); }}
-              >
-                {$t('dashboard.edit')}
-              </button>
-            </div>
+
           </div>
         </div>
       {:else}

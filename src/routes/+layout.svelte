@@ -65,7 +65,7 @@ onMount(async () => {
   // Guard: If userId is missing and not on public routes, redirect to root
   if (typeof window !== 'undefined') {
     const currentUserId = localStorage.getItem('userId');
-    const publicRoutes = ['/', '/signup'];
+    const publicRoutes = ['/', '/signup', '/create-user'];
     const currentPath = window.location.pathname;
     
     if (!currentUserId && !publicRoutes.includes(currentPath)) {

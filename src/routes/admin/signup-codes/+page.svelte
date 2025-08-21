@@ -236,6 +236,22 @@
       <h1 class="text-3xl font-bold text-gray-900 mb-2">{$t('admin.signup_codes.heading')}</h1>
       <p class="text-gray-600">{$t('admin.signup_codes.subheading')}</p>
     </div>
+    
+    <!-- Important Warning -->
+    <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+      <div class="flex items-start">
+        <svg class="w-5 h-5 text-red-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+        </svg>
+        <div>
+          <h3 class="text-sm font-medium text-red-900 mb-1">Important: Signup Code Status</h3>
+          <p class="text-sm text-red-700">
+            <strong>Generated codes are NOT usable until marked as "Given Out".</strong> Users will receive "Invalid code" errors if they try to use codes that are still marked as "Available". 
+            Make sure to mark codes as "Given Out" before distributing them to users.
+          </p>
+        </div>
+      </div>
+    </div>
     <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-8 mb-8">
       <form on:submit|preventDefault={generateCodes} class="flex flex-col md:flex-row items-center gap-4">
         <label for="count" class="block text-sm font-medium text-gray-700">{$t('admin.signup_codes.count_label')}</label>

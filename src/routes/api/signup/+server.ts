@@ -12,11 +12,12 @@ export const POST: RequestHandler = async ({ request }) => {
       userStreet, userZip, userCity, userCountry, userPhone, password, signupCode
     } = body;
 
-    // 1. Validate signup code
+    // 1. Validate signup code (normalize case since codes are stored in uppercase)
+    const normalizedCode = signupCode.toUpperCase().trim();
     const { data: codeData, error: codeError } = await supabase
       .from('signup_codes')
       .select('*')
-      .eq('code', signupCode)
+      .eq('code', normalizedCode)
       .eq('used', false)
       .eq('given_out', true)
       .single();
@@ -61,7 +62,7 @@ export const POST: RequestHandler = async ({ request }) => {
     await supabase
       .from('signup_codes')
       .update({ used: true, used_by: email, used_at: new Date().toISOString() })
-      .eq('code', signupCode);
+      .eq('code', normalizedCode);
 
     return json({ success: true });
   } catch (err: any) {

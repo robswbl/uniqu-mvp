@@ -94,9 +94,10 @@
 	// Function to continue letter generation for letters with pain points but no content
 	async function continueLetterGeneration(letter) {
 		try {
-			// Set the continuing letter ID to show inline address field
-			continuingLetterId = letter.id;
-			currentLetterId = letter.id;
+					// Set the continuing letter ID to show inline address field
+		continuingLetterId = letter.id;
+		currentLetterId = letter.id;
+		showRegenerationSection = false;
 			
 			// Set the form state with existing data
 			address = letter.address || ''; // Use existing address if available
@@ -235,6 +236,7 @@
 		painPointsAnalysisComplete = false;
 		analyzingPainPoints = true;
 		painPoints = '';
+		showRegenerationSection = false;
 
 		try {
 			analyzingPainPoints = true;
@@ -963,6 +965,7 @@
 			targetLength = 100;
 			changeRequestComment = '';
 			showChangeRequestField = false;
+			showRegenerationSection = false;
 			
 			console.log('Setting currentLetterId to:', letterId, 'type:', typeof letterId);
 			currentLetterId = letterId;
@@ -1127,6 +1130,7 @@
 	let targetLength = 100;
 	let changeRequestComment = '';
 	let showChangeRequestField = false;
+	let showRegenerationSection = false;
 
 	// Function to get language display name
 	function getLanguageDisplayName(languageCode) {
@@ -1517,6 +1521,7 @@
 	  
 	  // Reset tone to default for new letters
 	  newLetterTone = 'professional';
+	  showRegenerationSection = false;
 	}
 
 	// Set up real-time subscription for application letters
@@ -2083,6 +2088,7 @@
 									error = null;
 									currentLetterId = null;
 									newLetterTone = 'professional';
+									showRegenerationSection = false;
 								}}
 								class="px-4 py-3 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
 								type="button"

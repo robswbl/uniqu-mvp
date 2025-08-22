@@ -448,9 +448,7 @@
             </div>
           </div>
           
-          <div class="grid md:grid-cols-2 gap-6">
-            <!-- Left Column -->
-            <div class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
@@ -622,8 +620,7 @@
               </div>
             </div>
   
-            <!-- Right Column -->
-            <div class="space-y-4">
+
               <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
@@ -725,11 +722,7 @@
                   {$t('dashboard.edit')}
                 </button>
               </div>
-            </div>
-          </div>
 
-          <!-- Additional Row for Missing Fields -->
-          <div class="grid md:grid-cols-2 gap-6 mt-6">
             <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
               <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center space-x-2">
@@ -797,10 +790,7 @@
                 {$t('dashboard.edit')}
               </button>
             </div>
-          </div>
 
-          <!-- Fourth Row for Remaining Fields -->
-          <div class="grid md:grid-cols-2 gap-6 mt-6">
             <div class="bg-gradient-to-r from-rose-50 to-pink-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
               <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center space-x-2">
@@ -833,10 +823,7 @@
               >
                 {$t('dashboard.edit')}
               </button>
-            </div>
-
-
-          </div>
+                          </div>
         </div>
       {:else}
         <div class="bg-white rounded-xl shadow-lg p-8 text-center">

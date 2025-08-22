@@ -2216,11 +2216,9 @@
 											</button>
 										{/if}
 									</div>
-								</div>
-								
-								<div class="flex items-center space-x-4">
-									<!-- Status Section: Dropdown + Timeline -->
-									<div class="flex items-center space-x-4">
+									
+									<!-- Status Section (Dropdown + Timeline) -->
+									<div class="flex items-center space-x-4 mb-3">
 										<!-- Status Dropdown with Label -->
 										<div class="flex flex-col">
 											<label class="text-xs text-gray-500 mb-1">{$t('letters.set_application_status')}</label>
@@ -2252,6 +2250,10 @@
 											{/if}
 										</div>
 									</div>
+								</div>
+								
+								<!-- Action Buttons Section -->
+								<div class="flex items-center space-x-4">
 									
 									<!-- Direct Action Buttons or Generating State -->
 									{#if letter.status === 'draft' && !isLetterGenerated(letter)}

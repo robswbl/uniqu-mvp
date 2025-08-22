@@ -2632,6 +2632,18 @@
 						</div>
 					{/if}
 					
+					<!-- Delete Version Button (right after dropdown) -->
+					{#if selectedVersion[currentLetterId] && selectedVersion[currentLetterId].version_type !== 'original' && letterVersions[currentLetterId] && letterVersions[currentLetterId].length > 1}
+						<button 
+							on:click={() => deleteLetterVersion(selectedVersion[currentLetterId].id, currentLetterId)}
+							class="px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+							type="button"
+							aria-label="Delete version"
+						>
+							{$t('letters.delete_version')}
+						</button>
+					{/if}
+					
 					<!-- Copy Button -->
 					<button 
 						on:click={() => {
@@ -2674,18 +2686,6 @@
 							aria-label="Download as PDF"
 						>
 							{$t('letters.download_pdf')}
-						</button>
-					{/if}
-					
-					<!-- Delete Version Button -->
-					{#if selectedVersion[currentLetterId] && selectedVersion[currentLetterId].version_type !== 'original' && letterVersions[currentLetterId] && letterVersions[currentLetterId].length > 1}
-						<button 
-							on:click={() => deleteLetterVersion(selectedVersion[currentLetterId].id, currentLetterId)}
-							class="px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-							type="button"
-							aria-label="Delete version"
-						>
-							{$t('letters.delete_version')}
 						</button>
 					{/if}
 					

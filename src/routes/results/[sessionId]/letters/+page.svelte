@@ -2319,6 +2319,26 @@
 												</svg>
 												<span>{$t('letters.view_this_letter')}</span>
 											</button>
+											
+											<!-- Quick Regeneration Button -->
+											{#if letter.content_html || letter.letter_content_html}
+												<button 
+													on:click={() => {
+														currentLetterId = letter.id;
+														viewLetter(letter.id);
+													}}
+													class="flex items-center space-x-1 p-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors"
+													type="button"
+													aria-label="{$t('letters.regenerate_letter')}"
+													title="{$t('letters.regenerate_letter')}"
+												>
+													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+													</svg>
+													<span class="ml-1">{$t('letters.regenerate_letter')}</span>
+												</button>
+											{/if}
+											
 											<!-- Delete Button -->
 											<button 
 												on:click={() => deleteLetter(letter.id, letter.company_name)}
@@ -2346,25 +2366,6 @@
 														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
 													</svg>
 													<span class="ml-1">{$t('letters.update_company_name')}</span>
-												</button>
-											{/if}
-											
-											<!-- Quick Regeneration Button -->
-											{#if letter.content_html || letter.letter_content_html}
-												<button 
-													on:click={() => {
-														currentLetterId = letter.id;
-														viewLetter(letter.id);
-													}}
-													class="flex items-center space-x-1 p-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors"
-													type="button"
-													aria-label="{$t('letters.regenerate_letter')}"
-													title="{$t('letters.regenerate_letter')}"
-												>
-													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-													</svg>
-													<span class="ml-1">{$t('letters.regenerate_letter')}</span>
 												</button>
 											{/if}
 											

@@ -2222,6 +2222,7 @@
 										aria-label="Change letter status"
 										disabled={letter.status === 'draft' && !isLetterGenerated(letter)}
 									>
+										<option value="" disabled>{$t('letters.set_application_status')}</option>
 										{#each statusOptions as option}
 											<option value={option.value}>{$t(`letters.status.${option.value}`)}</option>
 										{/each}

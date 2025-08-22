@@ -128,6 +128,7 @@
     "created_at": "Erstellt",
     "updated_at": "Aktualisiert",
     "status_label": "Status",
+    "set_application_status": "Bewerbungsstatus setzen",
     "sent": "Gesendet",
     "response": "Antwort",
     "test": "Test",

@@ -159,6 +159,7 @@
     "created_at": "Created",
     "updated_at": "Updated",
     "status_label": "Status",
+    "set_application_status": "Set Application Status",
     "sent": "Sent",
     "response": "Response",
     "test": "Test",

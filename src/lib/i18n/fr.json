@@ -128,6 +128,7 @@
     "created_at": "Créé",
     "updated_at": "Mis à jour",
     "status_label": "Statut",
+    "set_application_status": "Définir le statut de candidature",
     "sent": "Envoyé",
     "response": "Réponse",
     "test": "Test",

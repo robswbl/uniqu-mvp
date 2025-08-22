@@ -2221,7 +2221,7 @@
 									<div class="flex items-center space-x-8 mb-6">
 										<!-- Status Dropdown with Label -->
 										<div class="flex flex-col">
-											<label class="text-xs text-gray-500 mb-1">{$t('letters.set_application_status')}</label>
+											<label class="text-xs text-gray-500 mb-1 pl-4">{$t('letters.set_application_status')}</label>
 											<select 
 												value={letter.status}
 												on:change={(e) => handleStatusChange(letter.id, e)}

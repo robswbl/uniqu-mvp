@@ -170,6 +170,13 @@
 				matchedCompanies = extractCompanyNames(companiesDoc.content_html);
 			}
 
+			// Fetch versions for all letters
+			if (applicationLetters.length > 0) {
+				for (const letter of applicationLetters) {
+					await fetchLetterVersions(letter.id);
+				}
+			}
+
 		} catch (err) {
 			console.error('Error fetching data:', err);
 			error = {
@@ -689,50 +696,56 @@
 			
 			console.log('Polling check for letter:', letterId, 'Content:', letterContent, 'Error:', contentError);
 			
-			if (!contentError && letterContent && (letterContent.content_html || letterContent.letter_content_html)) {
-	        console.log('Content detected for letter:', letterId, letterContent);
-	        generatedLetterIds.add(letterId.toString());
-	        pollingErrors[letterId] = false;
-	        delete localLetterCreatedAt[letterId];
-	        justGenerated[letterId] = true;
-	        
-	        			// Update the letter in the local state with the new content
-			applicationLetters = applicationLetters.map(letter =>
-			  letter.id === letterId 
-			    ? { ...letter, content_html: letterContent.content_html || letterContent.letter_content_html, letter_content_html: letterContent.letter_content_html, status: letterContent.status }
-			    : letter
-			);
-	        
-	        // Clear continuing letter state if this was the letter being continued
-	        if (continuingLetterId === letterId) {
-	          continuingLetterId = null;
-	          currentLetterId = null;
-	          address = '';
-	          newLetterTone = 'professional';
-	        }
-	        
-	        setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
-	        return;
-	      }
+						if (!contentError && letterContent && (letterContent.content_html || letterContent.letter_content_html)) {
+				console.log('Content detected for letter:', letterId, letterContent);
+				generatedLetterIds.add(letterId.toString());
+				pollingErrors[letterId] = false;
+				delete localLetterCreatedAt[letterId];
+				justGenerated[letterId] = true;
+				
+				// Update the letter in the local state with the new content
+				applicationLetters = applicationLetters.map(letter =>
+				  letter.id === letterId 
+				    ? { ...letter, content_html: letterContent.content_html || letterContent.letter_content_html, letter_content_html: letterContent.letter_content_html, status: letterContent.status }
+				    : letter
+				);
+				
+				// Create original version when letter is first generated
+				await createOriginalVersion(letterId);
+				
+				// Clear continuing letter state if this was the letter being continued
+				if (continuingLetterId === letterId) {
+				  continuingLetterId = null;
+				  currentLetterId = null;
+				  address = '';
+				  newLetterTone = 'professional';
+				}
+				
+				setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
+				return;
+			}
 	      
-	      // Also check if the status has changed to indicate completion
-	      if (!contentError && letterContent && letterContent.status === 'completed') {
-	        console.log('Status completed detected for letter:', letterId, letterContent);
-	        generatedLetterIds.add(letterId.toString());
-	        pollingErrors[letterId] = false;
-	        delete localLetterCreatedAt[letterId];
-	        justGenerated[letterId] = true;
-	        
-	        // Update the letter in the local state
-	        applicationLetters = applicationLetters.map(letter =>
-	          letter.id === letterId 
-	            ? { ...letter, status: letterContent.status }
-	            : letter
-	        );
-	        
-	        setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
-	        return;
-	      }
+	      			// Also check if the status has changed to indicate completion
+			if (!contentError && letterContent && letterContent.status === 'completed') {
+				console.log('Status completed detected for letter:', letterId, letterContent);
+				generatedLetterIds.add(letterId.toString());
+				pollingErrors[letterId] = false;
+				delete localLetterCreatedAt[letterId];
+				justGenerated[letterId] = true;
+				
+				// Update the letter in the local state
+				applicationLetters = applicationLetters.map(letter =>
+				  letter.id === letterId 
+				    ? { ...letter, status: letterContent.status }
+				    : letter
+				);
+				
+				// Create original version when letter is first generated
+				await createOriginalVersion(letterId);
+				
+				setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
+				return;
+			}
 	      
 	      // Check if content is stored in application_letters table (letter_content_html)
 	      const { data: letterContentData, error: letterContentError } = await supabase
@@ -743,23 +756,26 @@
 	      
 	      console.log('Checking application_letters for letter:', letterId, 'Data:', letterContentData, 'Error:', letterContentError);
 	      
-	      if (!letterContentError && letterContentData && (letterContentData.letter_content_html || letterContentData.content_html)) {
-	        console.log('Content found in application_letters for letter:', letterId, letterContentData);
-	        generatedLetterIds.add(letterId.toString());
-	        pollingErrors[letterId] = false;
-	        delete localLetterCreatedAt[letterId];
-	        justGenerated[letterId] = true;
-	        
-	        // Update the letter in the local state with content from application_letters
-	        applicationLetters = applicationLetters.map(letter =>
-	          letter.id === letterId 
-	            ? { ...letter, letter_content_html: letterContentData.letter_content_html, content_html: letterContentData.content_html }
-	            : letter
-	        );
-	        
-	        setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
-	        return;
-	      }
+	      			if (!letterContentError && letterContentData && (letterContentData.letter_content_html || letterContentData.content_html)) {
+				console.log('Content found in application_letters for letter:', letterId, letterContentData);
+				generatedLetterIds.add(letterId.toString());
+				pollingErrors[letterId] = false;
+				delete localLetterCreatedAt[letterId];
+				justGenerated[letterId] = true;
+				
+				// Update the letter in the local state with content from application_letters
+				applicationLetters = applicationLetters.map(letter =>
+				  letter.id === letterId 
+				    ? { ...letter, letter_content_html: letterContentData.letter_content_html, content_html: letterContentData.content_html }
+				    : letter
+				);
+				
+				// Create original version when letter is first generated
+				await createOriginalVersion(letterId);
+				
+				setTimeout(() => { delete justGenerated[letterId]; applicationLetters = [...applicationLetters]; }, 5000);
+				return;
+			}
 	      elapsed += interval;
 	      if (elapsed < maxTime) {
 	        poll();
@@ -932,9 +948,25 @@
 				return;
 			}
 
-			// Show in modal
-			currentLetterContent = letterData.content_html || letterData.letter_content_html;
-			currentLetterTitle = `Letter for ${letterData.company_name || 'Company'}`;
+					// Fetch versions for this letter
+		await fetchLetterVersions(letterId);
+
+		// Show in modal
+		currentLetterContent = letterData.content_html || letterData.letter_content_html;
+		currentLetterTitle = `Letter for ${letterData.company_name || 'Company'}`;
+		
+		console.log(`[Modal] Current letter versions:`, letterVersions[letterId]);
+		console.log(`[Modal] Selected version:`, selectedVersion[letterId]);
+			
+			// Reset regeneration form
+			targetTone = 'professional';
+			targetLength = 100;
+			changeRequestComment = '';
+			showChangeRequestField = false;
+			
+			console.log('Setting currentLetterId to:', letterId, 'type:', typeof letterId);
+			currentLetterId = letterId;
+			
 			showLetterModal = true;
 
 		} catch (err) {
@@ -1045,6 +1077,7 @@
 	}
 
 	let showNewLetterDropdown = false;
+	let dropdownRef;
 	let newLetterType = null; // 'job' or 'spontaneous'
 	let newLetterLanguage = 'en';
 	let newLetterTone = 'professional';
@@ -1066,18 +1099,305 @@
 	  { code: 'es', label: 'Español' }
 	];
 
-	const availableLetterTones = [
-		{ value: 'professional', label: 'Professional' },
-		{ value: 'inspirational', label: 'Inspirational' },
-		{ value: 'creative', label: 'Creative' },
-		{ value: 'technical', label: 'Technical' },
-		{ value: 'casual', label: 'Casual' }
+	    const availableLetterTones = [
+        { value: 'professional', label: 'Professional' },
+        { value: 'inspirational', label: 'Inspirational' },
+        { value: 'creative', label: 'Creative' },
+        { value: 'technical', label: 'Technical' },
+        { value: 'casual', label: 'Casual' },
+        { value: 'childishly_funny', label: 'Childishly Funny' }
+    ];
+
+	const availableLengthPercentages = [
+		{ value: 25, label: '25% - Very Short' },
+		{ value: 50, label: '50% - Short' },
+		{ value: 75, label: '75% - Medium-Short' },
+		{ value: 100, label: '100% - Standard' },
+		{ value: 125, label: '125% - Medium-Long' },
+		{ value: 150, label: '150% - Long' }
 	];
+
+	// Version management
+	let letterVersions = {};
+	let selectedVersion = {};
+	let regeneratingVersion = false;
+	let targetTone = 'professional';
+	let targetLength = 100;
+	let changeRequestComment = '';
+	let showChangeRequestField = false;
 
 	// Function to get language display name
 	function getLanguageDisplayName(languageCode) {
 		const language = availableLetterLanguages.find(lang => lang.code === languageCode);
 		return language ? language.label : languageCode;
+	}
+
+	// Function to create original version when letter is first generated
+	async function createOriginalVersion(letterId) {
+		try {
+			const { data: letter } = await supabase
+				.from('application_letters')
+				.select('content_html, letter_content_html, tone, language')
+				.eq('id', letterId)
+				.single();
+
+			if (letter && (letter.content_html || letter.letter_content_html)) {
+				const originalVersion = {
+					application_letter_id: letterId,
+					version_type: 'original',
+					tone: letter.tone || 'professional',
+					language: letter.language || 'en',
+					length_percentage: 100,
+					content_html: letter.content_html || letter.letter_content_html,
+					metadata: { created_from: 'original_generation' }
+				};
+
+				const { error } = await supabase
+					.from('application_letter_versions')
+					.insert(originalVersion);
+
+				if (error) {
+					console.error('Error creating original version:', error);
+				} else {
+					console.log('Original version created for letter:', letterId);
+				}
+			}
+		} catch (err) {
+			console.error('Error creating original version:', err);
+		}
+	}
+
+	// Function to fetch letter versions
+	async function fetchLetterVersions(letterId) {
+		try {
+			// Get any rewrite versions from application_letter_versions table
+			const { data: rewriteVersions, error: versionsError } = await supabase
+				.from('application_letter_versions')
+				.select('*')
+				.eq('application_letter_id', letterId)
+				.order('created_at', { ascending: false });
+
+			if (versionsError) {
+				console.error(`[fetchLetterVersions] Error fetching versions:`, versionsError);
+				return;
+			}
+
+			console.log(`[fetchLetterVersions] Raw rewrite versions from DB for letter ${letterId}:`, rewriteVersions);
+
+			// Only create versions array if we actually have rewrite versions
+			if (rewriteVersions && rewriteVersions.length > 0) {
+				console.log(`[fetchLetterVersions] Found ${rewriteVersions.length} rewrite versions for letter ${letterId}:`, rewriteVersions);
+				// Get the original letter content from application_letters table
+				const { data: originalLetter, error: letterError } = await supabase
+					.from('application_letters')
+					.select('content_html, letter_content_html, tone, language')
+					.eq('id', letterId)
+					.single();
+
+				if (letterError) {
+					console.error(`[fetchLetterVersions] Error fetching original letter ${letterId}:`, letterError);
+					return;
+				}
+
+				// Create a virtual "original" version from the main table
+				const virtualOriginalVersion = {
+					id: letterId, // Use the real letter ID, not a fake string
+					application_letter_id: letterId,
+					version_type: 'original',
+					tone: originalLetter.tone || 'professional',
+					language: originalLetter.language || 'en',
+					length_percentage: 100,
+					content_html: originalLetter.content_html || originalLetter.letter_content_html,
+					created_at: new Date().toISOString(),
+					isVirtual: true // Flag to identify this as a virtual version
+				};
+
+				// Combine virtual original with actual rewrite versions
+				const allVersions = [virtualOriginalVersion, ...rewriteVersions];
+				
+				console.log(`[fetchLetterVersions] Found ${allVersions.length} total versions for letter ${letterId}:`, allVersions);
+
+				letterVersions[letterId] = allVersions;
+				selectedVersion[letterId] = allVersions[0] || null;
+			} else {
+				// No rewrite versions exist, so no versions to show
+				console.log(`[fetchLetterVersions] No rewrite versions found for letter ${letterId}, showing no versions`);
+				letterVersions[letterId] = [];
+				selectedVersion[letterId] = null;
+			}
+
+			letterVersions = { ...letterVersions };
+			selectedVersion = { ...selectedVersion };
+
+		} catch (err) {
+			console.error('Error fetching letter versions:', err);
+		}
+	}
+
+	// Function to regenerate letter with new tone/length
+	async function regenerateLetter(letterId) {
+		try {
+			regeneratingVersion = true;
+
+			console.log('regenerateLetter called with letterId:', letterId, 'type:', typeof letterId);
+
+			// Validate letter ID
+			if (!letterId || letterId === null || letterId === undefined) {
+				throw new Error('Invalid letter ID provided');
+			}
+
+			// Check if letter exists in current state
+			if (!applicationLetters || !Array.isArray(applicationLetters)) {
+				console.error('Application letters array not available');
+				throw new Error('Application letters not loaded. Please refresh the page and try again.');
+			}
+
+			const existingLetter = applicationLetters.find(l => l.id === letterId);
+			if (!existingLetter) {
+				console.error('Letter not found in current application letters array:', letterId);
+				throw new Error('Letter not found in current session. Please refresh the page and try again.');
+			}
+
+			console.log('Attempting to regenerate letter with ID:', letterId);
+			console.log('Current application letters:', applicationLetters.map(l => ({ id: l.id, company: l.company_name })));
+			console.log('Session ID:', sessionId);
+
+			// Get the original letter content and additional metadata
+			const { data: letter, error: letterError } = await supabase
+				.from('application_letters')
+				.select('content_html, letter_content_html, tone, language, job_url')
+				.eq('id', letterId)
+				.single();
+
+			if (letterError) {
+				console.error('Database error fetching letter:', letterError);
+				throw new Error(`Database error: ${letterError.message}`);
+			}
+
+			if (!letter) {
+				console.error('Letter not found in database for ID:', letterId);
+				throw new Error(`Letter with ID ${letterId} not found in database`);
+			}
+
+			console.log('Letter found:', { id: letterId, hasContent: !!(letter.content_html || letter.letter_content_html) });
+
+			const originalContent = letter.content_html || letter.letter_content_html;
+			if (!originalContent) {
+				console.error('Letter has no content to regenerate:', letter);
+				throw new Error('This letter has no content to regenerate. Please wait for the original letter to finish generating first.');
+			}
+
+			// Get session data for user_id and generation_id
+			const { data: sessionData } = await supabase
+				.from('questionnaire_sessions')
+				.select('user_id, generation_id')
+				.eq('id', sessionId)
+				.single();
+
+			// Call the rewrite webhook
+			const webhookData = {
+				application_letter_id: letterId,
+				session_id: sessionId,
+				target_tone: targetTone,
+				target_length: targetLength,
+				original_content: originalContent,
+				original_tone: letter.tone || 'professional',
+				original_language: letter.language || 'en',
+				user_id: sessionData?.user_id || null,
+				generation_id: sessionData?.generation_id || null,
+				job_url: letter.job_url,
+				change_request_comment: changeRequestComment.trim() || null
+			};
+
+			const response = await fetch('/api/proxy-rewrite', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(webhookData)
+			});
+
+			if (!response.ok) {
+				throw new Error(`Rewrite failed: ${response.status} ${response.statusText}`);
+			}
+
+			const result = await response.json();
+			console.log('Rewrite webhook response:', result);
+
+			// Start polling for the new version
+			pollForRegeneratedVersion(letterId);
+
+		} catch (err) {
+			console.error('Error regenerating letter:', err);
+			
+			// Provide more user-friendly error messages
+			let userMessage = 'Error regenerating letter: ';
+			if (err.message.includes('not found')) {
+				userMessage += 'The letter could not be found. Please refresh the page and try again.';
+			} else if (err.message.includes('no content')) {
+				userMessage += 'Please wait for the original letter to finish generating before creating variations.';
+			} else if (err.message.includes('Database error')) {
+				userMessage += 'Database connection issue. Please try again in a moment.';
+			} else {
+				userMessage += err.message || 'Unknown error occurred';
+			}
+			
+			alert(userMessage);
+		} finally {
+			regeneratingVersion = false;
+		}
+	}
+
+	// Function to poll for regenerated version
+	function pollForRegeneratedVersion(letterId) {
+		let elapsed = 0;
+		const interval = 2000; // 2 seconds
+		const maxTime = 60000; // 60 seconds
+
+		function poll() {
+			setTimeout(async () => {
+				try {
+					console.log(`[Polling] Checking for versions of letter ${letterId}...`);
+					console.log(`[Polling] Query: SELECT * FROM application_letter_versions WHERE application_letter_id = ${letterId}`);
+					
+					const { data: versions, error } = await supabase
+						.from('application_letter_versions')
+						.select('*')
+						.eq('application_letter_id', letterId)
+						.order('created_at', { ascending: false });
+
+					console.log(`[Polling] Found ${versions?.length || 0} versions:`, versions);
+					if (error) {
+						console.error(`[Polling] Database error:`, error);
+					}
+
+					if (!error && versions && versions.length > 0) {
+						// Check if we have a new version (not the original)
+						const newVersions = versions.filter(v => v.version_type === 'rewrite');
+						console.log(`[Polling] Found ${newVersions.length} rewrite versions:`, newVersions);
+						
+						if (newVersions.length > 0) {
+							console.log(`[Polling] New version detected! Refreshing...`);
+							// Refresh versions
+							await fetchLetterVersions(letterId);
+							console.log(`[Polling] After refresh - letterVersions:`, letterVersions[letterId]);
+							console.log(`[Polling] After refresh - selectedVersion:`, selectedVersion[letterId]);
+							console.log(`[Polling] Current letterVersions state:`, letterVersions);
+							return;
+						}
+					}
+
+					elapsed += interval;
+					if (elapsed < maxTime) {
+						poll();
+					} else {
+						console.error('Version generation timed out');
+						alert('Version generation timed out. Please check back later.');
+					}
+				} catch (pollError) {
+					console.error('Error during version polling:', pollError);
+				}
+			}, interval);
+		}
+		poll();
 	}
 
 	// Function to parse markdown-like text (improved implementation)
@@ -1206,7 +1526,7 @@
 					table: 'application_letters',
 					filter: `session_id=eq.${sessionId}`
 				}, 
-				(payload) => {
+				async (payload) => {
 					console.log('[Realtime] Application letter update received:', payload);
 					// Update the specific letter in local state
 					applicationLetters = applicationLetters.map(letter =>
@@ -1226,6 +1546,10 @@
 						delete localLetterCreatedAt[payload.new.id];
 						// Show success message
 						justGenerated[payload.new.id] = true;
+						
+						// Create original version when letter is first generated
+						await createOriginalVersion(payload.new.id);
+						
 						setTimeout(() => { 
 							delete justGenerated[payload.new.id]; 
 							applicationLetters = [...applicationLetters]; 
@@ -1251,7 +1575,7 @@
 					table: 'generated_documents',
 					filter: `session_id=eq.${sessionId}`
 				}, 
-				(payload) => {
+				async (payload) => {
 					console.log('[Realtime] Generated document event received:', payload);
 					if (payload.new.document_type === 'application_letter' && payload.new.application_letter_id) {
 						// Update the corresponding application letter
@@ -1263,6 +1587,10 @@
 						generatedLetterIds.add(payload.new.application_letter_id.toString());
 						delete localLetterCreatedAt[payload.new.application_letter_id];
 						justGenerated[payload.new.application_letter_id] = true;
+						
+						// Create original version when letter is first generated
+						await createOriginalVersion(payload.new.application_letter_id);
+						
 						setTimeout(() => { 
 							delete justGenerated[payload.new.application_letter_id]; 
 							applicationLetters = [...applicationLetters]; 
@@ -1332,6 +1660,21 @@
 	    });
 	  }
 	}
+
+	// Handle click outside dropdown
+	function handleClickOutside(event) {
+		if (dropdownRef && !dropdownRef.contains(event.target)) {
+			showNewLetterDropdown = false;
+		}
+	}
+
+	// Add click outside listener
+	onMount(() => {
+		document.addEventListener('click', handleClickOutside);
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
+	});
 </script>
 
 <svelte:head>
@@ -1360,7 +1703,7 @@
 					<h1 class="text-3xl font-bold text-gray-900 mb-2">{$t('letters.heading')}</h1>
 					<p class="text-gray-600">{$t('letters.subheading')}</p>
 				</div>
-				<div class="relative">
+				<div class="relative" bind:this={dropdownRef}>
 					<button
 						on:click={() => showNewLetterDropdown = !showNewLetterDropdown}
 						class="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-lg"
@@ -1774,6 +2117,21 @@
 												{letter.tone.charAt(0).toUpperCase() + letter.tone.slice(1)}
 											</span>
 										{/if}
+										
+										<!-- Version Count Indicator -->
+										{#if letterVersions[letter.id] && letterVersions[letter.id].length > 1}
+											<button
+												on:click={() => viewLetter(letter.id)}
+												class="flex items-center text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-2 py-1 rounded transition-colors cursor-pointer"
+												type="button"
+												title="Click to view letter versions"
+											>
+												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+												</svg>
+												{letterVersions[letter.id].length} {$t('letters.versions')}
+											</button>
+										{/if}
 									</div>
 								</div>
 								
@@ -1907,6 +2265,25 @@
 														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
 													</svg>
 													<span class="ml-1">{$t('letters.update_company_name')}</span>
+												</button>
+											{/if}
+											
+											<!-- Quick Regeneration Button -->
+											{#if letter.content_html || letter.letter_content_html}
+												<button 
+													on:click={() => {
+														currentLetterId = letter.id;
+														viewLetter(letter.id);
+													}}
+													class="flex items-center space-x-1 p-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors"
+													type="button"
+													aria-label="{$t('letters.regenerate_letter')}"
+													title="{$t('letters.regenerate_letter')}"
+												>
+													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+													</svg>
+													<span class="ml-1">{$t('letters.regenerate_letter')}</span>
 												</button>
 											{/if}
 										</div>
@@ -2136,6 +2513,26 @@
 			<div class="flex items-center justify-between p-4 border-b border-gray-200">
 				<h3 id="modal-title" class="text-lg font-semibold text-gray-900">{$t('letters.modal_title')}</h3>
 				<div class="flex items-center space-x-2">
+					<!-- Version Selector -->
+					{#if letterVersions[currentLetterId] && letterVersions[currentLetterId].length > 1}
+						<select 
+							bind:value={selectedVersion[currentLetterId]}
+							class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+							on:change={() => {
+								if (selectedVersion[currentLetterId]) {
+									currentLetterContent = selectedVersion[currentLetterId].content_html;
+								}
+							}}
+						>
+							{#each letterVersions[currentLetterId] || [] as version}
+								<option value={version}>
+									{version.version_type === 'original' ? $t('letters.original_version') : $t('letters.regenerated_version')} - 
+									{version.tone} - {version.length_percentage}%
+								</option>
+							{/each}
+						</select>
+					{/if}
+					
 					<button 
 						on:click={() => {
 							// Copy plain text from HTML
@@ -2189,7 +2586,99 @@
 					</button>
 				</div>
 			</div>
+			
 			<div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+				<!-- Regeneration Controls -->
+				{#if currentLetterId}
+				<div class="px-6 py-4 border-b border-gray-200 bg-gray-50 mb-6">
+					<div class="flex items-center space-x-4">
+						<div class="flex-1">
+							<h4 class="text-sm font-medium text-gray-700 mb-2">{$t('letters.regenerate_letter')}</h4>
+							<div class="flex items-center space-x-4">
+								<!-- Target Tone -->
+								<div>
+									<label for="target-tone" class="block text-xs text-gray-600 mb-1">{$t('letters.target_tone')}</label>
+									<select
+										id="target-tone"
+										bind:value={targetTone}
+										class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+									>
+										{#each availableLetterTones as tone}
+											<option value={tone.value}>{tone.label}</option>
+										{/each}
+									</select>
+								</div>
+								
+								<!-- Target Length -->
+								<div>
+									<label for="target-length" class="block text-xs text-gray-600 mb-1">{$t('letters.target_length')}</label>
+									<select
+										id="target-length"
+										bind:value={targetLength}
+										class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+									>
+										{#each availableLengthPercentages as length}
+											<option value={length.value}>{length.label}</option>
+										{/each}
+									</select>
+								</div>
+								
+								<!-- Change Request Comment Toggle -->
+								<div class="flex items-end">
+									<button
+										on:click={() => showChangeRequestField = !showChangeRequestField}
+										type="button"
+										class="px-3 py-2 text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded border border-indigo-200 hover:border-indigo-300 transition-colors"
+									>
+										{#if showChangeRequestField}
+											{$t('letters.change_request_optional')}
+										{:else}
+											{$t('letters.add_change_request')}
+										{/if}
+									</button>
+								</div>
+								
+								<!-- Regenerate Button -->
+								<button
+									on:click={() => regenerateLetter(currentLetterId)}
+									disabled={regeneratingVersion || !currentLetterId}
+									class="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+									type="button"
+									aria-label="{$t('letters.regenerate_with_settings')}"
+								>
+									{#if regeneratingVersion}
+										<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+										{$t('letters.generating_version')}
+									{:else}
+										{$t('letters.regenerate_with_settings')}
+									{/if}
+								</button>
+							</div>
+							
+							<!-- Collapsible Change Request Field -->
+							{#if showChangeRequestField}
+								<div class="mt-4 pt-4 border-t border-gray-200">
+									<div>
+										<label for="change-request-comment" class="block text-xs text-gray-600 mb-1">
+											{$t('letters.change_request_comment')} <span class="text-gray-400">({$t('letters.change_request_optional')})</span>
+										</label>
+										<textarea
+											id="change-request-comment"
+											bind:value={changeRequestComment}
+											placeholder="{$t('letters.change_request_comment_placeholder')}"
+											class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 resize-none"
+											rows="2"
+											maxlength="500"
+										></textarea>
+										<p class="text-xs text-gray-500 mt-1">{$t('letters.change_request_comment_hint')}</p>
+									</div>
+								</div>
+							{/if}
+						</div>
+					</div>
+				</div>
+				{/if}
+				
 				<div class="prose max-w-none">
 					{@html currentLetterContent}
 				</div>

@@ -2172,13 +2172,18 @@
 									{#if letter.job_title}
 										<p class="text-lg font-bold text-gray-800 mb-2">{letter.job_title}</p>
 									{/if}
-									<div class="flex items-center space-x-4 text-sm text-gray-500">
+									<!-- Dates Line -->
+									<div class="text-sm text-gray-500 mb-2">
 										<span>
 											{$t('letters.created_at')}: {new Date(letter.created_at).toLocaleDateString()}
 											{#if letter.updated_at !== letter.created_at}
 												{$t('letters.updated_at')}: {new Date(letter.updated_at).toLocaleDateString()}
 											{/if}
 										</span>
+									</div>
+									
+									<!-- Attributes Line (Language, Tone, Versions) -->
+									<div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
 										{#if letter.language}
 											<span class="flex items-center">
 												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2214,20 +2219,38 @@
 								</div>
 								
 								<div class="flex items-center space-x-4">
-									<!-- Status Dropdown with Label -->
-									<div class="flex flex-col">
-										<label class="text-xs text-gray-500 mb-1">{$t('letters.set_application_status')}</label>
-										<select 
-											value={letter.status}
-											on:change={(e) => handleStatusChange(letter.id, e)}
-											class="px-3 py-2 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 {getStatusColor(letter.status)}"
-											aria-label="Change letter status"
-											disabled={letter.status === 'draft' && !isLetterGenerated(letter)}
-										>
-											{#each statusOptions as option}
-												<option value={option.value}>{$t(`letters.status.${option.value}`)}</option>
-											{/each}
-										</select>
+									<!-- Status Section: Dropdown + Timeline -->
+									<div class="flex items-center space-x-4">
+										<!-- Status Dropdown with Label -->
+										<div class="flex flex-col">
+											<label class="text-xs text-gray-500 mb-1">{$t('letters.set_application_status')}</label>
+											<select 
+												value={letter.status}
+												on:change={(e) => handleStatusChange(letter.id, e)}
+												class="px-3 py-2 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 {getStatusColor(letter.status)}"
+												aria-label="Change letter status"
+												disabled={letter.status === 'draft' && !isLetterGenerated(letter)}
+											>
+												{#each statusOptions as option}
+													<option value={option.value}>{$t(`letters.status.${option.value}`)}</option>
+												{/each}
+											</select>
+										</div>
+										
+										<!-- Status Timeline -->
+										<div class="flex items-center space-x-2">
+											<span class="text-xs text-gray-600">{$t('letters.status_label')}:</span>
+											<span class="text-xs font-medium text-gray-600">{getStatusLabel(letter.status)}</span>
+											{#if getStatusTimeline(letter).length > 0}
+												<div class="flex flex-wrap items-center gap-2">
+													{#each getStatusTimeline(letter) as event}
+														<span class="text-xs px-2 py-1 rounded-full bg-gray-100 {event.color} font-medium">
+															{event.label} {new Date(event.date).toLocaleDateString()}
+														</span>
+													{/each}
+												</div>
+											{/if}
+										</div>
 									</div>
 									
 									<!-- Direct Action Buttons or Generating State -->
@@ -2375,22 +2398,7 @@
 								</div>
 							</div>
 
-							<!-- Status Timeline -->
-							<div class="mb-4">
-								<div class="flex items-center space-x-2 text-xs text-gray-600">
-									<span>{$t('letters.status_label')}:</span>
-									<span class="font-medium">{getStatusLabel(letter.status)}</span>
-								</div>
-								{#if getStatusTimeline(letter).length > 0}
-									<div class="flex flex-wrap items-center gap-2 mt-2">
-										{#each getStatusTimeline(letter) as event}
-											<span class="text-xs px-2 py-1 rounded-full bg-gray-100 {event.color} font-medium">
-												{event.label} {new Date(event.date).toLocaleDateString()}
-											</span>
-										{/each}
-									</div>
-								{/if}
-							</div>
+
 
 							<!-- Letter Details -->
 							<div class="mb-4 space-y-2">

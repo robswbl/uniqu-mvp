@@ -448,8 +448,8 @@
             </div>
           </div>
           
-          <div class="flex flex-wrap gap-6">
-              <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">📄</span>
@@ -483,7 +483,7 @@
                 </button>
               </div>
   
-              <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+              <div class="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">❤️</span>
@@ -517,7 +517,7 @@
                 </button>
               </div>
 
-              <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-gradient-to-r from-orange-50 to-amber-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+              <div class="bg-gradient-to-r from-orange-50 to-amber-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">🌍</span>
@@ -585,7 +585,7 @@
                 </button>
               </div>
 
-              <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-gradient-to-r from-indigo-50 to-purple-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+              <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">🎭</span>
@@ -621,7 +621,7 @@
             </div>
   
 
-              <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+              <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">⭐</span>
@@ -655,7 +655,7 @@
                 </button>
               </div>
   
-              <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+              <div class="bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">🎯</span>
@@ -689,7 +689,7 @@
                 </button>
               </div>
 
-              <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-gradient-to-r from-cyan-50 to-blue-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+              <div class="bg-gradient-to-r from-cyan-50 to-blue-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">
                     <span class="text-lg">💎</span>
@@ -723,7 +723,7 @@
                 </button>
               </div>
 
-            <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+            <div class="bg-gradient-to-r from-emerald-50 to-teal-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
               <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center space-x-2">
                   <span class="text-lg">🏠</span>
@@ -757,7 +757,7 @@
               </button>
             </div>
 
-            <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
               <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center space-x-2">
                   <span class="text-lg">🤔</span>
@@ -791,7 +791,7 @@
               </button>
             </div>
 
-            <div class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)] bg-gradient-to-r from-rose-50 to-pink-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
+            <div class="bg-gradient-to-r from-rose-50 to-pink-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative">
               <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center space-x-2">
                   <span class="text-lg">💭</span>

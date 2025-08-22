@@ -318,6 +318,78 @@
           <p class="text-gray-600">{$t('dashboard.loading_session_details')}</p>
         </div>
       {:else if sessionData}
+        <!-- Main Action Cards -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+          <!-- View Results Card -->
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800 mb-2">{$t('dashboard.view_your_results')}</h3>
+              <p class="text-gray-600 mb-4">
+                {hasResults ? seeYourPersonalizedAnalysis : resultsBeingGenerated}
+              </p>
+              {#if hasResults && lastUpdated}
+                <p class="text-sm text-gray-500 mb-4">{$t('dashboard.last_generated')} {lastUpdated}</p>
+              {/if}
+              <button 
+                on:click={viewResults}
+                class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
+                disabled={!hasResults}
+              >
+                {hasResults ? viewResultsText : processingText}
+              </button>
+            </div>
+          </div>
+
+          <!-- Application Letters Card -->
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800 mb-2">{$t('dashboard.application_letters')}</h3>
+              <p class="text-gray-600 mb-4">{$t('dashboard.view_and_manage_letters')}</p>
+              {#if sessionData.created_at}
+                <p class="text-sm text-gray-500 mb-4">{$t('dashboard.last_letters_updated')} {new Date(sessionData.created_at).toLocaleDateString()}</p>
+              {/if}
+              <button 
+                on:click={() => goto(`/results/${sessionId}/letters`)}
+                class="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
+              >
+                {$t('dashboard.view_letters')}
+              </button>
+            </div>
+          </div>
+
+          <!-- Edit Profile Card -->
+          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-800 mb-2">{$t('dashboard.edit_your_profile')}</h3>
+              <p class="text-gray-600 mb-4">{$t('dashboard.update_your_responses')}</p>
+              {#if sessionData.created_at}
+                <p class="text-sm text-gray-500 mb-4">{$t('dashboard.last_profile_updated')} {new Date(sessionData.created_at).toLocaleDateString()}</p>
+              {/if}
+              <button 
+                on:click={editAnswers}
+                class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
+              >
+                {$t('dashboard.edit_profile')}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Progress Overview Card -->
         <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
           <div class="flex items-center justify-between mb-4">
@@ -346,72 +418,6 @@
             <div class="text-center p-4 bg-purple-50 rounded-lg">
               <div class="text-2xl font-bold text-purple-600">{sessionData.status}</div>
               <div class="text-sm text-gray-600">{$t('dashboard.current_status')}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Main Action Cards -->
-        <div class="grid md:grid-cols-3 gap-6 mb-8">
-          <!-- View Results Card -->
-          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <div class="text-center">
-              <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-semibold text-gray-800 mb-2">{$t('dashboard.view_your_results')}</h3>
-              <p class="text-gray-600 mb-4">
-                {hasResults ? seeYourPersonalizedAnalysis : resultsBeingGenerated}
-              </p>
-              {#if hasResults && lastUpdated}
-                <p class="text-sm text-gray-500 mb-4">{$t('dashboard.last_generated')} {lastUpdated}</p>
-              {/if}
-              <button 
-                on:click={viewResults}
-                class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
-                disabled={!hasResults}
-              >
-                {hasResults ? viewResultsText : processingText}
-              </button>
-            </div>
-          </div>
-
-          <!-- Edit Profile Card -->
-          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <div class="text-center">
-              <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-semibold text-gray-800 mb-2">{$t('dashboard.edit_your_profile')}</h3>
-              <p class="text-gray-600 mb-4">{$t('dashboard.update_your_responses')}</p>
-              <button 
-                on:click={editAnswers}
-                class="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
-              >
-                {$t('dashboard.edit_profile')}
-              </button>
-            </div>
-          </div>
-
-          <!-- Application Letters Card -->
-          <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-            <div class="text-center">
-              <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-              </div>
-              <h3 class="text-xl font-semibold text-gray-800 mb-2">{$t('dashboard.application_letters')}</h3>
-              <p class="text-gray-600 mb-4">{$t('dashboard.view_and_manage_letters')}</p>
-              <button 
-                on:click={() => goto(`/results/${sessionId}/letters`)}
-                class="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105"
-              >
-                {$t('dashboard.view_letters')}
-              </button>
             </div>
           </div>
         </div>
@@ -462,7 +468,7 @@
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                         on:click={(e) => { e.stopPropagation(); toggleSection('cv'); }}
                       >
-                        {expandedSections['cv'] ? '▼ Less' : '▶ More'}
+                        {expandedSections['cv'] ? '▲ Less' : '▼ More'}
                       </button>
                     {/if}
                   </div>
@@ -496,7 +502,7 @@
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                         on:click={(e) => { e.stopPropagation(); toggleSection('love'); }}
                       >
-                        {expandedSections['love'] ? '▼ Less' : '▶ More'}
+                        {expandedSections['love'] ? '▲ Less' : '▼ More'}
                       </button>
                     {/if}
                   </div>
@@ -530,7 +536,7 @@
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                         on:click={(e) => { e.stopPropagation(); toggleSection('care_about'); }}
                       >
-                        {expandedSections['care_about'] ? '▼ Less' : '▶ More'}
+                        {expandedSections['care_about'] ? '▲ Less' : '▼ More'}
                       </button>
                     {/if}
                   </div>
@@ -564,7 +570,7 @@
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                         on:click={(e) => { e.stopPropagation(); toggleSection('inspires'); }}
                       >
-                        {expandedSections['inspires'] ? '▼ Less' : '▶ More'}
+                        {expandedSections['inspires'] ? '▲ Less' : '▼ More'}
                       </button>
                     {/if}
                   </div>
@@ -595,10 +601,10 @@
                     {#if hasMoreContent(sessionData.ikigai_want_to_be, 120)}
                       <button 
                         type="button"
-                        class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                        class="text-indigo-800 hover:text-indigo-800 text-sm font-medium"
                         on:click={(e) => { e.stopPropagation(); toggleSection('want_to_be'); }}
                       >
-                        {expandedSections['want_to_be'] ? '▼ Less' : '▶ More'}
+                        {expandedSections['want_to_be'] ? '▲ Less' : '▼ More'}
                       </button>
                     {/if}
                   </div>
@@ -632,7 +638,7 @@
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                         on:click={(e) => { e.stopPropagation(); toggleSection('good'); }}
                       >
-                        {expandedSections['good'] ? '▼ Less' : '▶ More'}
+                        {expandedSections['good'] ? '▲ Less' : '▼ More'}
                       </button>
                     {/if}
                   </div>
@@ -666,7 +672,7 @@
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                         on:click={(e) => { e.stopPropagation(); toggleSection('goals'); }}
                       >
-                        {expandedSections['goals'] ? '▼ Less' : '▶ More'}
+                        {expandedSections['goals'] ? '▲ Less' : '▼ More'}
                       </button>
                     {/if}
                   </div>
@@ -700,7 +706,7 @@
                         class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                         on:click={(e) => { e.stopPropagation(); toggleSection('values'); }}
                       >
-                        {expandedSections['values'] ? '▼ Less' : '▶ More'}
+                        {expandedSections['values'] ? '▲ Less' : '▼ More'}
                       </button>
                     {/if}
                   </div>
@@ -734,7 +740,7 @@
                       class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                       on:click={(e) => { e.stopPropagation(); toggleSection('life_context'); }}
                     >
-                      {expandedSections['life_context'] ? '▼ Less' : '▶ More'}
+                      {expandedSections['life_context'] ? '▲ Less' : '▼ More'}
                     </button>
                   {/if}
                 </div>

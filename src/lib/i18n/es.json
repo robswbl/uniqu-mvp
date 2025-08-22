@@ -150,6 +150,8 @@
     "modal_title": "Carta de presentación",
     "copy": "Copiar",
     "download_pdf": "Descargar como PDF",
+    "delete_version": "Eliminar versión",
+    "delete_version_confirm": "¿Estás seguro de que quieres eliminar esta versión? Esta acción no se puede deshacer.",
     "close_modal": "Cerrar",
     "status": {
       "draft": "Borrador",

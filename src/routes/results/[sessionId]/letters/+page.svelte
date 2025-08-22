@@ -1173,6 +1173,44 @@
 		}
 	}
 
+	// Function to delete a letter version
+	async function deleteLetterVersion(versionId, letterId) {
+		if (!confirm($t('letters.delete_version_confirm'))) {
+			return;
+		}
+
+		try {
+			const { error: deleteError } = await supabase
+				.from('application_letter_versions')
+				.delete()
+				.eq('id', versionId);
+
+			if (deleteError) throw deleteError;
+
+			// Update local state
+			if (letterVersions[letterId]) {
+				letterVersions[letterId] = letterVersions[letterId].filter(v => v.id !== versionId);
+				
+				// If we deleted the currently selected version, select the first available one
+				if (selectedVersion[letterId] && selectedVersion[letterId].id === versionId) {
+					selectedVersion[letterId] = letterVersions[letterId][0] || null;
+					if (selectedVersion[letterId]) {
+						currentLetterContent = selectedVersion[letterId].content_html;
+					}
+				}
+			}
+
+			// If no versions left, close modal
+			if (letterVersions[letterId] && letterVersions[letterId].length === 0) {
+				showLetterModal = false;
+			}
+
+		} catch (err) {
+			console.error('Error deleting version:', err);
+			alert('Error deleting version: ' + (err.message || 'Unknown error'));
+		}
+	}
+
 	// Function to fetch letter versions
 	async function fetchLetterVersions(letterId) {
 		try {
@@ -2553,7 +2591,19 @@
 			<div class="flex items-center justify-between p-4 border-b border-gray-200">
 				<h3 id="modal-title" class="text-lg font-semibold text-gray-900">{$t('letters.modal_title')}</h3>
 				<div class="flex items-center space-x-2">
-					<!-- Version Selector -->
+					<!-- Create New Version Button (Left) -->
+					{#if currentLetterId}
+					<button 
+						type="button" 
+						class="px-3 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+						on:click={() => showRegenerationSection = !showRegenerationSection}
+						aria-label="Create new version"
+					>
+						{$t('letters.create_new_version')}
+					</button>
+					{/if}
+					
+					<!-- Version Selector (Dropdown) -->
 					{#if letterVersions[currentLetterId] && letterVersions[currentLetterId].length > 1}
 						<div class="flex flex-col space-y-2">
 							<select 
@@ -2582,6 +2632,7 @@
 						</div>
 					{/if}
 					
+					<!-- Copy Button -->
 					<button 
 						on:click={() => {
 							// Copy plain text from HTML
@@ -2597,17 +2648,7 @@
 						{$t('letters.copy')}
 					</button>
 					
-					<!-- Create New Version Button -->
-					{#if currentLetterId}
-					<button 
-						type="button" 
-						class="px-3 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-						on:click={() => showRegenerationSection = !showRegenerationSection}
-						aria-label="Create new version"
-					>
-						{$t('letters.create_new_version')}
-					</button>
-					{/if}
+					<!-- Download/Print PDF Button -->
 					{#if currentLetterContent && currentLetterContent.includes('pdf_url')}
 						<!-- If pdf_url is present in content, extract and use it -->
 						{#await (async () => { try { const match = currentLetterContent.match(/pdf_url\s*[:=]\s*['"]([^'"]+)/); return match ? match[1] : null; } catch { return null; } })() then pdfUrl}
@@ -2635,6 +2676,19 @@
 							{$t('letters.download_pdf')}
 						</button>
 					{/if}
+					
+					<!-- Delete Version Button -->
+					{#if selectedVersion[currentLetterId] && selectedVersion[currentLetterId].version_type !== 'original' && letterVersions[currentLetterId] && letterVersions[currentLetterId].length > 1}
+						<button 
+							on:click={() => deleteLetterVersion(selectedVersion[currentLetterId].id, currentLetterId)}
+							class="px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+							type="button"
+							aria-label="Delete version"
+						>
+							{$t('letters.delete_version')}
+						</button>
+					{/if}
+					
 					<button 
 						on:click={() => showLetterModal = false}
 						class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"

@@ -181,6 +181,8 @@
     "modal_title": "Application Letter",
     "copy": "Copy",
     "download_pdf": "Download as PDF",
+    "delete_version": "Delete Version",
+    "delete_version_confirm": "Are you sure you want to delete this version? This action cannot be undone.",
     "close_modal": "Close",
     "status": {
       "draft": "Draft",

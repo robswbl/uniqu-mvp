@@ -150,6 +150,8 @@
     "modal_title": "Bewerbungsschreiben",
     "copy": "Kopieren",
     "download_pdf": "Als PDF herunterladen",
+    "delete_version": "Version löschen",
+    "delete_version_confirm": "Sind Sie sicher, dass Sie diese Version löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
     "close_modal": "Schließen",
     "status": {
       "draft": "Entwurf",

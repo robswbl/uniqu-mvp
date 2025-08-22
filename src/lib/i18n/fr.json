@@ -150,6 +150,8 @@
     "modal_title": "Lettre de candidature",
     "copy": "Copier",
     "download_pdf": "Télécharger en PDF",
+    "delete_version": "Supprimer la version",
+    "delete_version_confirm": "Êtes-vous sûr de vouloir supprimer cette version ? Cette action ne peut pas être annulée.",
     "close_modal": "Fermer",
     "status": {
       "draft": "Brouillon",

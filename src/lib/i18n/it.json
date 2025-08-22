@@ -150,6 +150,8 @@
     "modal_title": "Lettera di candidatura",
     "copy": "Copia",
     "download_pdf": "Scarica come PDF",
+    "delete_version": "Elimina versione",
+    "delete_version_confirm": "Sei sicuro di voler eliminare questa versione? Questa azione non può essere annullata.",
     "close_modal": "Chiudi",
     "status": {
       "draft": "Bozza",

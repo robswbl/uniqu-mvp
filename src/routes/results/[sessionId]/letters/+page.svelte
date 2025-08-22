@@ -2172,6 +2172,17 @@
 									{#if letter.job_title}
 										<p class="text-lg font-bold text-gray-800 mb-2">{letter.job_title}</p>
 									{/if}
+									
+									<!-- Job URL Line -->
+									{#if letter.job_url}
+										<div class="text-sm text-gray-600 mb-2">
+											<span class="font-medium">Job URL:</span>
+											<a href="{letter.job_url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline ml-2" title="{letter.job_url}">
+												{letter.job_url.length > 50 ? letter.job_url.substring(0, 47) + '...' : letter.job_url}
+											</a>
+										</div>
+									{/if}
+									
 									<!-- Dates Line -->
 									<div class="text-sm text-gray-500 mb-2">
 										<span>
@@ -2402,16 +2413,6 @@
 
 							<!-- Letter Details -->
 							<div class="mb-4 space-y-2">
-								{#if letter.job_url}
-									<div>
-										<span class="text-xs font-medium text-gray-600">Job URL:</span>
-										<p class="text-sm text-gray-700 mt-1 bg-gray-50 p-2 rounded break-all">
-											<a href="{letter.job_url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline" title="{letter.job_url}">
-												{letter.job_url.length > 50 ? letter.job_url.substring(0, 47) + '...' : letter.job_url}
-											</a>
-										</p>
-									</div>
-								{/if}
 								{#if letter.pain_points}
 									<div>
 										<span class="text-xs font-medium text-gray-600">{$t('letters.key_pain_points')}</span>
@@ -2527,7 +2528,8 @@
 							</div>
 
 							<!-- Notes Section -->
-							<div class="border-t border-gray-100 pt-4">
+							<div class="border-t border-gray-100 pt-4 mb-6">
+								<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
 								<div class="flex items-start justify-between mb-2">
 									<label for="notes-{letter.id}" class="text-sm font-medium text-gray-700">{$t('letters.notes')}</label>
 									{#if editingNotes[letter.id] !== undefined}
@@ -2575,6 +2577,54 @@
 										{letter.notes || $t('letters.no_notes_added')}
 									</p>
 								{/if}
+								</div>
+							</div>
+							
+							<!-- CV Section -->
+							<div class="border-t border-gray-100 pt-4">
+								<h4 class="text-lg font-semibold text-gray-900 mb-4">CV Enhancement</h4>
+								
+								<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+									<!-- CV Tagline -->
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700">CV Tagline</label>
+										<div class="bg-blue-50 border border-blue-200 rounded-lg p-3 min-h-[80px]">
+											<p class="text-sm text-gray-700">
+												{letter.cv_tagline || 'Tagline will be generated based on your profile and this application...'}
+											</p>
+										</div>
+									</div>
+									
+									<!-- Keywords to use in CV -->
+									<div class="space-y-2">
+										<label class="text-sm font-medium text-gray-700">Keywords for CV</label>
+										<div class="bg-green-50 border border-green-200 rounded-lg p-3 min-h-[80px]">
+											<p class="text-sm text-gray-700">
+												{letter.cv_keywords || 'Keywords will be generated and categorized for this specific application...'}
+											</p>
+										</div>
+									</div>
+									
+									<!-- Management Summary -->
+									<div class="space-y-2 lg:col-span-2">
+										<label class="text-sm font-medium text-gray-700">Management Summary</label>
+										<div class="bg-purple-50 border border-purple-200 rounded-lg p-3 min-h-[120px]">
+											<p class="text-sm text-gray-700">
+												{letter.cv_management_summary || 'A comprehensive management summary will be generated to align your CV with this application...'}
+											</p>
+										</div>
+									</div>
+									
+									<!-- CV Tips -->
+									<div class="space-y-2 lg:col-span-2">
+										<label class="text-sm font-medium text-gray-700">CV Enhancement Tips</label>
+										<div class="bg-orange-50 border border-orange-200 rounded-lg p-3 min-h-[100px]">
+											<p class="text-sm text-gray-700">
+												{letter.cv_tips || 'Specific tips and suggestions will be provided to optimize your CV for this application...'}
+											</p>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					{/each}

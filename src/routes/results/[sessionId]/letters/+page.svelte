@@ -2596,6 +2596,18 @@
 					>
 						{$t('letters.copy')}
 					</button>
+					
+					<!-- Create New Version Button -->
+					{#if currentLetterId}
+					<button 
+						type="button" 
+						class="px-3 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+						on:click={() => showRegenerationSection = !showRegenerationSection}
+						aria-label="Create new version"
+					>
+						{$t('letters.create_new_version')}
+					</button>
+					{/if}
 					{#if currentLetterContent && currentLetterContent.includes('pdf_url')}
 						<!-- If pdf_url is present in content, extract and use it -->
 						{#await (async () => { try { const match = currentLetterContent.match(/pdf_url\s*[:=]\s*['"]([^'"]+)/); return match ? match[1] : null; } catch { return null; } })() then pdfUrl}
@@ -2637,12 +2649,12 @@
 			</div>
 			
 			<div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-				<!-- Regeneration Controls -->
-				{#if currentLetterId}
+				<!-- Regeneration Controls - Hidden by default -->
+				{#if currentLetterId && showRegenerationSection}
 				<div class="px-6 py-4 border-b border-gray-200 bg-gray-50 mb-6">
 					<div class="flex items-center space-x-4">
 						<div class="flex-1">
-							<h4 class="text-sm font-medium text-gray-700 mb-2">{$t('letters.regenerate_letter')}</h4>
+							<h4 class="text-sm font-medium text-gray-700 mb-2">{$t('letters.create_new_version')}</h4>
 							<div class="flex items-center space-x-4">
 								<!-- Target Tone -->
 								<div>
@@ -2693,13 +2705,13 @@
 									disabled={regeneratingVersion || !currentLetterId}
 									class="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 									type="button"
-									aria-label="{$t('letters.regenerate_with_settings')}"
+									aria-label="{$t('letters.create_new_version')}"
 								>
 									{#if regeneratingVersion}
 										<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
 										{$t('letters.generating_version')}
 									{:else}
-										{$t('letters.regenerate_with_settings')}
+										{$t('letters.create_new_version')}
 									{/if}
 								</button>
 							</div>

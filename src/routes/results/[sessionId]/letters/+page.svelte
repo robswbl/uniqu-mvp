@@ -2582,13 +2582,23 @@
 							
 							<!-- CV Section -->
 							<div class="border-t border-gray-100 pt-4">
-								<h4 class="text-lg font-semibold text-gray-900 mb-4">CV Enhancement</h4>
+								<h4 class="text-xl font-bold text-gray-900 mb-6">CV Enhancement</h4>
 								
 								<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 									<!-- CV Tagline -->
 									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700">CV Tagline</label>
-										<div class="bg-blue-50 border border-blue-200 rounded-lg p-3 min-h-[80px]">
+										<div class="bg-blue-50 border border-blue-200 rounded-lg p-3 min-h-[80px] relative">
+											<div class="flex items-center justify-between mb-2">
+												<label class="text-sm font-medium text-gray-700">CV Tagline</label>
+												<button 
+													on:click={() => navigator.clipboard.writeText(letter.cv_tagline || 'Tagline will be generated based on your profile and this application...')}
+													class="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+													type="button"
+													title="Copy to clipboard"
+												>
+													Copy
+												</button>
+											</div>
 											<p class="text-sm text-gray-700">
 												{letter.cv_tagline || 'Tagline will be generated based on your profile and this application...'}
 											</p>
@@ -2597,8 +2607,18 @@
 									
 									<!-- Keywords to use in CV -->
 									<div class="space-y-2">
-										<label class="text-sm font-medium text-gray-700">Keywords for CV</label>
-										<div class="bg-green-50 border border-green-200 rounded-lg p-3 min-h-[80px]">
+										<div class="bg-green-50 border border-green-200 rounded-lg p-3 min-h-[80px] relative">
+											<div class="flex items-center justify-between mb-2">
+												<label class="text-sm font-medium text-gray-700">Keywords for CV</label>
+												<button 
+													on:click={() => navigator.clipboard.writeText(letter.cv_keywords || 'Keywords will be generated and categorized for this specific application...')}
+													class="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+													type="button"
+													title="Copy to clipboard"
+												>
+													Copy
+												</button>
+											</div>
 											<p class="text-sm text-gray-700">
 												{letter.cv_keywords || 'Keywords will be generated and categorized for this specific application...'}
 											</p>
@@ -2607,8 +2627,18 @@
 									
 									<!-- Management Summary -->
 									<div class="space-y-2 lg:col-span-2">
-										<label class="text-sm font-medium text-gray-700">Management Summary</label>
-										<div class="bg-purple-50 border border-purple-200 rounded-lg p-3 min-h-[120px]">
+										<div class="bg-purple-50 border border-purple-200 rounded-lg p-3 min-h-[120px] relative">
+											<div class="flex items-center justify-between mb-2">
+												<label class="text-sm font-medium text-gray-700">Management Summary</label>
+												<button 
+													on:click={() => navigator.clipboard.writeText(letter.cv_management_summary || 'A comprehensive management summary will be generated to align your CV with this application...')}
+													class="text-xs px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+													type="button"
+													title="Copy to clipboard"
+												>
+													Copy
+												</button>
+											</div>
 											<p class="text-sm text-gray-700">
 												{letter.cv_management_summary || 'A comprehensive management summary will be generated to align your CV with this application...'}
 											</p>
@@ -2617,8 +2647,18 @@
 									
 									<!-- CV Tips -->
 									<div class="space-y-2 lg:col-span-2">
-										<label class="text-sm font-medium text-gray-700">CV Enhancement Tips</label>
-										<div class="bg-orange-50 border border-orange-200 rounded-lg p-3 min-h-[100px]">
+										<div class="bg-orange-50 border border-orange-200 rounded-lg p-3 min-h-[100px] relative">
+											<div class="flex items-center justify-between mb-2">
+												<label class="text-sm font-medium text-gray-700">CV Enhancement Tips</label>
+												<button 
+													on:click={() => navigator.clipboard.writeText(letter.cv_tips || 'Specific tips and suggestions will be provided to optimize your CV for this application...')}
+													class="text-xs px-2 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
+													type="button"
+													title="Copy to clipboard"
+												>
+													Copy
+												</button>
+											</div>
 											<p class="text-sm text-gray-700">
 												{letter.cv_tips || 'Specific tips and suggestions will be provided to optimize your CV for this application...'}
 											</p>

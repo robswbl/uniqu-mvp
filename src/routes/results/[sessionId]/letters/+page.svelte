@@ -2221,7 +2221,7 @@
 									<div class="flex items-center space-x-8 mb-6">
 										<!-- Status Dropdown with Label -->
 										<div class="flex flex-col">
-											<label class="text-xs text-gray-500 mb-1 text-center">{$t('letters.set_application_status')}</label>
+											<label class="text-xs text-gray-500 mb-1">{$t('letters.set_application_status')}</label>
 											<select 
 												value={letter.status}
 												on:change={(e) => handleStatusChange(letter.id, e)}
@@ -2237,8 +2237,6 @@
 										
 										<!-- Status Timeline -->
 										<div class="flex items-center space-x-2">
-											<span class="text-xs text-gray-600">{$t('letters.status_label')}:</span>
-											<span class="text-xs font-medium text-gray-600">{getStatusLabel(letter.status)}</span>
 											{#if getStatusTimeline(letter).length > 0}
 												<div class="flex flex-wrap items-center gap-2">
 													{#each getStatusTimeline(letter) as event}

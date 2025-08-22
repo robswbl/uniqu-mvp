@@ -2582,7 +2582,7 @@
 							
 							<!-- CV Section -->
 							<div class="border-t border-gray-100 pt-4">
-								<h4 class="text-xl font-bold text-gray-900 mb-6">CV Enhancement</h4>
+								<h4 class="text-xl font-bold text-gray-900 mb-6">{$t('letters.cv_enhancement')}</h4>
 								
 								<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
 									<!-- CV Tagline -->
@@ -2591,7 +2591,20 @@
 											<div class="flex items-center justify-between mb-2">
 												<label class="text-sm font-medium text-gray-700">CV Tagline</label>
 												<button 
-													on:click={() => navigator.clipboard.writeText(letter.cv_tagline || 'Tagline will be generated based on your profile and this application...')}
+													on:click={(e) => {
+														navigator.clipboard.writeText(letter.cv_tagline || 'Tagline will be generated based on your profile and this application...');
+														// Show temporary confirmation
+														const btn = e.target;
+														const originalText = btn.textContent;
+														btn.textContent = 'Copied!';
+														btn.classList.add('bg-green-600', 'hover:bg-green-700');
+														btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+														setTimeout(() => {
+															btn.textContent = originalText;
+															btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+															btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+														}, 2000);
+													}}
 													class="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
 													type="button"
 													title="Copy to clipboard"
@@ -2609,18 +2622,31 @@
 									<div class="space-y-2">
 										<div class="bg-green-50 border border-green-200 rounded-lg p-3 min-h-[80px] relative">
 											<div class="flex items-center justify-between mb-2">
-												<label class="text-sm font-medium text-gray-700">Keywords for CV</label>
+												<label class="text-sm font-medium text-gray-700">{$t('letters.cv_keywords')}</label>
 												<button 
-													on:click={() => navigator.clipboard.writeText(letter.cv_keywords || 'Keywords will be generated and categorized for this specific application...')}
+													on:click={(e) => {
+														navigator.clipboard.writeText(letter.cv_keywords || $t('letters.cv_keywords_placeholder'));
+														// Show temporary confirmation
+														const btn = e.target;
+														const originalText = btn.textContent;
+														btn.textContent = $t('letters.copied');
+														btn.classList.add('bg-green-600', 'hover:bg-green-700');
+														btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+														setTimeout(() => {
+															btn.textContent = originalText;
+															btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+															btn.classList.add('bg-green-600', 'hover:bg-green-700');
+														}, 2000);
+													}}
 													class="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
 													type="button"
 													title="Copy to clipboard"
 												>
-													Copy
+													{$t('letters.copy')}
 												</button>
 											</div>
 											<p class="text-sm text-gray-700">
-												{letter.cv_keywords || 'Keywords will be generated and categorized for this specific application...'}
+												{letter.cv_keywords || $t('letters.cv_keywords_placeholder')}
 											</p>
 										</div>
 									</div>
@@ -2629,18 +2655,31 @@
 									<div class="space-y-2 lg:col-span-2">
 										<div class="bg-purple-50 border border-purple-200 rounded-lg p-3 min-h-[120px] relative">
 											<div class="flex items-center justify-between mb-2">
-												<label class="text-sm font-medium text-gray-700">Management Summary</label>
+												<label class="text-sm font-medium text-gray-700">{$t('letters.cv_management_summary')}</label>
 												<button 
-													on:click={() => navigator.clipboard.writeText(letter.cv_management_summary || 'A comprehensive management summary will be generated to align your CV with this application...')}
+													on:click={(e) => {
+														navigator.clipboard.writeText(letter.cv_management_summary || $t('letters.cv_management_summary_placeholder'));
+														// Show temporary confirmation
+														const btn = e.target;
+														const originalText = btn.textContent;
+														btn.textContent = $t('letters.copied');
+														btn.classList.add('bg-green-600', 'hover:bg-green-700');
+														btn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+														setTimeout(() => {
+															btn.textContent = originalText;
+															btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+															btn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+														}, 2000);
+													}}
 													class="text-xs px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
 													type="button"
 													title="Copy to clipboard"
 												>
-													Copy
+													{$t('letters.copy')}
 												</button>
 											</div>
 											<p class="text-sm text-gray-700">
-												{letter.cv_management_summary || 'A comprehensive management summary will be generated to align your CV with this application...'}
+												{letter.cv_management_summary || $t('letters.cv_management_summary_placeholder')}
 											</p>
 										</div>
 									</div>
@@ -2649,18 +2688,31 @@
 									<div class="space-y-2 lg:col-span-2">
 										<div class="bg-orange-50 border border-orange-200 rounded-lg p-3 min-h-[100px] relative">
 											<div class="flex items-center justify-between mb-2">
-												<label class="text-sm font-medium text-gray-700">CV Enhancement Tips</label>
+												<label class="text-sm font-medium text-gray-700">{$t('letters.cv_enhancement_tips')}</label>
 												<button 
-													on:click={() => navigator.clipboard.writeText(letter.cv_tips || 'Specific tips and suggestions will be provided to optimize your CV for this application...')}
+													on:click={(e) => {
+														navigator.clipboard.writeText(letter.cv_tips || $t('letters.cv_tips_placeholder'));
+														// Show temporary confirmation
+														const btn = e.target;
+														const originalText = btn.textContent;
+														btn.textContent = $t('letters.copied');
+														btn.classList.add('bg-green-600', 'hover:bg-green-700');
+														btn.classList.remove('bg-orange-600', 'hover:bg-orange-700');
+														setTimeout(() => {
+															btn.textContent = originalText;
+															btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+															btn.classList.add('bg-orange-600', 'hover:bg-orange-700');
+														}, 2000);
+													}}
 													class="text-xs px-2 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
 													type="button"
 													title="Copy to clipboard"
 												>
-													Copy
+													{$t('letters.copy')}
 												</button>
 											</div>
 											<p class="text-sm text-gray-700">
-												{letter.cv_tips || 'Specific tips and suggestions will be provided to optimize your CV for this application...'}
+												{letter.cv_tips || $t('letters.cv_tips_placeholder')}
 											</p>
 										</div>
 									</div>

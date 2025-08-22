@@ -2214,19 +2214,21 @@
 								</div>
 								
 								<div class="flex items-center space-x-3">
-									<!-- Status Dropdown -->
-									<select 
-										value={letter.status}
-										on:change={(e) => handleStatusChange(letter.id, e)}
-										class="px-3 py-2 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 {getStatusColor(letter.status)}"
-										aria-label="Change letter status"
-										disabled={letter.status === 'draft' && !isLetterGenerated(letter)}
-									>
-										<option value="" disabled>{$t('letters.set_application_status')}</option>
-										{#each statusOptions as option}
-											<option value={option.value}>{$t(`letters.status.${option.value}`)}</option>
-										{/each}
-									</select>
+									<!-- Status Dropdown with Label -->
+									<div class="flex flex-col">
+										<label class="text-xs text-gray-500 mb-1">{$t('letters.set_application_status')}</label>
+										<select 
+											value={letter.status}
+											on:change={(e) => handleStatusChange(letter.id, e)}
+											class="px-3 py-2 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 {getStatusColor(letter.status)}"
+											aria-label="Change letter status"
+											disabled={letter.status === 'draft' && !isLetterGenerated(letter)}
+										>
+											{#each statusOptions as option}
+												<option value={option.value}>{$t(`letters.status.${option.value}`)}</option>
+											{/each}
+										</select>
+									</div>
 									
 									<!-- Direct Action Buttons or Generating State -->
 									{#if letter.status === 'draft' && !isLetterGenerated(letter)}

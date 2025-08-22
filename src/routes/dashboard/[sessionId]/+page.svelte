@@ -618,8 +618,6 @@
                   {$t('dashboard.edit')}
                 </button>
               </div>
-            </div>
-  
 
               <div class="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative break-inside-avoid mb-6">
                 <div class="flex justify-between items-start mb-2">
@@ -823,7 +821,8 @@
               >
                 {$t('dashboard.edit')}
               </button>
-                          </div>
+            </div>
+          </div>
         </div>
       {:else}
         <div class="bg-white rounded-xl shadow-lg p-8 text-center">

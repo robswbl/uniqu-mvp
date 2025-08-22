@@ -1121,6 +1121,8 @@
 	let letterVersions = {};
 	let selectedVersion = {};
 	let regeneratingVersion = false;
+	let showSuccessMessage = false;
+	let successMessage = '';
 	let targetTone = 'professional';
 	let targetLength = 100;
 	let changeRequestComment = '';
@@ -1379,8 +1381,28 @@
 							// Refresh versions
 							await fetchLetterVersions(letterId);
 							console.log(`[Polling] After refresh - letterVersions:`, letterVersions[letterId]);
-							console.log(`[Polling] After refresh - selectedVersion:`, selectedVersion[letterId]);
+							console.log(`[Polling] After refresh - selectedVersion:`, letterVersions[letterId]);
 							console.log(`[Polling] Current letterVersions state:`, letterVersions);
+							
+							// Auto-select the newest version (first in the array after refresh)
+							if (letterVersions[letterId] && letterVersions[letterId].length > 0) {
+								selectedVersion[letterId] = letterVersions[letterId][0];
+								selectedVersion = { ...selectedVersion };
+								
+								// Update the modal content if it's open
+								if (currentLetterId === letterId && showLetterModal) {
+									currentLetterContent = selectedVersion[letterId].content_html;
+								}
+							}
+							
+							// Show success message
+							successMessage = `✅ New letter version generated successfully!`;
+							showSuccessMessage = true;
+							setTimeout(() => {
+								showSuccessMessage = false;
+								successMessage = '';
+							}, 5000); // Hide after 5 seconds
+							
 							return;
 						}
 					}
@@ -1739,6 +1761,18 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- Success Message -->
+		{#if showSuccessMessage}
+			<div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+				<div class="flex items-center">
+					<svg class="w-5 h-5 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+					</svg>
+					<span class="text-green-800 font-medium">{successMessage}</span>
+				</div>
+			</div>
+		{/if}
 
 		{#if loading}
 			<div class="flex justify-center items-center h-64">
@@ -2515,22 +2549,31 @@
 				<div class="flex items-center space-x-2">
 					<!-- Version Selector -->
 					{#if letterVersions[currentLetterId] && letterVersions[currentLetterId].length > 1}
-						<select 
-							bind:value={selectedVersion[currentLetterId]}
-							class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
-							on:change={() => {
-								if (selectedVersion[currentLetterId]) {
-									currentLetterContent = selectedVersion[currentLetterId].content_html;
-								}
-							}}
-						>
-							{#each letterVersions[currentLetterId] || [] as version}
-								<option value={version}>
-									{version.version_type === 'original' ? $t('letters.original_version') : $t('letters.regenerated_version')} - 
-									{version.tone} - {version.length_percentage}%
-								</option>
-							{/each}
-						</select>
+						<div class="flex flex-col space-y-2">
+							<select 
+								bind:value={selectedVersion[currentLetterId]}
+								class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+								on:change={() => {
+									if (selectedVersion[currentLetterId]) {
+										currentLetterContent = selectedVersion[currentLetterId].content_html;
+									}
+								}}
+							>
+								{#each letterVersions[currentLetterId] || [] as version}
+									<option value={version}>
+										{version.version_type === 'original' ? $t('letters.original_version') : $t('letters.regenerated_version')} - 
+										{version.tone} - {version.length_percentage}%
+									</option>
+								{/each}
+							</select>
+							
+							<!-- Change Request Comment Display -->
+							{#if selectedVersion[currentLetterId] && selectedVersion[currentLetterId].change_request_comment}
+								<div class="text-xs text-gray-600 bg-blue-50 px-3 py-2 rounded border border-blue-200">
+									<strong>Change Request:</strong> {selectedVersion[currentLetterId].change_request_comment}
+								</div>
+							{/if}
+						</div>
 					{/if}
 					
 					<button 

@@ -448,7 +448,7 @@
             </div>
           </div>
           
-          <div class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+          <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
               <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg hover:shadow-md transition-all duration-300 relative break-inside-avoid mb-6">
                 <div class="flex justify-between items-start mb-2">
                   <div class="flex items-center space-x-2">

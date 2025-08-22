@@ -2194,7 +2194,7 @@
 									</div>
 									
 									<!-- Attributes Line (Language, Tone, Versions) -->
-									<div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
+									<div class="flex items-center space-x-4 text-sm text-gray-500 mb-6">
 										{#if letter.language}
 											<span class="flex items-center">
 												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

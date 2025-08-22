@@ -74,6 +74,12 @@
 	// Track local creation time for new letters
 	let localLetterCreatedAt = {};
 
+	// Track which application letter boxes are collapsed
+	let collapsedLetterBoxes = [];
+	
+	// Track if all boxes should be collapsed/expanded
+	let allBoxesCollapsed = false;
+
 	// Track which letters just finished generating for success message
 	let justGenerated = {};
 
@@ -84,7 +90,7 @@
 	let continuingLetterId = null;
 
 	// Track expanded pain points sections
-	let expandedPainPoints = new Set();
+	let expandedPainPoints = [];
 
 	// Function to clear errors
 	function clearError() {
@@ -165,6 +171,9 @@
 			}
 
 			applicationLetters = lettersData || [];
+			
+			// Initialize collapsedLetterBoxes as empty array
+			collapsedLetterBoxes = [];
 			
 			// Extract company names from the companies document (simple parsing)
 			if (companiesDoc?.content_html) {
@@ -1062,7 +1071,8 @@
 	// Watch for new letters in 'draft' state with no generated document
 	$: {
 	  applicationLetters.forEach(letter => {
-	    if (letter.status === 'draft' && letterProgress[letter.id] === undefined) {
+	    const numericId = typeof letter.id === 'string' ? parseInt(letter.id, 10) : letter.id;
+	    if (letter.status === 'draft' && letterProgress[numericId] === undefined) {
 	      startLetterProgress(letter.id);
 	    }
 	  });
@@ -1070,7 +1080,8 @@
 
 	// Helper: Check if a letter is 'actively generating' (created < 20s ago)
 	function isActivelyGenerating(letter) {
-	  let created = localLetterCreatedAt[letter.id] || new Date(letter.created_at).getTime();
+	  const numericId = typeof letter.id === 'string' ? parseInt(letter.id, 10) : letter.id;
+	  let created = localLetterCreatedAt[numericId] || new Date(letter.created_at).getTime();
 	  return letter.status === 'draft' && (Date.now() - created < GENERATION_TIME);
 	}
 
@@ -1464,7 +1475,7 @@
 		poll();
 	}
 
-	// Function to parse markdown-like text (improved implementation)
+	// Function to parse markdown-like text (simplified and effective)
 	function parseMarkdown(text) {
 		if (!text) return '';
 		
@@ -1474,53 +1485,84 @@
 		// Convert *text* to <em>text</em>
 		text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
 		
-		// Handle main title (lines starting with #)
-		text = text.replace(/^#\s+(.*?)$/gm, '<h2 class="text-xl font-bold text-gray-900 mb-4">$1</h2>');
+		// Handle ### headings
+		text = text.replace(/^###\s+(.*?)$/gm, '<h3 class="text-lg font-semibold text-gray-800 mt-4 mb-2">$1</h3>');
 		
-		// Handle numbered lists with bold subheadings
-		// First, split the text into sections
-		let sections = text.split(/(?=^\d+\.\s+)/gm);
+		// Handle ## headings
+		text = text.replace(/^##\s+(.*?)$/gm, '<h2 class="text-xl font-semibold text-gray-800 mt-6 mb-3">$1</h2>');
 		
-		if (sections.length > 1) {
-			// Process each section
-			sections = sections.map((section, index) => {
-				if (index === 0) return section; // Skip the first section (before any numbered item)
-				
-				// Handle numbered items with bold subheadings
-				section = section.replace(/^(\d+)\.\s+\*\*(.*?)\*\*/gm, '<div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-3">$2</h3>');
-				
-				// Handle bullet points within each section
-				section = section.replace(/^[-*]\s+(.*?)$/gm, '<li class="list-disc ml-6 mb-2 text-gray-700">$1</li>');
-				
-				// Wrap bullet point lists in <ul> tags
-				section = section.replace(/(<li class="list-disc ml-6 mb-2 text-gray-700">.*?<\/li>)+/gs, '<ul class="list-disc ml-6 space-y-2 mb-4">$&</ul>');
-				
-				// Convert remaining line breaks to <br> (but not within list items)
-				section = section.replace(/\n(?!<li)/g, '<br>');
-				
-				// Clean up any double <br> tags
-				section = section.replace(/<br><br>/g, '<br>');
-				
-				return section;
-			});
+		// Handle # headings
+		text = text.replace(/^#\s+(.*?)$/gm, '<h1 class="text-2xl font-bold text-gray-900 mt-6 mb-4">$1</h1>');
+		
+		// Split text into paragraphs and process each
+		let paragraphs = text.split(/\n\n+/);
+		
+		paragraphs = paragraphs.map(paragraph => {
+			// Skip if it's already a heading
+			if (paragraph.match(/^<h[1-3]/)) {
+				return paragraph;
+			}
 			
-			text = sections.join('');
-		} else {
-			// Fallback for non-numbered content
-			// Convert bullet points (- text or * text) to proper list items
-			text = text.replace(/^[-*]\s+(.*?)$/gm, '<li class="list-disc ml-4 mb-2">$1</li>');
+			// Check if paragraph contains bullet points
+			let lines = paragraph.split('\n');
+			let hasBullets = lines.some(line => line.trim().match(/^[-*]\s+/));
 			
-			// Wrap bullet point lists in <ul> tags
-			text = text.replace(/(<li class="list-disc ml-4 mb-2">.*?<\/li>)+/g, '<ul class="list-disc ml-4 space-y-2 mb-4">$&</ul>');
+			if (hasBullets) {
+				// Process bullet points
+				let processedLines = lines.map(line => {
+					if (line.trim().match(/^[-*]\s+/)) {
+						// Extract the content after the bullet
+						let content = line.replace(/^[-*]\s+/, '');
+						return `<li class="mb-1">${content}</li>`;
+					}
+					return line;
+				});
+				
+				// Filter out empty lines and wrap in ul
+				let listItems = processedLines.filter(line => line.trim().length > 0);
+				if (listItems.length > 0) {
+					return `<ul class="list-disc ml-6 space-y-1 mb-3">${listItems.join('')}</ul>`;
+				}
+			}
 			
-			// Convert line breaks to <br> (but not within list items)
-			text = text.replace(/\n(?!<li)/g, '<br>');
-			
-			// Clean up any double <br> tags
-			text = text.replace(/<br><br>/g, '<br>');
+			// Regular paragraph
+			return `<p class="mb-3 leading-relaxed">${paragraph}</p>`;
+		});
+		
+		return paragraphs.join('');
+	}
+
+	// Function to format CV keywords nicely
+	function formatCvKeywords(keywords) {
+		if (!keywords) return '';
+		
+		// If it's already an array, format it nicely
+		if (Array.isArray(keywords)) {
+			return keywords.map(keyword => keyword.trim()).filter(keyword => keyword.length > 0);
 		}
 		
-		return text;
+		// If it's a string, try to parse it as JSON
+		if (typeof keywords === 'string') {
+			try {
+				// Handle the case where it's stored as a JSON string
+				const parsed = JSON.parse(keywords);
+				if (Array.isArray(parsed)) {
+					return parsed.map(keyword => keyword.trim()).filter(keyword => keyword.length > 0);
+				}
+				return [keywords]; // If parsing fails, return as single item
+			} catch (e) {
+				// If it's not valid JSON, try to extract keywords from the string
+				// Look for patterns like "keyword1", "keyword2", etc.
+				const keywordMatches = keywords.match(/"([^"]+)"/g);
+				if (keywordMatches) {
+					return keywordMatches.map(match => match.replace(/"/g, '').trim()).filter(keyword => keyword.length > 0);
+				}
+				// If no quotes found, split by commas
+				return keywords.split(',').map(keyword => keyword.trim()).filter(keyword => keyword.length > 0);
+			}
+		}
+		
+		return keywords;
 	}
 
 	// Function to truncate text for preview
@@ -1531,12 +1573,59 @@
 
 	// Function to toggle pain points expansion
 	function togglePainPointsExpansion(letterId) {
-		if (expandedPainPoints.has(letterId)) {
-			expandedPainPoints.delete(letterId);
+		if (expandedPainPoints.includes(letterId)) {
+			expandedPainPoints = expandedPainPoints.filter(id => id !== letterId);
 		} else {
-			expandedPainPoints.add(letterId);
+			expandedPainPoints.push(letterId);
 		}
-		expandedPainPoints = expandedPainPoints; // Trigger reactivity
+		// Force reactivity by creating a new array
+		expandedPainPoints = [...expandedPainPoints];
+	}
+
+	// FIXED COLLAPSE FUNCTIONS
+	function isLetterCollapsed(letterId) {
+		return collapsedLetterBoxes.includes(String(letterId));
+	}
+
+	function toggleLetterBoxCollapse(letterId) {
+		const stringId = String(letterId);
+		
+		if (collapsedLetterBoxes.includes(stringId)) {
+			// Remove from collapsed array (expand)
+			collapsedLetterBoxes = collapsedLetterBoxes.filter(id => id !== stringId);
+		} else {
+			// Add to collapsed array (collapse)
+			collapsedLetterBoxes = [...collapsedLetterBoxes, stringId];
+		}
+	}
+
+	function collapseAllLetterBoxes() {
+		collapsedLetterBoxes = applicationLetters.map(letter => String(letter.id));
+		allBoxesCollapsed = true;
+	}
+
+	function expandAllLetterBoxes() {
+		collapsedLetterBoxes = [];
+		allBoxesCollapsed = false;
+	}
+
+	// Function to get first two lines of text for collapsed preview
+	function getFirstTwoLines(text, maxLength = 150) {
+		if (!text) return '';
+		
+		// Remove HTML tags for preview
+		const plainText = text.replace(/<[^>]*>/g, '');
+		
+		// Split into lines and take first two
+		const lines = plainText.split('\n').filter(line => line.trim().length > 0);
+		const firstTwoLines = lines.slice(0, 2).join(' ');
+		
+		// Truncate if too long
+		if (firstTwoLines.length > maxLength) {
+			return firstTwoLines.substring(0, maxLength) + '...';
+		}
+		
+		return firstTwoLines;
 	}
 
 	// Real-time subscription for application letters
@@ -2017,7 +2106,7 @@
 									</label>
 									<div class="border border-gray-300 rounded-lg bg-green-50 p-3">
 										{#if painPoints}
-											{#if expandedPainPoints.has('form')}
+											{#if expandedPainPoints.includes('form')}
 												<!-- Show full content when expanded -->
 												<div class="text-sm text-gray-700 prose prose-sm max-w-none">
 													{@html parseMarkdown(painPoints)}
@@ -2161,109 +2250,75 @@
 					</div>
 				</div>
 			{:else}
+				<!-- Collapse All / Expand All Controls -->
+				<div class="flex items-center justify-between mb-4">
+					<div class="flex items-center space-x-3">
+						<button
+							on:click={collapseAllLetterBoxes}
+							class="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+							type="button"
+							aria-label="Collapse all letter boxes"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+							</svg>
+							<span>Collapse All</span>
+						</button>
+						
+						<button
+							on:click={expandAllLetterBoxes}
+							class="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+							type="button"
+							aria-label="Expand all letter boxes"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+							</svg>
+							<span>Expand All</span>
+						</button>
+					</div>
+					
+					<div class="text-sm text-gray-500">
+						{applicationLetters.length} application letter{applicationLetters.length !== 1 ? 's' : ''}
+					</div>
+				</div>
+				
 				<div class="space-y-6">
 					{#each applicationLetters as letter, index}
 						<div class="bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300">
 							
-							<!-- Letter Header -->
+							<!-- Letter Header - ALWAYS VISIBLE -->
 							<div class="flex items-start justify-between mb-4">
 								<div class="flex-1">
-									<h3 class="text-xl font-semibold text-gray-900 mb-1">{letter.company_name}</h3>
+									<div class="flex items-center space-x-3 mb-1">
+										<h3 class="text-xl font-semibold text-gray-900">{letter.company_name}</h3>
+										
+										<!-- Collapse/Expand Toggle Button -->
+										<button
+											on:click={() => toggleLetterBoxCollapse(letter.id)}
+											class="flex items-center space-x-1 p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
+											type="button"
+											aria-label="{isLetterCollapsed(letter.id) ? 'Expand' : 'Collapse'} letter box"
+											title="{isLetterCollapsed(letter.id) ? 'Expand' : 'Collapse'} letter box"
+										>
+											{#if isLetterCollapsed(letter.id)}
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+												</svg>
+											{:else}
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+												</svg>
+											{/if}
+										</button>
+									</div>
 									{#if letter.job_title}
 										<p class="text-lg font-bold text-gray-800 mb-2">{letter.job_title}</p>
 									{/if}
-									
-									<!-- Job URL Line -->
-									{#if letter.job_url}
-										<div class="text-sm text-gray-600 mb-2">
-											<span class="font-medium">Job URL:</span>
-											<a href="{letter.job_url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline ml-2" title="{letter.job_url}">
-												{letter.job_url.length > 50 ? letter.job_url.substring(0, 47) + '...' : letter.job_url}
-											</a>
-										</div>
-									{/if}
-									
-									<!-- Dates Line -->
-									<div class="text-sm text-gray-500 mb-2">
-										<span>
-											{$t('letters.created_at')}: {new Date(letter.created_at).toLocaleDateString()}
-											{#if letter.updated_at !== letter.created_at}
-												{$t('letters.updated_at')}: {new Date(letter.updated_at).toLocaleDateString()}
-											{/if}
-										</span>
-									</div>
-									
-									<!-- Attributes Line (Language, Tone, Versions) -->
-									<div class="flex items-center space-x-4 text-sm text-gray-500 mb-12">
-										{#if letter.language}
-											<span class="flex items-center">
-												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-												</svg>
-												{getLanguageDisplayName(letter.language)}
-											</span>
-										{/if}
-										{#if letter.tone}
-											<span class="flex items-center">
-												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-												</svg>
-												{letter.tone.charAt(0).toUpperCase() + letter.tone.slice(1)}
-											</span>
-										{/if}
-										
-										<!-- Version Count Indicator -->
-										{#if letterVersions[letter.id] && letterVersions[letter.id].length > 1}
-											<button
-												on:click={() => viewLetter(letter.id)}
-												class="flex items-center text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-2 py-1 rounded transition-colors cursor-pointer"
-												type="button"
-												title="Click to view letter versions"
-											>
-												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-												</svg>
-												{letterVersions[letter.id].length} {$t('letters.versions')}
-											</button>
-										{/if}
-									</div>
-									
-									<!-- Status Section (Dropdown + Timeline) -->
-									<div class="flex items-center space-x-8 mb-6">
-										<!-- Status Dropdown with Label -->
-										<div class="flex flex-col">
-											<label class="text-xs text-gray-500 mb-1 pl-4">{$t('letters.set_application_status')}</label>
-											<select 
-												value={letter.status}
-												on:change={(e) => handleStatusChange(letter.id, e)}
-												class="px-4 py-2 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 min-w-[200px] {getStatusColor(letter.status)}"
-												aria-label="Change letter status"
-												disabled={letter.status === 'draft' && !isLetterGenerated(letter)}
-											>
-												{#each statusOptions as option}
-													<option value={option.value}>{$t(`letters.status.${option.value}`)}</option>
-												{/each}
-											</select>
-										</div>
-										
-										<!-- Status Timeline -->
-										<div class="flex items-center space-x-2">
-											{#if getStatusTimeline(letter).length > 0}
-												<div class="flex flex-wrap items-center gap-2">
-													{#each getStatusTimeline(letter) as event}
-														<span class="text-xs px-2 py-1 rounded-full bg-gray-100 {event.color} font-medium">
-															{event.label} {new Date(event.date).toLocaleDateString()}
-														</span>
-													{/each}
-												</div>
-											{/if}
-										</div>
-									</div>
 								</div>
 								
-								<!-- Action Buttons Section -->
+								<!-- Action Buttons Section - ALWAYS VISIBLE -->
 								<div class="flex items-center space-x-4">
-									
 									<!-- Direct Action Buttons or Generating State -->
 									{#if letter.status === 'draft' && !isLetterGenerated(letter)}
 										{#if letter.pain_points && !letter.content_html && !letter.letter_content_html}
@@ -2283,7 +2338,7 @@
 													<span class="ml-1">{$t('buttons.delete')}</span>
 												</button>
 											</div>
-										{:else if pollingErrors[letter.id]}
+										{:else if pollingErrors[typeof letter.id === 'string' ? parseInt(letter.id, 10) : letter.id]}
 											<div class="flex flex-col items-end min-w-[180px]">
 												<div class="flex items-center space-x-2 mb-1">
 													<svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2313,7 +2368,7 @@
 													<div class="w-40 bg-gray-200 rounded-full h-2">
 														<div 
 															class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-200"
-															style="width: {Math.round((letterProgress[letter.id] || 0) * 100)}%"
+															style="width: {Math.round((letterProgress[typeof letter.id === 'string' ? parseInt(letter.id, 10) : letter.id] || 0) * 100)}%"
 														></div>
 													</div>
 													<div class="text-xs text-gray-500 mt-1">{$t('letters.estimate_time')}</div>
@@ -2402,322 +2457,465 @@
 													<span class="ml-1">{$t('letters.update_company_name')}</span>
 												</button>
 											{/if}
-											
-
 										</div>
 									{/if}
 								</div>
 							</div>
 
-
-
-							<!-- Letter Details -->
-							<div class="mb-4 space-y-2">
-								{#if letter.pain_points}
-									<div>
-										<span class="text-xs font-medium text-gray-600">{$t('letters.key_pain_points')}</span>
-										<div class="mt-1 bg-gray-50 p-3 rounded">
-											{#if expandedPainPoints.has(letter.id)}
-												<!-- Show full content when expanded -->
-												<div class="text-sm text-gray-700 prose prose-sm max-w-none">
-													{@html parseMarkdown(letter.pain_points)}
-												</div>
-												<button 
-													on:click={() => togglePainPointsExpansion(letter.id)}
-													class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
-													type="button"
-													aria-label="Show less"
-												>
-													Show less
-												</button>
-											{:else}
-												<!-- Show truncated content when collapsed -->
-												<div class="text-sm text-gray-700 prose prose-sm max-w-none">
-													{@html parseMarkdown(truncateText(letter.pain_points))}
-												</div>
-												{#if letter.pain_points.length > 300}
+							<!-- Letter Details - ONLY SHOW WHEN EXPANDED -->
+							{#if !isLetterCollapsed(letter.id)}
+								<div class="mb-4 space-y-2">
+									{#if letter.pain_points}
+										<div>
+											<span class="text-xs font-medium text-gray-600">{$t('letters.key_pain_points')}</span>
+											<div class="mt-1 bg-gray-50 p-3 rounded">
+												{#if expandedPainPoints.includes(letter.id)}
+													<!-- Show full content when expanded -->
+													<div class="text-sm text-gray-700 prose prose-sm max-w-none">
+														{@html parseMarkdown(letter.pain_points)}
+													</div>
 													<button 
 														on:click={() => togglePainPointsExpansion(letter.id)}
 														class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
 														type="button"
-														aria-label="Show more"
+														aria-label="{$t('letters.show_less')}"
 													>
-														Show more
+														{$t('letters.show_less')}
 													</button>
+												{:else}
+													<!-- Show truncated content when collapsed -->
+													<div class="text-sm text-gray-700 prose prose-sm max-w-none">
+														{@html parseMarkdown(truncateText(letter.pain_points))}
+													</div>
+													{#if letter.pain_points.length > 300}
+														<button 
+															on:click={() => togglePainPointsExpansion(letter.id)}
+															class="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium transition-colors"
+															type="button"
+															aria-label="{$t('letters.show_more')}"
+														>
+															{$t('letters.show_more')}
+														</button>
+													{/if}
 												{/if}
+											</div>
+											
+											<!-- Continue Letter Generation Button (only for letters with pain points but no content) -->
+											{#if letter.status === 'draft' && !letter.content_html && !letter.letter_content_html}
+												<div class="mt-3 flex justify-center">
+													<button 
+														on:click={() => continueLetterGeneration(letter)}
+														class="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-base shadow-md border border-blue-700"
+														type="button"
+														aria-label="{$t('letters.continue_letter_generation')}"
+														title="{$t('letters.continue_letter_generation')}"
+													>
+														<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+														</svg>
+														<span>{letter.address && letter.address.trim() ? $t('letters.generate_letter_now') : $t('letters.continue_letter_generation')}</span>
+													</button>
+												</div>
+											{/if}
+										</div>
+									{/if}
+									
+									<!-- Inline Address Field for Continuing Letter Generation -->
+									{#if continuingLetterId === letter.id}
+										<div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+											<div class="mb-3">
+												<label for="inline-address-{letter.id}" class="block text-sm font-medium text-gray-700 mb-2">
+													<span class="text-red-500">*</span> {$t('letters.company_recipient')}
+												</label>
+												<textarea
+													id="inline-address-{letter.id}"
+													bind:value={address}
+													placeholder="{$t('letters.address_placeholder')}"
+													class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+													rows="3"
+													required
+												></textarea>
+												<p class="text-xs text-gray-500 mt-1">{$t('letters.address_hint')}</p>
+											</div>
+											
+											<div class="flex items-center space-x-3">
+												<button
+													on:click={generateLetter}
+													disabled={generating || !address.trim()}
+													class="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+													type="button"
+													aria-label="{$t('letters.generate_letter')}"
+												>
+													{#if generating}
+														<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+														<span>{$t('letters.generating')}</span>
+													{:else}
+														<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+														</svg>
+														<span>{$t('letters.generate_letter')}</span>
+													{/if}
+												</button>
+												
+												<button
+													on:click={() => {
+														continuingLetterId = null;
+														currentLetterId = null;
+														address = '';
+														newLetterTone = 'professional';
+													}}
+													class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
+													type="button"
+													aria-label="{$t('letters.cancel')}"
+												>
+													{$t('letters.cancel')}
+												</button>
+											</div>
+										</div>
+									{:else if letter.address}
+										<div>
+											<span class="text-xs font-medium text-gray-600">{$t('letters.address')}</span>
+											<p class="text-sm text-gray-700 mt-1 bg-gray-50 p-2 rounded whitespace-pre-line">{letter.address}</p>
+										</div>
+									{/if}
+								</div>
+
+								<!-- Additional Letter Details (only shown when expanded) -->
+								<div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+									<!-- Job URL Line -->
+									{#if letter.job_url}
+										<div class="text-sm text-gray-600 mb-3">
+											<span class="font-medium">Job URL:</span>
+											<a href="{letter.job_url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 underline ml-2" title="{letter.job_url}">
+												{letter.job_url.length > 50 ? letter.job_url.substring(0, 47) + '...' : letter.job_url}
+											</a>
+										</div>
+									{/if}
+									
+									<!-- Dates Line -->
+									<div class="text-sm text-gray-500 mb-3">
+										<span>
+											{$t('letters.created_at')}: {new Date(letter.created_at).toLocaleDateString()}
+											{#if letter.updated_at !== letter.created_at}
+												{$t('letters.updated_at')}: {new Date(letter.updated_at).toLocaleDateString()}
+											{/if}
+										</span>
+									</div>
+									
+									<!-- Attributes Line (Language, Tone, Versions) -->
+									<div class="flex items-center space-x-4 text-sm text-gray-500 mb-3">
+										{#if letter.language}
+											<span class="flex items-center">
+												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+												</svg>
+												{getLanguageDisplayName(letter.language)}
+											</span>
+										{/if}
+										{#if letter.tone}
+											<span class="flex items-center">
+												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+												</svg>
+												{letter.tone.charAt(0).toUpperCase() + letter.tone.slice(1)}
+											</span>
+										{/if}
+										
+										<!-- Version Count Indicator -->
+										{#if letterVersions[letter.id] && letterVersions[letter.id].length > 1}
+											<button
+												on:click={() => viewLetter(letter.id)}
+												class="flex items-center text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-2 py-1 rounded transition-colors cursor-pointer"
+												type="button"
+												title="Click to view letter versions"
+											>
+												<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+												</svg>
+												{letterVersions[letter.id].length} {$t('letters.versions')}
+											</button>
+										{/if}
+									</div>
+									
+									<!-- Status Section (Dropdown + Timeline) -->
+									<div class="flex items-center space-x-8">
+										<!-- Status Dropdown with Label -->
+										<div class="flex flex-col">
+											<label class="text-xs text-gray-500 mb-1 pl-4">{$t('letters.set_application_status')}</label>
+											<select 
+												value={letter.status}
+												on:change={(e) => handleStatusChange(letter.id, e)}
+												class="px-4 py-2 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 min-w-[200px] {getStatusColor(letter.status)}"
+												aria-label="Change letter status"
+												disabled={letter.status === 'draft' && !isLetterGenerated(letter)}
+											>
+												{#each statusOptions as option}
+													<option value={option.value}>{$t(`letters.status.${option.value}`)}</option>
+												{/each}
+											</select>
+										</div>
+										
+										<!-- Status Timeline -->
+										<div class="flex items-center space-x-2">
+											{#if getStatusTimeline(letter).length > 0}
+												<div class="flex flex-wrap items-center gap-2">
+													{#each getStatusTimeline(letter) as event}
+														<span class="text-xs px-2 py-1 rounded-full bg-gray-100 {event.color} font-medium">
+															{event.label} {new Date(event.date).toLocaleDateString()}
+														</span>
+													{/each}
+												</div>
+											{/if}
+										</div>
+									</div>
+								</div>
+
+								<!-- Notes Section -->
+								<div class="border-t border-gray-100 pt-4 mb-6">
+									<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+										<div class="flex items-start justify-between mb-2">
+											<label for="notes-{letter.id}" class="text-sm font-medium text-gray-700">{$t('letters.notes')}</label>
+											{#if editingNotes[letter.id] !== undefined}
+												<div class="flex items-center space-x-2">
+													<button 
+														on:click={() => saveNotes(letter.id)}
+														class="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+														type="button"
+														aria-label="Save notes"
+													>
+														{$t('letters.save')}
+													</button>
+													<button 
+														on:click={() => cancelEditingNotes(letter.id)}
+														class="text-xs px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+														type="button"
+														aria-label="Cancel editing notes"
+													>
+														{$t('letters.cancel')}
+													</button>
+												</div>
+											{:else}
+												<button 
+													on:click={() => startEditingNotes(letter.id, letter.notes)}
+													class="text-xs text-indigo-600 hover:text-indigo-800 transition-colors"
+													type="button"
+													aria-label={letter.notes ? $t('letters.edit_notes') : $t('letters.add_note')}
+												>
+													{letter.notes ? $t('letters.edit') : $t('letters.add_note')}
+												</button>
 											{/if}
 										</div>
 										
-										<!-- Continue Letter Generation Button (only for letters with pain points but no content) -->
-										{#if letter.status === 'draft' && !letter.content_html && !letter.letter_content_html}
-											<div class="mt-3 flex justify-center">
-												<button 
-													on:click={() => continueLetterGeneration(letter)}
-													class="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold text-base shadow-md border border-blue-700"
-													type="button"
-													aria-label="{$t('letters.continue_letter_generation')}"
-													title="{$t('letters.continue_letter_generation')}"
-												>
-													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-													</svg>
-													<span>{letter.address && letter.address.trim() ? $t('letters.generate_letter_now') : $t('letters.continue_letter_generation')}</span>
-												</button>
-											</div>
+										{#if editingNotes[letter.id] !== undefined}
+											<textarea
+												id="notes-{letter.id}"
+												bind:value={editingNotes[letter.id]}
+												placeholder="{$t('letters.notes_placeholder')}"
+												class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-sm"
+												rows="3"
+												aria-label="Letter notes"
+											></textarea>
+										{:else}
+											<p class="text-sm text-gray-600 italic min-h-[1.5rem]">
+												{letter.notes || $t('letters.no_notes_added')}
+											</p>
 										{/if}
 									</div>
-								{/if}
-								<!-- Inline Address Field for Continuing Letter Generation -->
-								{#if continuingLetterId === letter.id}
-									<div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-										<div class="mb-3">
-											<label for="inline-address-{letter.id}" class="block text-sm font-medium text-gray-700 mb-2">
-												<span class="text-red-500">*</span> {$t('letters.company_recipient')}
-											</label>
-											<textarea
-												id="inline-address-{letter.id}"
-												bind:value={address}
-												placeholder="{$t('letters.address_placeholder')}"
-												class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-												rows="3"
-												required
-											></textarea>
-											<p class="text-xs text-gray-500 mt-1">{$t('letters.address_hint')}</p>
-										</div>
+								</div>
+								
+								<!-- CV Section - Only show when there's actual CV data -->
+								{#if letter.cv_tagline || letter.cv_keywords || letter.cv_managementsummary || letter.cv_tips}
+									<div class="border-t border-gray-100 pt-4">
+										<h4 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+											<svg class="w-6 h-6 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+											</svg>
+											{$t('letters.cv_enhancement')}
+										</h4>
 										
-										<div class="flex items-center space-x-3">
-											<button
-												on:click={generateLetter}
-												disabled={generating || !address.trim()}
-												class="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-												type="button"
-												aria-label="{$t('letters.generate_letter')}"
-											>
-												{#if generating}
-													<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-													<span>{$t('letters.generating')}</span>
-												{:else}
-													<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-													</svg>
-													<span>{$t('letters.generate_letter')}</span>
-												{/if}
-											</button>
+										<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+											<!-- CV Tagline -->
+											{#if letter.cv_tagline}
+												<div class="space-y-2">
+													<div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4 min-h-[100px] relative shadow-sm hover:shadow-md transition-shadow duration-200">
+														<div class="flex items-center justify-between mb-3">
+															<label class="text-sm font-semibold text-blue-800 flex items-center">
+																<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+																</svg>
+																CV Tagline
+															</label>
+															<button 
+																on:click={(e) => {
+																	navigator.clipboard.writeText(letter.cv_tagline);
+																	// Show temporary confirmation
+																	const btn = e.target;
+																	const originalText = btn.textContent;
+																	btn.textContent = 'Copied!';
+																	btn.classList.add('bg-green-600', 'hover:bg-green-700');
+																	btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+																	setTimeout(() => {
+																		btn.textContent = originalText;
+																		btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+																		btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+																	}, 2000);
+																}}
+																class="text-xs px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium shadow-sm"
+																type="button"
+																title="Copy to clipboard"
+															>
+																Copy
+															</button>
+														</div>
+														<div class="text-sm text-gray-700 prose prose-sm max-w-none leading-relaxed">
+															{@html parseMarkdown(letter.cv_tagline)}
+														</div>
+													</div>
+												</div>
+											{/if}
 											
-											<button
-												on:click={() => {
-													continuingLetterId = null;
-													currentLetterId = null;
-													address = '';
-													newLetterTone = 'professional';
-												}}
-												class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
-												type="button"
-												aria-label="{$t('letters.cancel')}"
-											>
-												{$t('letters.cancel')}
-											</button>
+											<!-- Keywords to use in CV -->
+											{#if letter.cv_keywords}
+												<div class="space-y-2">
+													<div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4 min-h-[100px] relative shadow-sm hover:shadow-md transition-shadow duration-200">
+														<div class="flex items-center justify-between mb-3">
+															<label class="text-sm font-semibold text-green-800 flex items-center">
+																<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7.732A4 4 0 0115.732 4h1.086a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V15.732A4 4 0 0112.268 20H7.268A4 4 0 013 15.732V8.268a1 1 0 01.293-.707L6.707 4.293A1 1 0 017.414 4H8.268A4 4 0 0112 7.732z" />
+																</svg>
+																{$t('letters.cv_keywords')}
+															</label>
+															<button 
+																on:click={(e) => {
+																	navigator.clipboard.writeText(letter.cv_keywords);
+																	// Show temporary confirmation
+																	const btn = e.target;
+																	const originalText = btn.textContent;
+																	btn.textContent = $t('letters.copied');
+																	btn.classList.add('bg-green-600', 'hover:bg-green-700');
+																	btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+																	setTimeout(() => {
+																		btn.textContent = originalText;
+																		btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+																	}, 2000);
+																}}
+																class="text-xs px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 font-medium shadow-sm"
+																type="button"
+																title="Copy to clipboard"
+															>
+																{$t('letters.copy')}
+															</button>
+														</div>
+														<div class="text-sm text-gray-700">
+															<!-- Always use formatCvKeywords to handle both arrays and strings -->
+															<div class="flex flex-wrap gap-2">
+																{#each formatCvKeywords(letter.cv_keywords) as keyword}
+																	<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full border border-green-200 hover:bg-green-200 transition-colors">
+																		{keyword}
+																	</span>
+																{/each}
+															</div>
+														</div>
+													</div>
+												</div>
+											{/if}
+											
+											<!-- Management Summary -->
+											{#if letter.cv_managementsummary}
+												<div class="space-y-2 lg:col-span-2">
+													<div class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-4 min-h-[140px] relative shadow-sm hover:shadow-md transition-shadow duration-200">
+														<div class="flex items-center justify-between mb-3">
+															<label class="text-sm font-semibold text-purple-800 flex items-center">
+																<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+																</svg>
+																{$t('letters.cv_management_summary')}
+															</label>
+															<button 
+																on:click={(e) => {
+																	navigator.clipboard.writeText(letter.cv_managementsummary);
+																	// Show temporary confirmation
+																	const btn = e.target;
+																	const originalText = btn.textContent;
+																	btn.textContent = $t('letters.copied');
+																	btn.classList.add('bg-green-600', 'hover:bg-green-700');
+																	btn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+																	setTimeout(() => {
+																		btn.textContent = originalText;
+																		btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+																	}, 2000);
+																}}
+																class="text-xs px-3 py-1.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all duration-200 font-medium shadow-sm"
+																type="button"
+																title="Copy to clipboard"
+															>
+																{$t('letters.copy')}
+															</button>
+														</div>
+														<div class="text-sm text-gray-700 prose prose-sm max-w-none leading-relaxed">
+															{@html parseMarkdown(letter.cv_managementsummary)}
+														</div>
+													</div>
+												</div>
+											{/if}
+											
+											<!-- CV Tips -->
+											{#if letter.cv_tips}
+												<div class="space-y-2 lg:col-span-2">
+													<div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-4 min-h-[160px] relative shadow-sm hover:shadow-md transition-shadow duration-200">
+														<div class="flex items-center justify-between mb-3">
+															<label class="text-sm font-semibold text-orange-800 flex items-center">
+																<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+																</svg>
+																{$t('letters.cv_enhancement_tips')}
+															</label>
+															<button 
+																on:click={(e) => {
+																	navigator.clipboard.writeText(letter.cv_tips);
+																	// Show temporary confirmation
+																	const btn = e.target;
+																	const originalText = btn.textContent;
+																	btn.textContent = $t('letters.copied');
+																	btn.classList.add('bg-green-600', 'hover:bg-green-700');
+																	btn.classList.remove('bg-orange-600', 'hover:bg-orange-700');
+																	setTimeout(() => {
+																		btn.textContent = originalText;
+																		btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+																	}, 2000);
+																}}
+																class="text-xs px-3 py-1.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-all duration-200 font-medium shadow-sm"
+																type="button"
+																title="Copy to clipboard"
+															>
+																{$t('letters.copy')}
+															</button>
+														</div>
+														<div class="text-sm text-gray-700 prose prose-sm max-w-none leading-relaxed">
+															{@html parseMarkdown(letter.cv_tips)}
+														</div>
+													</div>
+												</div>
+											{/if}
 										</div>
 									</div>
-								{:else if letter.address}
-									<div>
-										<span class="text-xs font-medium text-gray-600">{$t('letters.address')}</span>
-										<p class="text-sm text-gray-700 mt-1 bg-gray-50 p-2 rounded whitespace-pre-line">{letter.address}</p>
-									</div>
-								{/if}
-							</div>
-
-							<!-- Notes Section -->
-							<div class="border-t border-gray-100 pt-4 mb-6">
-								<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-								<div class="flex items-start justify-between mb-2">
-									<label for="notes-{letter.id}" class="text-sm font-medium text-gray-700">{$t('letters.notes')}</label>
-									{#if editingNotes[letter.id] !== undefined}
-										<div class="flex items-center space-x-2">
-											<button 
-												on:click={() => saveNotes(letter.id)}
-												class="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-												type="button"
-												aria-label="Save notes"
-											>
-												{$t('letters.save')}
-											</button>
-											<button 
-												on:click={() => cancelEditingNotes(letter.id)}
-												class="text-xs px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-												type="button"
-												aria-label="Cancel editing notes"
-											>
-												{$t('letters.cancel')}
-											</button>
-										</div>
-									{:else}
-										<button 
-											on:click={() => startEditingNotes(letter.id, letter.notes)}
-											class="text-xs text-indigo-600 hover:text-indigo-800 transition-colors"
-											type="button"
-											aria-label={letter.notes ? $t('letters.edit_notes') : $t('letters.add_note')}
-										>
-											{letter.notes ? $t('letters.edit') : $t('letters.add_note')}
-										</button>
-									{/if}
-								</div>
-								
-								{#if editingNotes[letter.id] !== undefined}
-									<textarea
-										id="notes-{letter.id}"
-										bind:value={editingNotes[letter.id]}
-										placeholder="{$t('letters.notes_placeholder')}"
-										class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-sm"
-										rows="3"
-										aria-label="Letter notes"
-									></textarea>
 								{:else}
-									<p class="text-sm text-gray-600 italic min-h-[1.5rem]">
-										{letter.notes || $t('letters.no_notes_added')}
-									</p>
+									<!-- CV Section Placeholder - Only show for generated letters -->
+									{#if letter.content_html || letter.letter_content_html}
+										<div class="border-t border-gray-100 pt-4">
+											<div class="text-center py-6">
+												<div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
+													<svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+													</svg>
+												</div>
+												<h4 class="text-lg font-medium text-gray-900 mb-2">{$t('letters.cv_enhancement')}</h4>
+												<p class="text-sm text-gray-500">{$t('letters.cv_enhancement_placeholder')}</p>
+											</div>
+										</div>
+									{/if}
 								{/if}
-								</div>
-							</div>
-							
-							<!-- CV Section -->
-							<div class="border-t border-gray-100 pt-4">
-								<h4 class="text-xl font-bold text-gray-900 mb-6">{$t('letters.cv_enhancement')}</h4>
-								
-								<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-									<!-- CV Tagline -->
-									<div class="space-y-2">
-										<div class="bg-blue-50 border border-blue-200 rounded-lg p-3 min-h-[80px] relative">
-											<div class="flex items-center justify-between mb-2">
-												<label class="text-sm font-medium text-gray-700">CV Tagline</label>
-												<button 
-													on:click={(e) => {
-														navigator.clipboard.writeText(letter.cv_tagline || 'Tagline will be generated based on your profile and this application...');
-														// Show temporary confirmation
-														const btn = e.target;
-														const originalText = btn.textContent;
-														btn.textContent = 'Copied!';
-														btn.classList.add('bg-green-600', 'hover:bg-green-700');
-														btn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-														setTimeout(() => {
-															btn.textContent = originalText;
-															btn.classList.remove('bg-green-600', 'hover:bg-green-700');
-															btn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-														}, 2000);
-													}}
-													class="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-													type="button"
-													title="Copy to clipboard"
-												>
-													Copy
-												</button>
-											</div>
-											<p class="text-sm text-gray-700">
-												{letter.cv_tagline || 'Tagline will be generated based on your profile and this application...'}
-											</p>
-										</div>
-									</div>
-									
-									<!-- Keywords to use in CV -->
-									<div class="space-y-2">
-										<div class="bg-green-50 border border-green-200 rounded-lg p-3 min-h-[80px] relative">
-											<div class="flex items-center justify-between mb-2">
-												<label class="text-sm font-medium text-gray-700">{$t('letters.cv_keywords')}</label>
-												<button 
-													on:click={(e) => {
-														navigator.clipboard.writeText(letter.cv_keywords || $t('letters.cv_keywords_placeholder'));
-														// Show temporary confirmation
-														const btn = e.target;
-														const originalText = btn.textContent;
-														btn.textContent = $t('letters.copied');
-														btn.classList.add('bg-green-600', 'hover:bg-green-700');
-														btn.classList.remove('bg-green-600', 'hover:bg-green-700');
-														setTimeout(() => {
-															btn.textContent = originalText;
-															btn.classList.remove('bg-green-600', 'hover:bg-green-700');
-															btn.classList.add('bg-green-600', 'hover:bg-green-700');
-														}, 2000);
-													}}
-													class="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-													type="button"
-													title="Copy to clipboard"
-												>
-													{$t('letters.copy')}
-												</button>
-											</div>
-											<p class="text-sm text-gray-700">
-												{letter.cv_keywords || $t('letters.cv_keywords_placeholder')}
-											</p>
-										</div>
-									</div>
-									
-									<!-- Management Summary -->
-									<div class="space-y-2 lg:col-span-2">
-										<div class="bg-purple-50 border border-purple-200 rounded-lg p-3 min-h-[120px] relative">
-											<div class="flex items-center justify-between mb-2">
-												<label class="text-sm font-medium text-gray-700">{$t('letters.cv_management_summary')}</label>
-												<button 
-													on:click={(e) => {
-														navigator.clipboard.writeText(letter.cv_management_summary || $t('letters.cv_management_summary_placeholder'));
-														// Show temporary confirmation
-														const btn = e.target;
-														const originalText = btn.textContent;
-														btn.textContent = $t('letters.copied');
-														btn.classList.add('bg-green-600', 'hover:bg-green-700');
-														btn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
-														setTimeout(() => {
-															btn.textContent = originalText;
-															btn.classList.remove('bg-green-600', 'hover:bg-green-700');
-															btn.classList.add('bg-purple-600', 'hover:bg-purple-700');
-														}, 2000);
-													}}
-													class="text-xs px-2 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-													type="button"
-													title="Copy to clipboard"
-												>
-													{$t('letters.copy')}
-												</button>
-											</div>
-											<p class="text-sm text-gray-700">
-												{letter.cv_management_summary || $t('letters.cv_management_summary_placeholder')}
-											</p>
-										</div>
-									</div>
-									
-									<!-- CV Tips -->
-									<div class="space-y-2 lg:col-span-2">
-										<div class="bg-orange-50 border border-orange-200 rounded-lg p-3 min-h-[100px] relative">
-											<div class="flex items-center justify-between mb-2">
-												<label class="text-sm font-medium text-gray-700">{$t('letters.cv_enhancement_tips')}</label>
-												<button 
-													on:click={(e) => {
-														navigator.clipboard.writeText(letter.cv_tips || $t('letters.cv_tips_placeholder'));
-														// Show temporary confirmation
-														const btn = e.target;
-														const originalText = btn.textContent;
-														btn.textContent = $t('letters.copied');
-														btn.classList.add('bg-green-600', 'hover:bg-green-700');
-														btn.classList.remove('bg-orange-600', 'hover:bg-orange-700');
-														setTimeout(() => {
-															btn.textContent = originalText;
-															btn.classList.remove('bg-green-600', 'hover:bg-green-700');
-															btn.classList.add('bg-orange-600', 'hover:bg-orange-700');
-														}, 2000);
-													}}
-													class="text-xs px-2 py-1 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
-													type="button"
-													title="Copy to clipboard"
-												>
-													{$t('letters.copy')}
-												</button>
-											</div>
-											<p class="text-sm text-gray-700">
-												{letter.cv_tips || $t('letters.cv_tips_placeholder')}
-											</p>
-										</div>
-									</div>
-								</div>
-							</div>
+							{/if}
 						</div>
 					{/each}
 				</div>

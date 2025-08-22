@@ -212,7 +212,8 @@
     "show_less": "Weniger anzeigen",
     "show_more": "Mehr anzeigen",
     "pain_points_will_appear": "Schwachstellen werden hier nach der Analyse angezeigt...",
-    "pain_points_analyzed": "✓ Schwachstellen vom Unternehmensportal analysiert"
+    "pain_points_analyzed": "✓ Schwachstellen vom Unternehmensportal analysiert",
+    "cv_enhancement_placeholder": "CV-Verbesserungsfunktionen werden verfügbar sein, sobald KI-generierte CV-Inhalte für diese Bewerbung bereit sind."
   },
   "all_documents": {
     "title": "Alle generierten Dokumente",

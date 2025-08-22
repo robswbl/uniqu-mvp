@@ -217,7 +217,8 @@
     "show_less": "Show less",
     "show_more": "Show more",
     "pain_points_will_appear": "Pain points will appear here after analysis...",
-    "pain_points_analyzed": "✓ Pain points analyzed from company portal"
+    "pain_points_analyzed": "✓ Pain points analyzed from company portal",
+    "cv_enhancement_placeholder": "CV enhancement features will be available once AI-generated CV content is ready for this application."
   },
   "all_documents": {
     "title": "All Generated Documents",

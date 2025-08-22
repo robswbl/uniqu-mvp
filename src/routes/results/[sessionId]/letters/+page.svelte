@@ -2218,14 +2218,14 @@
 									</div>
 									
 									<!-- Status Section (Dropdown + Timeline) -->
-									<div class="flex items-center space-x-4 mb-3">
+									<div class="flex items-center space-x-4 mb-6">
 										<!-- Status Dropdown with Label -->
 										<div class="flex flex-col">
 											<label class="text-xs text-gray-500 mb-1">{$t('letters.set_application_status')}</label>
 											<select 
 												value={letter.status}
 												on:change={(e) => handleStatusChange(letter.id, e)}
-												class="px-3 py-2 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 {getStatusColor(letter.status)}"
+												class="px-4 py-2 rounded-full text-xs font-medium border-0 focus:ring-2 focus:ring-indigo-500 min-w-[200px] {getStatusColor(letter.status)}"
 												aria-label="Change letter status"
 												disabled={letter.status === 'draft' && !isLetterGenerated(letter)}
 											>

@@ -2213,7 +2213,7 @@
 									</div>
 								</div>
 								
-								<div class="flex items-center space-x-3">
+								<div class="flex items-center space-x-4">
 									<!-- Status Dropdown with Label -->
 									<div class="flex flex-col">
 										<label class="text-xs text-gray-500 mb-1">{$t('letters.set_application_status')}</label>
@@ -2367,6 +2367,8 @@
 													<span class="ml-1">{$t('letters.regenerate_letter')}</span>
 												</button>
 											{/if}
+											
+
 										</div>
 									{/if}
 								</div>

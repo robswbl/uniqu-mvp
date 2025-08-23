@@ -3185,7 +3185,7 @@
 					
 					<!-- Version Selector (Dropdown) -->
 					{#if letterVersions[currentLetterId] && letterVersions[currentLetterId].length > 1}
-						<div class="flex flex-col space-y-2">
+						<div class="flex flex-col space-y-2 items-start">
 							<select 
 								bind:value={selectedVersion[currentLetterId]}
 								class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"

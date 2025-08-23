@@ -50,19 +50,44 @@
 		const timeline = [];
 		
 		if (letter.sent_at) {
-			timeline.push({ label: $t('letters.status.sent'), date: letter.sent_at, color: 'text-blue-600' });
+			timeline.push({ 
+				label: $t('letters.status.sent'), 
+				date: letter.sent_at, 
+				color: 'text-blue-600',
+				field: 'sent_at'
+			});
 		}
 		if (letter.response_received_at) {
-			timeline.push({ label: $t('letters.status.responded'), date: letter.response_received_at, color: 'text-yellow-600' });
+			timeline.push({ 
+				label: $t('letters.status.responded'), 
+				date: letter.response_received_at, 
+				color: 'text-yellow-600',
+				field: 'response_received_at'
+			});
 		}
 		if (letter.interview_scheduled_at) {
-			timeline.push({ label: $t('letters.status.interview'), date: letter.interview_scheduled_at, color: 'text-green-600' });
+			timeline.push({ 
+				label: $t('letters.status.interview'), 
+				date: letter.interview_scheduled_at, 
+				color: 'text-green-600',
+				field: 'interview_scheduled_at'
+			});
 		}
 		if (letter.offer_received_at) {
-			timeline.push({ label: $t('letters.status.accepted'), date: letter.offer_received_at, color: 'text-purple-600' });
+			timeline.push({ 
+				label: $t('letters.status.accepted'), 
+				date: letter.offer_received_at, 
+				color: 'text-purple-600',
+				field: 'offer_received_at'
+			});
 		}
 		if (letter.rejected_at) {
-			timeline.push({ label: $t('letters.status.rejected'), date: letter.rejected_at, color: 'text-red-600' });
+			timeline.push({ 
+				label: $t('letters.status.rejected'), 
+				date: letter.rejected_at, 
+				color: 'text-red-600',
+				field: 'rejected_at'
+			});
 		}
 		
 		return timeline;
@@ -91,10 +116,77 @@
 
 	// Track expanded pain points sections
 	let expandedPainPoints = [];
+	
+	// Track which status dates are being edited
+	let editingStatusDates = {};
 
 	// Function to clear errors
 	function clearError() {
 		error = null;
+	}
+	
+	// Function to start editing a status date
+	function startEditingStatusDate(letterId, statusField, currentDate) {
+		editingStatusDates[letterId] = {
+			...editingStatusDates[letterId],
+			[statusField]: currentDate
+		};
+	}
+	
+	// Function to save a status date
+	async function saveStatusDate(letterId, statusField) {
+		try {
+			const newDate = editingStatusDates[letterId]?.[statusField];
+			if (!newDate) return;
+			
+			// Update the letter in the database
+			const { error } = await supabase
+				.from('application_letters')
+				.update({ [statusField]: newDate })
+				.eq('id', letterId);
+			
+			if (error) throw error;
+			
+			// Update local state
+			const letterIndex = applicationLetters.findIndex(l => l.id === letterId);
+			if (letterIndex !== -1) {
+				applicationLetters[letterIndex] = {
+					...applicationLetters[letterIndex],
+					[statusField]: newDate
+				};
+				applicationLetters = [...applicationLetters]; // Force reactivity
+			}
+			
+			// Clear editing state
+			if (editingStatusDates[letterId]) {
+				delete editingStatusDates[letterId][statusField];
+				if (Object.keys(editingStatusDates[letterId]).length === 0) {
+					delete editingStatusDates[letterId];
+				}
+				editingStatusDates = { ...editingStatusDates }; // Force reactivity
+			}
+			
+		} catch (err) {
+			console.error('Error saving status date:', err);
+			error = {
+				type: 'status_date_error',
+				message: 'Error saving status date',
+				details: err.message || 'Failed to save status date',
+				timestamp: new Date().toISOString(),
+				originalError: err.message
+			};
+		}
+	}
+	
+	// Function to cancel editing a status date
+	function cancelEditingStatusDate(letterId, statusField) {
+		if (editingStatusDates[letterId]) {
+			delete editingStatusDates[letterId][statusField];
+			if (Object.keys(editingStatusDates[letterId]).length === 0) {
+				delete editingStatusDates[letterId];
+			}
+			editingStatusDates = { ...editingStatusDates }; // Force reactivity
+		}
 	}
 
 	// Function to continue letter generation for letters with pain points but no content
@@ -1582,7 +1674,7 @@
 		expandedPainPoints = [...expandedPainPoints];
 	}
 
-	// FIXED COLLAPSE FUNCTIONS
+	// FIXED COLLAPSE FUNCTIONS with proper Svelte reactivity
 	function isLetterCollapsed(letterId) {
 		return collapsedLetterBoxes.includes(String(letterId));
 	}
@@ -1597,17 +1689,29 @@
 			// Add to collapsed array (collapse)
 			collapsedLetterBoxes = [...collapsedLetterBoxes, stringId];
 		}
+		
+		// Force Svelte reactivity
+		collapsedLetterBoxes = collapsedLetterBoxes;
 	}
 
 	function collapseAllLetterBoxes() {
 		collapsedLetterBoxes = applicationLetters.map(letter => String(letter.id));
 		allBoxesCollapsed = true;
+		
+		// Force Svelte reactivity
+		collapsedLetterBoxes = collapsedLetterBoxes;
 	}
 
 	function expandAllLetterBoxes() {
 		collapsedLetterBoxes = [];
 		allBoxesCollapsed = false;
+		
+		// Force Svelte reactivity
+		collapsedLetterBoxes = collapsedLetterBoxes;
 	}
+
+	// Add reactive statement to ensure UI updates
+	$: collapsedCount = collapsedLetterBoxes.length;
 
 	// Function to get first two lines of text for collapsed preview
 	function getFirstTwoLines(text, maxLength = 150) {
@@ -2660,9 +2764,43 @@
 											{#if getStatusTimeline(letter).length > 0}
 												<div class="flex flex-wrap items-center gap-2">
 													{#each getStatusTimeline(letter) as event}
-														<span class="text-xs px-2 py-1 rounded-full bg-gray-100 {event.color} font-medium">
-															{event.label} {new Date(event.date).toLocaleDateString()}
-														</span>
+														{#if editingStatusDates[letter.id]?.[event.field] !== undefined}
+															<!-- Editing state -->
+															<div class="flex items-center space-x-2">
+																<input
+																	type="date"
+																	bind:value={editingStatusDates[letter.id][event.field]}
+																	class="text-xs px-2 py-1 rounded border border-gray-300 focus:ring-1 focus:ring-indigo-500"
+																/>
+																<button
+																	on:click={() => saveStatusDate(letter.id, event.field)}
+																	class="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+																	type="button"
+																	aria-label="Save date"
+																>
+																	✓
+																</button>
+																<button
+																	on:click={() => cancelEditingStatusDate(letter.id, event.field)}
+																	class="text-xs px-2 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+																	type="button"
+																	aria-label="Cancel editing"
+																>
+																	✕
+																</button>
+															</div>
+														{:else}
+															<!-- Display state - clickable -->
+															<button
+																on:click={() => startEditingStatusDate(letter.id, event.field, event.date)}
+																class="text-xs px-2 py-1 rounded-full bg-gray-100 {event.color} font-medium hover:bg-gray-200 transition-colors cursor-pointer"
+																type="button"
+																aria-label="Edit {event.label} date"
+																title="Click to edit date"
+															>
+																{event.label} {new Date(event.date).toLocaleDateString()}
+															</button>
+														{/if}
 													{/each}
 												</div>
 											{/if}

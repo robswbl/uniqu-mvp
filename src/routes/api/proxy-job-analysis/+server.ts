@@ -1,6 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { json } from '@sveltejs/kit';
-import { supabase } from '$lib/supabase.js';
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
@@ -56,39 +55,6 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const result = await response.json();
     console.log('Job analysis proxy - webhook success response:', result);
-    
-    // If the response contains company_name and application_letter_id, update the database
-    if (result.company_name && result.application_letter_id) {
-      console.log('Job analysis proxy - updating database with company name:', result.company_name);
-      
-      const updates = {
-        company_name: result.company_name,
-        status: result.status || 'draft',
-        updated_at: new Date().toISOString()
-      };
-      
-      // Add job title if provided
-      if (result.job_title) {
-        updates.job_title = result.job_title;
-      }
-      
-      // Add job URL if provided
-      if (result.job_url) {
-        updates.job_url = result.job_url;
-      }
-      
-      const { error: updateError } = await supabase
-        .from('application_letters')
-        .update(updates)
-        .eq('id', result.application_letter_id);
-      
-      if (updateError) {
-        console.error('Job analysis proxy - error updating database:', updateError);
-      } else {
-        console.log('Job analysis proxy - successfully updated database with company name:', result.company_name);
-      }
-    }
-    
     return json(result);
   } catch (error: any) {
     console.error('Job analysis webhook error:', error);

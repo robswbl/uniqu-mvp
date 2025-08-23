@@ -3312,17 +3312,15 @@
 							</div>
 							
 							<!-- Change Request Comment Toggle -->
-							<button
-								on:click={() => showChangeRequestField = !showChangeRequestField}
-								type="button"
-								class="px-3 py-2 text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded border border-indigo-200 hover:border-indigo-300 transition-colors"
-							>
-								{#if showChangeRequestField}
-									{$t('letters.change_request_optional')}
-								{:else}
+							{#if !showChangeRequestField}
+								<button
+									on:click={() => showChangeRequestField = true}
+									type="button"
+									class="px-3 py-2 text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded border border-indigo-200 hover:border-indigo-300 transition-colors"
+								>
 									{$t('letters.add_change_request')}
-								{/if}
-							</button>
+								</button>
+							{/if}
 							
 							<!-- Regenerate Button -->
 							<button
@@ -3344,10 +3342,19 @@
 						<!-- Collapsible Change Request Field -->
 						{#if showChangeRequestField}
 							<div class="mt-4 pt-4 border-t border-gray-200">
-								<div>
-									<label for="change-request-comment" class="block text-xs text-gray-600 mb-1">
-										{$t('letters.change_request_comment')} <span class="text-gray-400">({$t('letters.change_request_optional')})</span>
-									</label>
+								<div class="relative">
+									<!-- Close button -->
+									<button
+										on:click={() => showChangeRequestField = false}
+										type="button"
+										class="absolute top-0 right-0 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+										aria-label="Close instructions field"
+									>
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+										</svg>
+									</button>
+									
 									<textarea
 										id="change-request-comment"
 										bind:value={changeRequestComment}

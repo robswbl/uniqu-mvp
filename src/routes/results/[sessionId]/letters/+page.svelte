@@ -3188,7 +3188,7 @@
 						<div class="flex flex-col space-y-2 items-start">
 							<select 
 								bind:value={selectedVersion[currentLetterId]}
-								class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+								class="pl-0 pr-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
 								on:change={() => {
 									if (selectedVersion[currentLetterId]) {
 										currentLetterContent = selectedVersion[currentLetterId].content_html;

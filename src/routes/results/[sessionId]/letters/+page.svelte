@@ -3205,7 +3205,7 @@
 							
 							<!-- Change Request Comment Display -->
 							{#if selectedVersion[currentLetterId] && selectedVersion[currentLetterId].change_request_comment}
-								<div class="text-xs text-blue-600 mt-1 pl-3">
+								<div class="text-xs text-blue-600 mt-0.5 pl-3">
 									<button
 										on:click={() => showChangeInstructionsPopup = true}
 										class="text-blue-600 hover:text-blue-800 underline"

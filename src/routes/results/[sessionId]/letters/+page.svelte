@@ -1234,7 +1234,7 @@
 	let changeRequestComment = '';
 	let showChangeRequestField = false;
 	let showRegenerationSection = false;
-	let showFullChangeRequest = false;
+	let showChangeInstructionsPopup = false;
 
 	// Function to get language display name
 	function getLanguageDisplayName(languageCode) {
@@ -1678,7 +1678,7 @@
 							targetLength = 100;
 							changeRequestComment = '';
 							showChangeRequestField = false;
-							showFullChangeRequest = false; // Reset change request display
+							// Reset change request display
 							
 							// Show success message
 							successMessage = `✅ New letter version generated successfully!`;
@@ -3153,11 +3153,9 @@
 		class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
 		on:click={() => {
 			showLetterModal = false;
-			showFullChangeRequest = false; // Reset to collapsed state
 		}}
 		on:keydown={(e) => e.key === 'Escape' && (() => {
 			showLetterModal = false;
-			showFullChangeRequest = false; // Reset to collapsed state
 		})()}
 		role="dialog"
 		aria-modal="true"
@@ -3194,7 +3192,6 @@
 								on:change={() => {
 									if (selectedVersion[currentLetterId]) {
 										currentLetterContent = selectedVersion[currentLetterId].content_html;
-										showFullChangeRequest = false; // Reset to collapsed state
 									}
 								}}
 							>
@@ -3208,32 +3205,14 @@
 							
 							<!-- Change Request Comment Display -->
 							{#if selectedVersion[currentLetterId] && selectedVersion[currentLetterId].change_request_comment}
-								{@const comment = selectedVersion[currentLetterId].change_request_comment}
-								{@const isLongComment = comment.length > 100}
-								{@const shortComment = comment.substring(0, 100) + '...'}
-								<div class="text-xs text-gray-600 bg-blue-50 px-3 py-2 rounded border border-blue-200">
-									<strong>Change Request:</strong> 
-									{#if isLongComment && !showFullChangeRequest}
-										{shortComment}
-										<button
-											on:click={() => showFullChangeRequest = true}
-											class="ml-2 text-blue-600 hover:text-blue-800 underline text-xs"
-											type="button"
-										>
-											Show more
-										</button>
-									{:else if isLongComment && showFullChangeRequest}
-										{comment}
-										<button
-											on:click={() => showFullChangeRequest = false}
-											class="ml-2 text-blue-600 hover:text-blue-800 underline text-xs"
-											type="button"
-										>
-											Show less
-										</button>
-									{:else}
-										{comment}
-									{/if}
+								<div class="text-xs text-blue-600 mt-1">
+									<button
+										on:click={() => showChangeInstructionsPopup = true}
+										class="text-blue-600 hover:text-blue-800 underline"
+										type="button"
+									>
+										Show change instructions used
+									</button>
 								</div>
 							{/if}
 						</div>
@@ -3410,6 +3389,48 @@
 				<div class="prose max-w-none">
 					{@html currentLetterContent}
 				</div>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Change Instructions Popup -->
+{#if showChangeInstructionsPopup}
+	<div 
+		class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
+		on:click={() => showChangeInstructionsPopup = false}
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="change-instructions-title"
+	>
+		<div 
+			class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden" 
+			on:click|stopPropagation
+			role="document"
+		>
+			<div class="flex items-center justify-between p-4 border-b border-gray-200">
+				<h3 id="change-instructions-title" class="text-lg font-semibold text-gray-900">Change Instructions Used</h3>
+				<button 
+					on:click={() => showChangeInstructionsPopup = false}
+					class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+					type="button"
+					aria-label="Close popup"
+				>
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			
+			<div class="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
+				{#if selectedVersion[currentLetterId] && selectedVersion[currentLetterId].change_request_comment}
+					<div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+						<h4 class="text-sm font-medium text-blue-800 mb-3">Change Request:</h4>
+						<div class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+							{selectedVersion[currentLetterId].change_request_comment}
+						</div>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>

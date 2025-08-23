@@ -1051,7 +1051,7 @@
 				return;
 			}
 
-					// Fetch versions for this letter
+					// Fetch versions for this letter (this will also clean up duplicates)
 		await fetchLetterVersions(letterId);
 
 		// Show in modal
@@ -1244,6 +1244,25 @@
 	// Function to create original version when letter is first generated
 	async function createOriginalVersion(letterId) {
 		try {
+			// First check if an original version already exists
+			const { data: existingVersion, error: checkError } = await supabase
+				.from('application_letter_versions')
+				.select('id')
+				.eq('application_letter_id', letterId)
+				.eq('version_type', 'original')
+				.maybeSingle();
+
+			if (checkError) {
+				console.error('Error checking for existing original version:', checkError);
+				return;
+			}
+
+			// If original version already exists, don't create another one
+			if (existingVersion) {
+				console.log('Original version already exists for letter:', letterId);
+				return;
+			}
+
 			const { data: letter } = await supabase
 				.from('application_letters')
 				.select('content_html, letter_content_html, tone, language')
@@ -1314,9 +1333,83 @@
 		}
 	}
 
+	// Function to clean up duplicate original versions for a specific letter
+	async function cleanupDuplicateOriginalVersions(letterId) {
+		try {
+			// Get all original versions for this letter
+			const { data: originalVersions, error: fetchError } = await supabase
+				.from('application_letter_versions')
+				.select('id, created_at')
+				.eq('application_letter_id', letterId)
+				.eq('version_type', 'original')
+				.order('created_at', { ascending: true });
+
+			if (fetchError) {
+				console.error('Error fetching original versions for cleanup:', fetchError);
+				return;
+			}
+
+			// If there are multiple original versions, keep only the first one
+			if (originalVersions && originalVersions.length > 1) {
+				console.log(`Found ${originalVersions.length} original versions for letter ${letterId}, cleaning up duplicates`);
+				
+				// Keep the first (oldest) original version, delete the rest
+				const versionsToDelete = originalVersions.slice(1);
+				const idsToDelete = versionsToDelete.map(v => v.id);
+				
+				const { error: deleteError } = await supabase
+					.from('application_letter_versions')
+					.delete()
+					.in('id', idsToDelete);
+
+				if (deleteError) {
+					console.error('Error deleting duplicate original versions:', deleteError);
+				} else {
+					console.log(`Successfully deleted ${versionsToDelete.length} duplicate original versions`);
+				}
+			}
+		} catch (err) {
+			console.error('Error cleaning up duplicate original versions:', err);
+		}
+	}
+
+	// Function to clean up all duplicate original versions across all letters
+	async function cleanupAllDuplicateOriginalVersions() {
+		try {
+			console.log('Starting cleanup of all duplicate original versions...');
+			
+			// Get all letters that have versions
+			const { data: lettersWithVersions, error: fetchError } = await supabase
+				.from('application_letter_versions')
+				.select('application_letter_id')
+				.eq('version_type', 'original');
+
+			if (fetchError) {
+				console.error('Error fetching letters with versions for cleanup:', fetchError);
+				return;
+			}
+
+			// Get unique letter IDs
+			const uniqueLetterIds = [...new Set(lettersWithVersions.map(v => v.application_letter_id))];
+			console.log(`Found ${uniqueLetterIds.length} letters with versions to check`);
+
+			// Clean up duplicates for each letter
+			for (const letterId of uniqueLetterIds) {
+				await cleanupDuplicateOriginalVersions(letterId);
+			}
+
+			console.log('Finished cleanup of all duplicate original versions');
+		} catch (err) {
+			console.error('Error cleaning up all duplicate original versions:', err);
+		}
+	}
+
 	// Function to fetch letter versions
 	async function fetchLetterVersions(letterId) {
 		try {
+			// First, clean up any duplicate original versions
+			await cleanupDuplicateOriginalVersions(letterId);
+			
 			// Get any rewrite versions from application_letter_versions table
 			const { data: rewriteVersions, error: versionsError } = await supabase
 				.from('application_letter_versions')
@@ -1331,10 +1424,56 @@
 
 			console.log(`[fetchLetterVersions] Raw rewrite versions from DB for letter ${letterId}:`, rewriteVersions);
 
-			// Only create versions array if we actually have rewrite versions
+			// Check if we have any versions (original or rewrite)
 			if (rewriteVersions && rewriteVersions.length > 0) {
-				console.log(`[fetchLetterVersions] Found ${rewriteVersions.length} rewrite versions for letter ${letterId}:`, rewriteVersions);
-				// Get the original letter content from application_letters table
+				console.log(`[fetchLetterVersions] Found ${rewriteVersions.length} versions for letter ${letterId}:`, rewriteVersions);
+				
+				// Check if there's already an original version in the versions
+				const existingOriginal = rewriteVersions.find(v => v.version_type === 'original');
+				
+				if (existingOriginal) {
+					// Use the existing original version from the database
+					console.log(`[fetchLetterVersions] Using existing original version from database`);
+					letterVersions[letterId] = rewriteVersions;
+					selectedVersion[letterId] = rewriteVersions[0] || null;
+				} else {
+					// No original version exists, create a virtual one
+					console.log(`[fetchLetterVersions] Creating virtual original version`);
+					const { data: originalLetter, error: letterError } = await supabase
+						.from('application_letters')
+						.select('content_html, letter_content_html, tone, language')
+						.eq('id', letterId)
+						.single();
+
+					if (letterError) {
+						console.error(`[fetchLetterVersions] Error fetching original letter ${letterId}:`, letterError);
+						return;
+					}
+
+					// Create a virtual "original" version from the main table
+					const virtualOriginalVersion = {
+						id: `virtual_${letterId}`, // Use a virtual ID to avoid conflicts
+						application_letter_id: letterId,
+						version_type: 'original',
+						tone: originalLetter.tone || 'professional',
+						language: originalLetter.language || 'en',
+						length_percentage: 100,
+						content_html: originalLetter.content_html || originalLetter.letter_content_html,
+						created_at: new Date().toISOString(),
+						isVirtual: true // Flag to identify this as a virtual version
+					};
+
+					// Combine virtual original with actual rewrite versions
+					const allVersions = [virtualOriginalVersion, ...rewriteVersions];
+					
+					console.log(`[fetchLetterVersions] Found ${allVersions.length} total versions for letter ${letterId}:`, allVersions);
+
+					letterVersions[letterId] = allVersions;
+					selectedVersion[letterId] = allVersions[0] || null;
+				}
+			} else {
+				// No versions exist, create a virtual original version
+				console.log(`[fetchLetterVersions] No versions found, creating virtual original version`);
 				const { data: originalLetter, error: letterError } = await supabase
 					.from('application_letters')
 					.select('content_html, letter_content_html, tone, language')
@@ -1348,7 +1487,7 @@
 
 				// Create a virtual "original" version from the main table
 				const virtualOriginalVersion = {
-					id: letterId, // Use the real letter ID, not a fake string
+					id: `virtual_${letterId}`, // Use a virtual ID to avoid conflicts
 					application_letter_id: letterId,
 					version_type: 'original',
 					tone: originalLetter.tone || 'professional',
@@ -1359,18 +1498,8 @@
 					isVirtual: true // Flag to identify this as a virtual version
 				};
 
-				// Combine virtual original with actual rewrite versions
-				const allVersions = [virtualOriginalVersion, ...rewriteVersions];
-				
-				console.log(`[fetchLetterVersions] Found ${allVersions.length} total versions for letter ${letterId}:`, allVersions);
-
-				letterVersions[letterId] = allVersions;
-				selectedVersion[letterId] = allVersions[0] || null;
-			} else {
-				// No rewrite versions exist, so no versions to show
-				console.log(`[fetchLetterVersions] No rewrite versions found for letter ${letterId}, showing no versions`);
-				letterVersions[letterId] = [];
-				selectedVersion[letterId] = null;
+				letterVersions[letterId] = [virtualOriginalVersion];
+				selectedVersion[letterId] = virtualOriginalVersion;
 			}
 
 			letterVersions = { ...letterVersions };
@@ -3031,6 +3160,20 @@
 						aria-label="Create new version"
 					>
 						{$t('letters.create_new_version')}
+					</button>
+					
+					<!-- Cleanup Duplicates Button (for debugging) -->
+					<button 
+						type="button" 
+						class="px-3 py-2 text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
+						on:click={async () => {
+							await cleanupDuplicateOriginalVersions(currentLetterId);
+							await fetchLetterVersions(currentLetterId);
+						}}
+						aria-label="Cleanup duplicate versions"
+						title="Clean up duplicate original versions for this letter"
+					>
+						Cleanup Duplicates
 					</button>
 					{/if}
 					

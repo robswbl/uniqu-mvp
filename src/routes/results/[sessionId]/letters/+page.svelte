@@ -2354,34 +2354,8 @@
 					</div>
 				</div>
 			{:else}
-				<!-- Collapse All / Expand All Controls -->
-				<div class="flex items-center justify-between mb-4">
-					<div class="flex items-center space-x-3">
-						<button
-							on:click={collapseAllLetterBoxes}
-							class="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-							type="button"
-							aria-label="Collapse all letter boxes"
-						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-							</svg>
-							<span>Collapse All</span>
-						</button>
-						
-						<button
-							on:click={expandAllLetterBoxes}
-							class="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-							type="button"
-							aria-label="Expand all letter boxes"
-						>
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-							</svg>
-							<span>Expand All</span>
-						</button>
-					</div>
-					
+				<!-- Letter Count Display -->
+				<div class="flex items-center justify-end mb-4">
 					<div class="text-sm text-gray-500">
 						{applicationLetters.length} application letter{applicationLetters.length !== 1 ? 's' : ''}
 					</div>
@@ -2396,25 +2370,6 @@
 								<div class="flex-1">
 									<div class="flex items-center space-x-3 mb-1">
 										<h3 class="text-xl font-semibold text-gray-900">{letter.company_name}</h3>
-										
-										<!-- Collapse/Expand Toggle Button -->
-										<button
-											on:click={() => toggleLetterBoxCollapse(letter.id)}
-											class="flex items-center space-x-1 p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
-											type="button"
-											aria-label="{isLetterCollapsed(letter.id) ? 'Expand' : 'Collapse'} letter box"
-											title="{isLetterCollapsed(letter.id) ? 'Expand' : 'Collapse'} letter box"
-										>
-											{#if isLetterCollapsed(letter.id)}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-												</svg>
-											{:else}
-												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-												</svg>
-											{/if}
-										</button>
 									</div>
 									{#if letter.job_title}
 										<p class="text-lg font-bold text-gray-800 mb-2">{letter.job_title}</p>
@@ -2566,8 +2521,7 @@
 								</div>
 							</div>
 
-							<!-- Letter Details - ONLY SHOW WHEN EXPANDED -->
-							{#if !isLetterCollapsed(letter.id)}
+							<!-- Letter Details -->
 								<div class="mb-4 space-y-2">
 									{#if letter.pain_points}
 										<div>
@@ -3037,29 +2991,12 @@
 											{/if}
 										</div>
 									</div>
-								{:else}
-									<!-- CV Section Placeholder - Only show for generated letters -->
-									{#if letter.content_html || letter.letter_content_html}
-										<div class="border-t border-gray-100 pt-4">
-											<div class="text-center py-6">
-												<div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
-													<svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-													</svg>
-												</div>
-												<h4 class="text-lg font-medium text-gray-900 mb-2">{$t('letters.cv_enhancement')}</h4>
-												<p class="text-sm text-gray-500">{$t('letters.cv_enhancement_placeholder')}</p>
-											</div>
-										</div>
-									{/if}
 								{/if}
-							{/if}
 						</div>
 					{/each}
 				</div>
 			{/if}
-		{/if}
-	</div>
+		</div>
 </div>
 
 <!-- Letter Modal -->

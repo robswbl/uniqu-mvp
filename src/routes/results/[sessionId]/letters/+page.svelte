@@ -2998,7 +2998,8 @@
 				</div>
 			{/if}
 		</div>
-</div>
+		{/if}
+	</div>
 
 <!-- Letter Modal -->
 {#if showLetterModal}
@@ -3231,3 +3232,4 @@
 		</div>
 	</div>
 {/if}
+</div>

@@ -64,7 +64,7 @@
 			saveStatus = $t('step3.saved');
 		}
 		isSaving = false;
-		setTimeout(() => saveStatus = '', 1200);
+		setTimeout(() => (saveStatus = ''), 1200);
 	}
 
 	async function goToNext() {
@@ -81,161 +81,217 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
-	<div class="max-w-4xl mx-auto p-6 md:p-8">
-		<div class="text-center mb-12">
-			<div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-6">
-				<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+	<div class="mx-auto max-w-4xl p-6 md:p-8">
+		<div class="mb-12 text-center">
+			<div
+				class="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+			>
+				<svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+					></path>
 				</svg>
 			</div>
-			<h1 class="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
+			<h1
+				class="mb-4 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-4xl font-bold text-transparent"
+			>
 				{$t('step3.heading')}
 			</h1>
-			<p class="text-xl text-gray-600 max-w-2xl mx-auto">
+			<p class="mx-auto max-w-2xl text-xl text-gray-600">
 				{$t('step3.intro')}
 			</p>
 		</div>
-		<div class="bg-white rounded-2xl shadow-xl p-8 mb-8 flex flex-col min-h-[500px] space-y-8">
+		<div class="mb-8 flex min-h-[500px] flex-col space-y-8 rounded-2xl bg-white p-8 shadow-xl">
 			{#if saveStatus}
 				<span class="absolute top-4 right-4 text-sm text-gray-500">{saveStatus}</span>
 			{/if}
 
 			<!-- Ikigai: What do you love? -->
-			<div class="bg-red-50 rounded-xl p-6 border-l-4 border-red-400">
-				<div class="flex items-center mb-4">
-					<div class="w-10 h-10 bg-gradient-to-r from-red-400 to-pink-500 rounded-full flex items-center justify-center mr-4">
-						<span class="text-white font-bold text-lg">❤️</span>
+			<div class="rounded-xl border-l-4 border-red-400 bg-red-50 p-6">
+				<div class="mb-4 flex items-center">
+					<div
+						class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-red-400 to-pink-500"
+					>
+						<span class="text-lg font-bold text-white">❤️</span>
 					</div>
 					<h2 class="text-2xl font-bold text-gray-800">{$t('step3.love.title')}</h2>
 				</div>
-				<button type="button" class="text-sm text-red-700 underline mb-2" on:click={() => showInspiration.love = !showInspiration.love}>
-					{showInspiration.love ? $t('step3.love.hide_inspiration') : $t('step3.love.show_inspiration')}
+				<button
+					type="button"
+					class="mb-2 text-sm text-red-700 underline"
+					on:click={() => (showInspiration.love = !showInspiration.love)}
+				>
+					{showInspiration.love
+						? $t('step3.love.hide_inspiration')
+						: $t('step3.love.show_inspiration')}
 				</button>
 				{#if showInspiration.love}
-					<div class="p-4 bg-red-50 rounded-lg border border-red-200 space-y-3 mb-2">
-						<p class="text-gray-600 text-sm">{$t('step3.love.inspiration_text')}</p>
-						<p class="text-gray-500 text-xs italic">{$t('step3.love.inspiration_examples')}</p>
+					<div class="mb-2 space-y-3 rounded-lg border border-red-200 bg-red-50 p-4">
+						<p class="text-sm text-gray-600">{$t('step3.love.inspiration_text')}</p>
+						<p class="text-xs text-gray-500 italic">{$t('step3.love.inspiration_examples')}</p>
 					</div>
 				{/if}
 				<textarea
 					bind:value={ikigai_love}
 					on:input={markAsChanged}
 					placeholder={$t('step3.love.textarea_placeholder')}
-					class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-400 focus:ring-red-400 resize-none overflow-hidden min-h-[100px] p-4 mb-2"
+					class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-red-400 focus:ring-red-400"
 				></textarea>
 			</div>
 
 			<!-- Ikigai: What are you great at? -->
-			<div class="bg-blue-50 rounded-xl p-6 border-l-4 border-blue-400">
-				<div class="flex items-center mb-4">
-					<div class="w-10 h-10 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center mr-4">
-						<span class="text-white font-bold text-lg">⭐</span>
+			<div class="rounded-xl border-l-4 border-blue-400 bg-blue-50 p-6">
+				<div class="mb-4 flex items-center">
+					<div
+						class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-400 to-indigo-500"
+					>
+						<span class="text-lg font-bold text-white">⭐</span>
 					</div>
 					<h2 class="text-2xl font-bold text-gray-800">{$t('step3.good_at.title')}</h2>
 				</div>
-				<button type="button" class="text-sm text-blue-700 underline mb-2" on:click={() => showInspiration.good_at = !showInspiration.good_at}>
-					{showInspiration.good_at ? $t('step3.good_at.hide_inspiration') : $t('step3.good_at.show_inspiration')}
+				<button
+					type="button"
+					class="mb-2 text-sm text-blue-700 underline"
+					on:click={() => (showInspiration.good_at = !showInspiration.good_at)}
+				>
+					{showInspiration.good_at
+						? $t('step3.good_at.hide_inspiration')
+						: $t('step3.good_at.show_inspiration')}
 				</button>
 				{#if showInspiration.good_at}
-					<div class="p-4 bg-blue-50 rounded-lg border border-blue-200 space-y-3 mb-2">
-						<p class="text-gray-600 text-sm">{$t('step3.good_at.inspiration_text')}</p>
-						<p class="text-gray-500 text-xs italic">{$t('step3.good_at.inspiration_examples')}</p>
+					<div class="mb-2 space-y-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
+						<p class="text-sm text-gray-600">{$t('step3.good_at.inspiration_text')}</p>
+						<p class="text-xs text-gray-500 italic">{$t('step3.good_at.inspiration_examples')}</p>
 					</div>
 				{/if}
 				<textarea
 					bind:value={ikigai_good_at}
 					on:input={markAsChanged}
 					placeholder={$t('step3.good_at.textarea_placeholder')}
-					class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-400 focus:ring-blue-400 resize-none overflow-hidden min-h-[100px] p-4 mb-2"
+					class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-blue-400 focus:ring-blue-400"
 				></textarea>
 			</div>
 
 			<!-- Ikigai: What do you care about? -->
-			<div class="bg-green-50 rounded-xl p-6 border-l-4 border-green-400">
-				<div class="flex items-center mb-4">
-					<div class="w-10 h-10 bg-gradient-to-r from-green-400 to-teal-500 rounded-full flex items-center justify-center mr-4">
-						<span class="text-white font-bold text-lg">🌍</span>
+			<div class="rounded-xl border-l-4 border-green-400 bg-green-50 p-6">
+				<div class="mb-4 flex items-center">
+					<div
+						class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-green-400 to-teal-500"
+					>
+						<span class="text-lg font-bold text-white">🌍</span>
 					</div>
 					<h2 class="text-2xl font-bold text-gray-800">{$t('step3.care_about.title')}</h2>
 				</div>
-				<button type="button" class="text-sm text-green-700 underline mb-2" on:click={() => showInspiration.care_about = !showInspiration.care_about}>
-					{showInspiration.care_about ? $t('step3.care_about.hide_inspiration') : $t('step3.care_about.show_inspiration')}
+				<button
+					type="button"
+					class="mb-2 text-sm text-green-700 underline"
+					on:click={() => (showInspiration.care_about = !showInspiration.care_about)}
+				>
+					{showInspiration.care_about
+						? $t('step3.care_about.hide_inspiration')
+						: $t('step3.care_about.show_inspiration')}
 				</button>
 				{#if showInspiration.care_about}
-					<div class="p-4 bg-green-50 rounded-lg border border-green-200 space-y-3 mb-2">
-						<p class="text-gray-600 text-sm">{$t('step3.care_about.inspiration_text')}</p>
-						<p class="text-gray-500 text-xs italic">{$t('step3.care_about.inspiration_examples')}</p>
+					<div class="mb-2 space-y-3 rounded-lg border border-green-200 bg-green-50 p-4">
+						<p class="text-sm text-gray-600">{$t('step3.care_about.inspiration_text')}</p>
+						<p class="text-xs text-gray-500 italic">
+							{$t('step3.care_about.inspiration_examples')}
+						</p>
 					</div>
 				{/if}
 				<textarea
 					bind:value={ikigai_care_about}
 					on:input={markAsChanged}
 					placeholder={$t('step3.care_about.textarea_placeholder')}
-					class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-400 focus:ring-green-400 resize-none overflow-hidden min-h-[100px] p-4 mb-2"
+					class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-green-400 focus:ring-green-400"
 				></textarea>
 			</div>
 
 			<!-- Ikigai: What inspires you? -->
-			<div class="bg-orange-50 rounded-xl p-6 border-l-4 border-orange-400">
-				<div class="flex items-center mb-4">
-					<div class="w-10 h-10 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full flex items-center justify-center mr-4">
-						<span class="text-white font-bold text-lg">🚀</span>
+			<div class="rounded-xl border-l-4 border-orange-400 bg-orange-50 p-6">
+				<div class="mb-4 flex items-center">
+					<div
+						class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-orange-400 to-pink-500"
+					>
+						<span class="text-lg font-bold text-white">🚀</span>
 					</div>
 					<h2 class="text-2xl font-bold text-gray-800">{$t('step3.inspires.title')}</h2>
 				</div>
-				<button type="button" class="text-sm text-orange-700 underline mb-2" on:click={() => showInspiration.inspires = !showInspiration.inspires}>
-					{showInspiration.inspires ? $t('step3.inspires.hide_inspiration') : $t('step3.inspires.show_inspiration')}
+				<button
+					type="button"
+					class="mb-2 text-sm text-orange-700 underline"
+					on:click={() => (showInspiration.inspires = !showInspiration.inspires)}
+				>
+					{showInspiration.inspires
+						? $t('step3.inspires.hide_inspiration')
+						: $t('step3.inspires.show_inspiration')}
 				</button>
 				{#if showInspiration.inspires}
-					<div class="p-4 bg-orange-50 rounded-lg border border-orange-200 space-y-3 mb-2">
-						<p class="text-gray-600 text-sm">{$t('step3.inspires.inspiration_text')}</p>
-						<p class="text-gray-500 text-xs italic">{$t('step3.inspires.inspiration_examples')}</p>
+					<div class="mb-2 space-y-3 rounded-lg border border-orange-200 bg-orange-50 p-4">
+						<p class="text-sm text-gray-600">{$t('step3.inspires.inspiration_text')}</p>
+						<p class="text-xs text-gray-500 italic">{$t('step3.inspires.inspiration_examples')}</p>
 					</div>
 				{/if}
 				<textarea
 					bind:value={ikigai_inspires}
 					on:input={markAsChanged}
 					placeholder={$t('step3.inspires.textarea_placeholder')}
-					class="w-full rounded-lg border-gray-300 shadow-sm focus:border-orange-400 focus:ring-orange-400 resize-none overflow-hidden min-h-[100px] p-4 mb-2"
+					class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-orange-400 focus:ring-orange-400"
 				></textarea>
 			</div>
 
 			<!-- Ikigai: Who do you want to become? -->
-			<div class="bg-purple-50 rounded-xl p-6 border-l-4 border-purple-400">
-				<div class="flex items-center mb-4">
-					<div class="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mr-4">
-						<span class="text-white font-bold text-lg">🎯</span>
+			<div class="rounded-xl border-l-4 border-purple-400 bg-purple-50 p-6">
+				<div class="mb-4 flex items-center">
+					<div
+						class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-purple-400 to-pink-500"
+					>
+						<span class="text-lg font-bold text-white">🎯</span>
 					</div>
 					<h2 class="text-2xl font-bold text-gray-800">{$t('step3.want_to_be.title')}</h2>
 				</div>
-				<button type="button" class="text-sm text-purple-700 underline mb-2" on:click={() => showInspiration.want_to_be = !showInspiration.want_to_be}>
-					{showInspiration.want_to_be ? $t('step3.want_to_be.hide_inspiration') : $t('step3.want_to_be.show_inspiration')}
+				<button
+					type="button"
+					class="mb-2 text-sm text-purple-700 underline"
+					on:click={() => (showInspiration.want_to_be = !showInspiration.want_to_be)}
+				>
+					{showInspiration.want_to_be
+						? $t('step3.want_to_be.hide_inspiration')
+						: $t('step3.want_to_be.show_inspiration')}
 				</button>
 				{#if showInspiration.want_to_be}
-					<div class="p-4 bg-purple-50 rounded-lg border border-purple-200 space-y-3 mb-2">
-						<p class="text-gray-600 text-sm">{$t('step3.want_to_be.inspiration_text')}</p>
-						<p class="text-gray-500 text-xs italic">{$t('step3.want_to_be.inspiration_examples')}</p>
+					<div class="mb-2 space-y-3 rounded-lg border border-purple-200 bg-purple-50 p-4">
+						<p class="text-sm text-gray-600">{$t('step3.want_to_be.inspiration_text')}</p>
+						<p class="text-xs text-gray-500 italic">
+							{$t('step3.want_to_be.inspiration_examples')}
+						</p>
 					</div>
 				{/if}
 				<textarea
 					bind:value={ikigai_want_to_be}
 					on:input={markAsChanged}
 					placeholder={$t('step3.want_to_be.textarea_placeholder')}
-					class="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-400 focus:ring-purple-400 resize-none overflow-hidden min-h-[100px] p-4 mb-2"
+					class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-purple-400 focus:ring-purple-400"
 				></textarea>
 			</div>
 		</div>
-		<div class="flex justify-between mt-8">
-			<button on:click={goToBack} class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+		<div class="mt-8 flex justify-between">
+			<button
+				on:click={goToBack}
+				class="rounded-lg bg-gray-200 px-6 py-2 text-gray-700 transition-colors hover:bg-gray-300"
+			>
 				{$t('buttons.back')}
 			</button>
 			<button
 				on:click={goToNext}
-				class="px-8 py-3 bg-gradient-to-r from-pink-600 to-orange-500 text-white font-semibold rounded-lg shadow-lg hover:from-pink-700 hover:to-orange-600 transition-colors text-lg"
+				class="rounded-lg bg-gradient-to-r from-pink-600 to-orange-500 px-8 py-3 text-lg font-semibold text-white shadow-lg transition-colors hover:from-pink-700 hover:to-orange-600"
 				disabled={isSaving}
 			>
 				{$t('buttons.next')}
 			</button>
 		</div>
 	</div>
-</div> 
+</div>

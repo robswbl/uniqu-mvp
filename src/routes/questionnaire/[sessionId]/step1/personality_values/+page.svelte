@@ -43,7 +43,7 @@
 			saveStatus = $t('step1.personality_values.saved');
 		}
 		isSaving = false;
-		setTimeout(() => saveStatus = '', 1200);
+		setTimeout(() => (saveStatus = ''), 1200);
 	}
 
 	async function goToNext() {
@@ -112,14 +112,18 @@
 	emoji="💎"
 	explainer={$t('step1.personality_values.explainer')}
 	explainerColor="blue"
-	explainerBullets={[$t('step1.personality_values.bullet1'), $t('step1.personality_values.bullet2'), $t('step1.personality_values.bullet3')]}
+	explainerBullets={[
+		$t('step1.personality_values.bullet1'),
+		$t('step1.personality_values.bullet2'),
+		$t('step1.personality_values.bullet3')
+	]}
 	textareaPlaceholder={$t('step1.personality_values.textarea_placeholder')}
 	bind:textareaValue={personalityValues}
-	saveStatus={saveStatus}
+	{saveStatus}
 	onInput={handleInput}
 	onNext={goToNext}
 	nextLabel={$t('buttons.next')}
 	backLabel={$t('buttons.back')}
 	onBack={goToBack}
 	disabled={isSaving}
-/> 
+/>

@@ -35,7 +35,6 @@ export const actions = {
 					action: 'regenerate'
 				})
 			});
-
 		} catch (err) {
 			console.error('Error:', err);
 		}

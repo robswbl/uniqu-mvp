@@ -82,16 +82,14 @@
 		} else {
 			saveStatus = $t('step2.saved');
 		}
-		setTimeout(() => saveStatus = '', 1200);
+		setTimeout(() => (saveStatus = ''), 1200);
 	}
 
 	async function handleFileUpload(event: Event) {
 		const input = event.target as HTMLInputElement;
 		const file = input.files?.[0];
 		if (!file) return;
-		const allowedTypes = [
-			'application/pdf'
-		];
+		const allowedTypes = ['application/pdf'];
 		const ext = file.name.split('.').pop()?.toLowerCase();
 		if (!allowedTypes.includes(file.type) && ext !== 'pdf') {
 			alert('Please upload a PDF document (.pdf)');
@@ -165,7 +163,9 @@
 		}, 2000);
 	}
 
-	onDestroy(() => { if (pollingInterval) clearInterval(pollingInterval); });
+	onDestroy(() => {
+		if (pollingInterval) clearInterval(pollingInterval);
+	});
 
 	function goToBack() {
 		goto(`/questionnaire/${sessionId}/step1/${lastStep1Question}`);
@@ -181,64 +181,95 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-	<div class="max-w-4xl mx-auto p-6 md:p-8">
-		<div class="text-center mb-12">
-			<div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mb-6">
-				<svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+	<div class="mx-auto max-w-4xl p-6 md:p-8">
+		<div class="mb-12 text-center">
+			<div
+				class="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
+			>
+				<svg class="h-8 w-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+					></path>
 				</svg>
 			</div>
-			<h1 class="text-4xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">
+			<h1
+				class="mb-4 bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-4xl font-bold text-transparent"
+			>
 				{userFirstName ? `${$t('step2.heading')}, ${userFirstName}` : $t('step2.heading')}
 			</h1>
-			<p class="text-xl text-gray-600 max-w-2xl mx-auto">
+			<p class="mx-auto max-w-2xl text-xl text-gray-600">
 				{$t('step2.intro')}
 			</p>
 		</div>
-		<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-			<h2 class="text-2xl font-bold text-gray-800 mb-6">{$t('step2.method_heading')}</h2>
-			<div class="grid md:grid-cols-2 gap-6 mb-8">
+		<div class="mb-8 rounded-2xl bg-white p-8 shadow-lg">
+			<h2 class="mb-6 text-2xl font-bold text-gray-800">{$t('step2.method_heading')}</h2>
+			<div class="mb-8 grid gap-6 md:grid-cols-2">
 				<button
 					type="button"
-					class="p-6 rounded-xl border-2 transition-all duration-200 {uploadMethod === 'paste' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-gray-300'}"
-					on:click={() => uploadMethod = 'paste'}
+					class="rounded-xl border-2 p-6 transition-all duration-200 {uploadMethod === 'paste'
+						? 'border-indigo-500 bg-indigo-50'
+						: 'border-gray-200 hover:border-gray-300'}"
+					on:click={() => (uploadMethod = 'paste')}
 				>
-					<div class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg mb-4 mx-auto">
-						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+					<div
+						class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500"
+					>
+						<svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+							></path>
 						</svg>
 					</div>
-					<h3 class="text-lg font-semibold text-gray-800 mb-2">{$t('step2.paste_text')}</h3>
-					<p class="text-gray-600 text-sm">{$t('step2.paste_text_desc')}</p>
+					<h3 class="mb-2 text-lg font-semibold text-gray-800">{$t('step2.paste_text')}</h3>
+					<p class="text-sm text-gray-600">{$t('step2.paste_text_desc')}</p>
 				</button>
 				<button
 					type="button"
-					class="p-6 rounded-xl border-2 transition-all duration-200 {uploadMethod === 'upload' ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:border-gray-300'}"
-					on:click={() => uploadMethod = 'upload'}
+					class="rounded-xl border-2 p-6 transition-all duration-200 {uploadMethod === 'upload'
+						? 'border-indigo-500 bg-indigo-50'
+						: 'border-gray-200 hover:border-gray-300'}"
+					on:click={() => (uploadMethod = 'upload')}
 				>
-					<div class="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg mb-4 mx-auto">
-						<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+					<div
+						class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-purple-500 to-pink-500"
+					>
+						<svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+							></path>
 						</svg>
 					</div>
-					<h3 class="text-lg font-semibold text-gray-800 mb-2">{$t('step2.upload_file')}</h3>
-					<p class="text-gray-600 text-sm">{$t('step2.upload_file_desc')}</p>
+					<h3 class="mb-2 text-lg font-semibold text-gray-800">{$t('step2.upload_file')}</h3>
+					<p class="text-sm text-gray-600">{$t('step2.upload_file_desc')}</p>
 				</button>
 			</div>
 			{#if uploadMethod === 'paste'}
 				<div class="space-y-4">
-					<label for="cv-textarea" class="block text-lg font-medium text-gray-800">{$t('step2.paste_text_label')}</label>
+					<label for="cv-textarea" class="block text-lg font-medium text-gray-800"
+						>{$t('step2.paste_text_label')}</label
+					>
 					<div class="relative">
-						<textarea 
+						<textarea
 							id="cv-textarea"
-							bind:value={cv_text} 
-							on:input={handleInput} 
+							bind:value={cv_text}
+							on:input={handleInput}
 							placeholder={$t('step2.paste_text_placeholder')}
-							class="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 resize-none overflow-y-auto p-4 text-gray-700 placeholder-gray-400"
+							class="w-full resize-none overflow-y-auto rounded-xl border-gray-300 p-4 text-gray-700 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
 							style="height: 200px !important; max-height: 200px !important;"
 						></textarea>
 						{#if cv_text.length > 0}
-							<div class="absolute bottom-3 right-3 text-xs text-gray-500 bg-white bg-opacity-90 px-2 py-1 rounded">
+							<div
+								class="bg-opacity-90 absolute right-3 bottom-3 rounded bg-white px-2 py-1 text-xs text-gray-500"
+							>
 								{cv_text.length} characters
 							</div>
 						{/if}
@@ -247,10 +278,15 @@
 			{/if}
 			{#if uploadMethod === 'upload'}
 				<div class="space-y-4">
-					<label for="cv-upload" class="block text-lg font-medium text-gray-800">{$t('step2.upload_file_label')}</label>
-					<div class="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-indigo-400 transition-colors duration-200 {isDragging ? 'border-indigo-500 bg-indigo-50' : ''}"
-						on:dragover|preventDefault={() => isDragging = true}
-						on:dragleave={() => isDragging = false}
+					<label for="cv-upload" class="block text-lg font-medium text-gray-800"
+						>{$t('step2.upload_file_label')}</label
+					>
+					<div
+						class="rounded-xl border-2 border-dashed border-gray-300 p-8 text-center transition-colors duration-200 hover:border-indigo-400 {isDragging
+							? 'border-indigo-500 bg-indigo-50'
+							: ''}"
+						on:dragover|preventDefault={() => (isDragging = true)}
+						on:dragleave={() => (isDragging = false)}
 						on:drop={handleDrop}
 						tabindex="0"
 						role="button"
@@ -263,51 +299,75 @@
 							on:change={handleFileUpload}
 							class="hidden"
 						/>
-						<svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+						<svg
+							class="mx-auto mb-4 h-12 w-12 text-gray-400"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+							></path>
 						</svg>
 						<button
 							type="button"
 							on:click={() => document.getElementById('cv-upload')?.click()}
-							class="text-indigo-600 hover:text-indigo-500 font-medium"
+							class="font-medium text-indigo-600 hover:text-indigo-500"
 						>
 							{$t('step2.choose_file')}
 						</button>
-						<p class="text-gray-500 text-sm mt-2">{$t('step2.drag_drop_hint')}</p>
+						<p class="mt-2 text-sm text-gray-500">{$t('step2.drag_drop_hint')}</p>
 						{#if uploadStatus}
-							<div class="mt-4 text-lg font-semibold {uploadStatus.includes('complete') || uploadStatus.includes('processed') ? 'text-green-600' : uploadStatus.includes('Processing') ? 'text-blue-600' : 'text-red-600'}">{uploadStatus}</div>
+							<div
+								class="mt-4 text-lg font-semibold {uploadStatus.includes('complete') ||
+								uploadStatus.includes('processed')
+									? 'text-green-600'
+									: uploadStatus.includes('Processing')
+										? 'text-blue-600'
+										: 'text-red-600'}"
+							>
+								{uploadStatus}
+							</div>
 						{/if}
 						{#if uploadProgress > 0 && uploadProgress < 100}
-							<div class="w-full bg-gray-200 rounded-full h-3 mt-4">
-								<div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-3 rounded-full transition-all duration-300" style="width: {uploadProgress}%"></div>
+							<div class="mt-4 h-3 w-full rounded-full bg-gray-200">
+								<div
+									class="h-3 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-300"
+									style="width: {uploadProgress}%"
+								></div>
 							</div>
-							<div class="text-xs text-gray-600 mt-1">{uploadProgress}%</div>
+							<div class="mt-1 text-xs text-gray-600">{uploadProgress}%</div>
 						{/if}
 					</div>
 					{#if cv_text}
-						<div class="bg-gray-50 rounded-xl p-4">
-							<h4 class="font-medium text-gray-800 mb-2">{$t('step2.content_editable')}</h4>
-							<p class="text-sm text-gray-600 mb-3">{$t('step2.content_editable_desc')}</p>
+						<div class="rounded-xl bg-gray-50 p-4">
+							<h4 class="mb-2 font-medium text-gray-800">{$t('step2.content_editable')}</h4>
+							<p class="mb-3 text-sm text-gray-600">{$t('step2.content_editable_desc')}</p>
 							<div class="relative">
-								<textarea 
-									bind:value={cv_text} 
-									on:input={handleInput} 
+								<textarea
+									bind:value={cv_text}
+									on:input={handleInput}
 									placeholder={$t('step2.content_editable_placeholder')}
-									class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 resize-none overflow-y-auto p-4 text-gray-700 placeholder-gray-400 bg-white"
+									class="w-full resize-none overflow-y-auto rounded-lg border-gray-300 bg-white p-4 text-gray-700 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
 									style="height: 200px !important; max-height: 200px !important;"
 								></textarea>
 								{#if cv_text.length > 0}
-									<div class="absolute bottom-3 right-3 text-xs text-gray-500 bg-white bg-opacity-90 px-2 py-1 rounded border">
+									<div
+										class="bg-opacity-90 absolute right-3 bottom-3 rounded border bg-white px-2 py-1 text-xs text-gray-500"
+									>
 										{cv_text.length} characters
 									</div>
 								{/if}
 							</div>
 							<div class="mt-3 flex items-center justify-between text-xs text-gray-500">
 								<span>✅ {$t('step2.content_ready')}</span>
-								<button 
+								<button
 									type="button"
-									on:click={() => cv_text = ''}
-									class="text-red-600 hover:text-red-800 underline"
+									on:click={() => (cv_text = '')}
+									class="text-red-600 underline hover:text-red-800"
 								>
 									{$t('step2.clear_content')}
 								</button>
@@ -317,8 +377,11 @@
 				</div>
 			{/if}
 		</div>
-		<div class="flex justify-between mt-8">
-			<button on:click={goToBack} class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+		<div class="mt-8 flex justify-between">
+			<button
+				on:click={goToBack}
+				class="rounded-lg bg-gray-200 px-6 py-2 text-gray-700 transition-colors hover:bg-gray-300"
+			>
 				{$t('buttons.back')}
 			</button>
 			<button
@@ -329,11 +392,11 @@
 						goto(`/questionnaire/${sessionId}/step3`);
 					}
 				}}
-				class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-500 text-white font-semibold rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-600 transition-colors text-lg"
+				class="rounded-lg bg-gradient-to-r from-indigo-600 to-purple-500 px-8 py-3 text-lg font-semibold text-white shadow-lg transition-colors hover:from-indigo-700 hover:to-purple-600"
 				disabled={!cv_text || pollingCvText}
 			>
 				{fromOnboarding ? $t('step1.overview.continue_to_step3') : $t('step2.go_to_ikigai')}
 			</button>
 		</div>
 	</div>
-</div> 
+</div>

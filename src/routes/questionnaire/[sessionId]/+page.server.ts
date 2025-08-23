@@ -35,7 +35,6 @@ export const actions = {
 
 			// Redirect to the results page
 			throw redirect(303, `/results/${sessionId}`);
-
 		} catch (e) {
 			// This is the corrected, safe error handling block
 			// First, check if the error is a redirect and let it pass through

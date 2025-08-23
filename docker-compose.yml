@@ -3,8 +3,8 @@ services:
   web:
     build: .
     ports:
-      - "6134:6134"
+      - '6134:6134'
     environment:
       - NODE_ENV=production
       - VITE_SUPABASE_URL=https://hqdflespxzoktqkkwxft.supabase.co
-      - VITE_SUPABASE_ANON_KEY=sb_publishable_PYvs9FP_p_E9nycieuFPwA_TOYQOlZw 
+      - VITE_SUPABASE_ANON_KEY=sb_publishable_PYvs9FP_p_E9nycieuFPwA_TOYQOlZw

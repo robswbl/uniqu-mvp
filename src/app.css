@@ -4,127 +4,127 @@
 
 /* Safari-specific fixes for button visibility */
 @supports (-webkit-appearance: none) {
-  /* Force button display in Safari */
-  button {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    -webkit-appearance: none;
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-  
-  /* Ensure flexbox works properly in Safari */
-  .flex {
-    display: -webkit-flex !important;
-    display: flex !important;
-  }
-  
-  /* Fix button transitions in Safari */
-  button {
-    -webkit-transition: all 0.2s ease;
-    transition: all 0.2s ease;
-  }
+	/* Force button display in Safari */
+	button {
+		display: flex !important;
+		visibility: visible !important;
+		opacity: 1 !important;
+		-webkit-appearance: none;
+		-webkit-user-select: none;
+		-webkit-tap-highlight-color: transparent;
+	}
+
+	/* Ensure flexbox works properly in Safari */
+	.flex {
+		display: -webkit-flex !important;
+		display: flex !important;
+	}
+
+	/* Fix button transitions in Safari */
+	button {
+		-webkit-transition: all 0.2s ease;
+		transition: all 0.2s ease;
+	}
 }
 
 /* Additional Safari compatibility */
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
-  button {
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
-  }
+	button {
+		-webkit-transform: translateZ(0);
+		transform: translateZ(0);
+	}
 }
 
 /* Ensure buttons are always visible */
-button[type="button"],
-button[type="submit"] {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  position: relative !important;
-  z-index: 1 !important;
+button[type='button'],
+button[type='submit'] {
+	display: flex !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+	position: relative !important;
+	z-index: 1 !important;
 }
 
 /* Force button content to be visible */
 button * {
-  visibility: visible !important;
-  opacity: 1 !important;
+	visibility: visible !important;
+	opacity: 1 !important;
 }
 
 /* Custom prose styles for pain points */
 .prose-sm {
-  font-size: 0.875rem;
-  line-height: 1.7142857;
+	font-size: 0.875rem;
+	line-height: 1.7142857;
 }
 
 .prose-sm p {
-  margin-top: 0;
-  margin-bottom: 0.75rem;
+	margin-top: 0;
+	margin-bottom: 0.75rem;
 }
 
 .prose-sm p:last-child {
-  margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 .prose-sm strong {
-  font-weight: 600;
-  color: #1f2937;
+	font-weight: 600;
+	color: #1f2937;
 }
 
 .prose-sm em {
-  font-style: italic;
+	font-style: italic;
 }
 
 .prose-sm ul {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-  padding-left: 1.5rem;
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+	padding-left: 1.5rem;
 }
 
 .prose-sm ol {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-  padding-left: 1.5rem;
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
+	padding-left: 1.5rem;
 }
 
 .prose-sm li {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-  line-height: 1.5;
+	margin-top: 0.25rem;
+	margin-bottom: 0.25rem;
+	line-height: 1.5;
 }
 
 .prose-sm li > p {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
+	margin-top: 0.25rem;
+	margin-bottom: 0.25rem;
 }
 
 /* Specific styles for pain points headings */
 .prose-sm h2 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 1rem;
-  margin-top: 0;
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: #111827;
+	margin-bottom: 1rem;
+	margin-top: 0;
 }
 
 .prose-sm h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.75rem;
-  margin-top: 1.5rem;
+	font-size: 1.125rem;
+	font-weight: 600;
+	color: #374151;
+	margin-bottom: 0.75rem;
+	margin-top: 1.5rem;
 }
 
 /* Better spacing for pain points sections */
 .prose-sm div {
-  margin-bottom: 1rem;
+	margin-bottom: 1rem;
 }
 
 .prose-sm div:last-child {
-  margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 /* Ensure proper spacing between sections */
 .prose-sm div + div {
-  margin-top: 1.5rem;
+	margin-top: 1.5rem;
 }

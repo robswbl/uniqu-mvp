@@ -6,4 +6,4 @@ export const load: PageServerLoad = async ({ params }) => {
 		agencyId: params.agencyId,
 		userId: params.userId
 	};
-}; 
+};

@@ -10,7 +10,7 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
-	
+
 	// Add this part to define your environment variables
 	interface ImportMetaEnv {
 		readonly VITE_SUPABASE_URL: string;

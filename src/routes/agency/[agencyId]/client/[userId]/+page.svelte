@@ -19,14 +19,19 @@
 	let selectedVersions: Record<string, string> = {};
 
 	// Main document types to show
-	const mainDocumentTypes = ['reflection_letter', 'career_themes', 'ideal_companies', 'matching_companies'];
+	const mainDocumentTypes = [
+		'reflection_letter',
+		'career_themes',
+		'ideal_companies',
+		'matching_companies'
+	];
 
 	// Group documents by type and get latest version for each
 	function getDocumentsByType() {
 		const grouped: Record<string, any[]> = {};
-		
+
 		// Group generated documents
-		documents.forEach(doc => {
+		documents.forEach((doc) => {
 			if (mainDocumentTypes.includes(doc.document_type)) {
 				if (!grouped[doc.document_type]) {
 					grouped[doc.document_type] = [];
@@ -46,20 +51,26 @@
 	function getLatestDocument(type: string) {
 		const docs = getDocumentsByType()[type];
 		if (!docs || docs.length === 0) return null;
-		
+
 		// Sort by created_at descending and return the latest
-		return docs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0];
+		return docs.sort(
+			(a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+		)[0];
 	}
 
 	function getDocumentVersions(type: string) {
 		const docs = getDocumentsByType()[type];
 		if (!docs) return [];
-		
-		return docs.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+		return docs
+			.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 			.map((doc, index) => ({
 				id: doc.id,
 				version: `v${index + 1}`,
-				date: new Date(doc.created_at).toLocaleDateString() + ' ' + new Date(doc.created_at).toLocaleTimeString(),
+				date:
+					new Date(doc.created_at).toLocaleDateString() +
+					' ' +
+					new Date(doc.created_at).toLocaleTimeString(),
 				document: doc
 			}));
 	}
@@ -67,11 +78,11 @@
 	function getSelectedDocument(type: string) {
 		const versions = getDocumentVersions(type);
 		const selectedId = selectedVersions[type];
-		
+
 		if (selectedId) {
-			return versions.find(v => v.document.id === selectedId)?.document;
+			return versions.find((v) => v.document.id === selectedId)?.document;
 		}
-		
+
 		// Default to latest
 		return getLatestDocument(type);
 	}
@@ -79,11 +90,14 @@
 	function viewDocument(type: string) {
 		const doc = getSelectedDocument(type);
 		if (!doc) return;
-		
+
 		if (type === 'application_letters') {
 			// For application letters, we need to handle differently
 			const letter = doc;
-			window.open(`/results/${sessions[0]?.id}/application_letter?company=${letter.company_name}`, '_blank');
+			window.open(
+				`/results/${sessions[0]?.id}/application_letter?company=${letter.company_name}`,
+				'_blank'
+			);
 		} else {
 			window.open(`/results/${sessions[0]?.id}/${type}`, '_blank');
 		}
@@ -92,7 +106,7 @@
 	function copyDocument(type: string) {
 		const doc = getSelectedDocument(type);
 		if (!doc) return;
-		
+
 		// For now, just copy the URL
 		let url = '';
 		if (type === 'application_letters') {
@@ -100,18 +114,21 @@
 		} else {
 			url = `${window.location.origin}/results/${sessions[0]?.id}/${type}`;
 		}
-		
-		navigator.clipboard.writeText(url).then(() => {
-			alert('Document URL copied to clipboard!');
-		}).catch(() => {
-			alert('Failed to copy URL. Please copy manually: ' + url);
-		});
+
+		navigator.clipboard
+			.writeText(url)
+			.then(() => {
+				alert('Document URL copied to clipboard!');
+			})
+			.catch(() => {
+				alert('Failed to copy URL. Please copy manually: ' + url);
+			});
 	}
 
 	function printDocument(type: string) {
 		const doc = getSelectedDocument(type);
 		if (!doc) return;
-		
+
 		// Open in new window for printing
 		let url = '';
 		if (type === 'application_letters') {
@@ -119,7 +136,7 @@
 		} else {
 			url = `/results/${sessions[0]?.id}/${type}`;
 		}
-		
+
 		// Open in new window and trigger print after load
 		const printWindow = window.open(url, '_blank');
 		if (printWindow) {
@@ -132,24 +149,24 @@
 
 	function getApplicationStatusColor(status: string): string {
 		const statusColors: Record<string, string> = {
-			'draft': 'bg-gray-100 text-gray-700',
-			'sent': 'bg-blue-100 text-blue-700',
-			'responded': 'bg-yellow-100 text-yellow-700',
-			'interview': 'bg-green-100 text-green-700',
-			'rejected': 'bg-red-100 text-red-700',
-			'accepted': 'bg-purple-100 text-purple-700'
+			draft: 'bg-gray-100 text-gray-700',
+			sent: 'bg-blue-100 text-blue-700',
+			responded: 'bg-yellow-100 text-yellow-700',
+			interview: 'bg-green-100 text-green-700',
+			rejected: 'bg-red-100 text-red-700',
+			accepted: 'bg-purple-100 text-purple-700'
 		};
 		return statusColors[status] || 'bg-gray-100 text-gray-700';
 	}
 
 	function getApplicationStatusLabel(status: string): string {
 		const statusLabels: Record<string, string> = {
-			'draft': 'Draft',
-			'sent': 'Sent',
-			'responded': 'Response Received',
-			'interview': 'Interview Scheduled',
-			'rejected': 'Rejected',
-			'accepted': 'Offer Received'
+			draft: 'Draft',
+			sent: 'Sent',
+			responded: 'Response Received',
+			interview: 'Interview Scheduled',
+			rejected: 'Rejected',
+			accepted: 'Offer Received'
 		};
 		return statusLabels[status] || status;
 	}
@@ -214,7 +231,6 @@
 			if (!lettersError && lettersData) {
 				applicationLetters = lettersData;
 			}
-
 		} catch (err: any) {
 			error = err.message;
 			console.error('Error loading client data:', err);
@@ -226,29 +242,30 @@
 	async function generateClientSummary(sessionId: string) {
 		try {
 			// Call the n8n webhook to generate summary
-			const response = await fetch('https://manage.app.n8n.cloud/webhook/clients/uniqu-agentsummary', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					user_id: userId,
-					session_id: sessionId,
-					agency_id: agencyId
-				})
-			});
+			const response = await fetch(
+				'https://manage.app.n8n.cloud/webhook/clients/uniqu-agentsummary',
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						user_id: userId,
+						session_id: sessionId,
+						agency_id: agencyId
+					})
+				}
+			);
 
 			if (response.ok) {
 				// Log the activity
-				await supabase
-					.from('agency_activities')
-					.insert({
-						agency_id: agencyId,
-						user_id: userId,
-						activity_type: 'results_generated',
-						session_id: sessionId,
-						metadata: { action: 'summary_generated' }
-					});
+				await supabase.from('agency_activities').insert({
+					agency_id: agencyId,
+					user_id: userId,
+					activity_type: 'results_generated',
+					session_id: sessionId,
+					metadata: { action: 'summary_generated' }
+				});
 
 				alert('Summary generation started! You will receive it shortly.');
 				// Reload activities
@@ -262,14 +279,16 @@
 	}
 
 	function formatDate(dateString: string) {
-		return new Date(dateString).toLocaleDateString() + ' ' + new Date(dateString).toLocaleTimeString();
+		return (
+			new Date(dateString).toLocaleDateString() + ' ' + new Date(dateString).toLocaleTimeString()
+		);
 	}
 
 	function getStatusBadge(status: string) {
 		const statusConfig: Record<string, { class: string; text: string }> = {
-			'completed': { class: 'bg-green-100 text-green-800', text: 'Completed' },
+			completed: { class: 'bg-green-100 text-green-800', text: 'Completed' },
 			'in-progress': { class: 'bg-yellow-100 text-yellow-800', text: 'In Progress' },
-			'not_started': { class: 'bg-gray-100 text-gray-800', text: 'Not Started' }
+			not_started: { class: 'bg-gray-100 text-gray-800', text: 'Not Started' }
 		};
 		const config = statusConfig[status] || { class: 'bg-gray-100 text-gray-800', text: status };
 		return `<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${config.class}">${config.text}</span>`;
@@ -277,37 +296,40 @@
 
 	function getActivityIcon(activityType: string) {
 		const icons: Record<string, string> = {
-			'user_registered': '👤',
-			'questionnaire_started': '📝',
-			'questionnaire_completed': '✅',
-			'results_generated': '📊',
-			'application_letter_created': '📄',
-			'profile_updated': '🔄',
-			'login': '🔑'
+			user_registered: '👤',
+			questionnaire_started: '📝',
+			questionnaire_completed: '✅',
+			results_generated: '📊',
+			application_letter_created: '📄',
+			profile_updated: '🔄',
+			login: '🔑'
 		};
 		return icons[activityType] || '📋';
 	}
 
 	function getDocumentIcon(documentType: string): string {
 		const icons: Record<string, string> = {
-			'reflection_letter': '📝',
-			'career_themes': '🎯',
-			'ideal_companies': '🏢',
-			'matching_companies': '🔍',
-			'application_letter': '📄'
+			reflection_letter: '📝',
+			career_themes: '🎯',
+			ideal_companies: '🏢',
+			matching_companies: '🔍',
+			application_letter: '📄'
 		};
 		return icons[documentType] || '📋';
 	}
 
 	function getDocumentTitle(documentType: string): string {
 		const titles: Record<string, string> = {
-			'reflection_letter': 'Reflection Letter',
-			'career_themes': 'Career Themes',
-			'ideal_companies': 'Ideal Companies',
-			'matching_companies': 'Matching Companies',
-			'application_letter': 'Application Letter'
+			reflection_letter: 'Reflection Letter',
+			career_themes: 'Career Themes',
+			ideal_companies: 'Ideal Companies',
+			matching_companies: 'Matching Companies',
+			application_letter: 'Application Letter'
 		};
-		return titles[documentType] || documentType.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
+		return (
+			titles[documentType] ||
+			documentType.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
+		);
 	}
 
 	function getDocumentCount(): number {
@@ -316,7 +338,7 @@
 
 	function formatActivityMetadata(metadata: any): string {
 		if (!metadata) return '';
-		
+
 		const action = metadata.action;
 		switch (action) {
 			case 'summary_generated':
@@ -344,45 +366,48 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">
-	<div class="max-w-7xl mx-auto px-4 py-8">
+	<div class="mx-auto max-w-7xl px-4 py-8">
 		<!-- Back Button -->
-		<button 
+		<button
 			on:click={() => goto(`/agency/${agencyId}`)}
-			class="inline-flex items-center text-gray-600 hover:text-gray-800 transition-colors duration-200 mb-6"
+			class="mb-6 inline-flex items-center text-gray-600 transition-colors duration-200 hover:text-gray-800"
 			type="button"
 		>
-			<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
 			</svg>
 			Back to Agency Dashboard
 		</button>
 
 		{#if loading}
-			<div class="flex justify-center items-center h-64">
-				<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+			<div class="flex h-64 items-center justify-center">
+				<div class="h-12 w-12 animate-spin rounded-full border-b-2 border-indigo-600"></div>
 			</div>
 		{:else if error}
-			<div class="bg-red-50 border border-red-200 rounded-lg p-4">
-				<h3 class="text-red-800 font-medium">Error</h3>
+			<div class="rounded-lg border border-red-200 bg-red-50 p-4">
+				<h3 class="font-medium text-red-800">Error</h3>
 				<p class="text-red-600">{error}</p>
 			</div>
 		{:else}
 			<!-- Client Header -->
-			<div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+			<div class="mb-8 rounded-lg bg-white p-6 shadow-sm">
 				<div class="flex items-center justify-between">
 					<div class="flex items-center">
-						<div class="flex-shrink-0 h-16 w-16">
-							<div class="h-16 w-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-xl">
+						<div class="h-16 w-16 flex-shrink-0">
+							<div
+								class="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-xl font-semibold text-white"
+							>
 								{client?.user_firstname?.charAt(0) || 'U'}
 							</div>
 						</div>
 						<div class="ml-6">
 							<h1 class="text-3xl font-bold text-gray-900">
-								{client?.user_firstname} {client?.user_lastname}
+								{client?.user_firstname}
+								{client?.user_lastname}
 							</h1>
-							<p class="text-gray-600 mt-1">{client?.user_email}</p>
+							<p class="mt-1 text-gray-600">{client?.user_email}</p>
 							{#if client?.user_phone}
-								<p class="text-gray-500 text-sm mt-1">📞 {client.user_phone}</p>
+								<p class="mt-1 text-sm text-gray-500">📞 {client.user_phone}</p>
 							{/if}
 						</div>
 					</div>
@@ -393,18 +418,18 @@
 				</div>
 			</div>
 
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+			<div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
 				<!-- Documents Section -->
-				<div class="bg-white rounded-lg shadow-sm">
-					<div class="px-6 py-4 border-b border-gray-200">
+				<div class="rounded-lg bg-white shadow-sm">
+					<div class="border-b border-gray-200 px-6 py-4">
 						<h2 class="text-xl font-semibold text-gray-900">Generated Documents</h2>
-						<p class="text-gray-600 mt-1">All career analysis documents and application letters</p>
+						<p class="mt-1 text-gray-600">All career analysis documents and application letters</p>
 					</div>
 
 					{#if documents.length === 0 && applicationLetters.length === 0}
 						<div class="p-8 text-center">
-							<div class="text-gray-400 text-4xl mb-4">📄</div>
-							<h3 class="text-lg font-medium text-gray-900 mb-2">No documents yet</h3>
+							<div class="mb-4 text-4xl text-gray-400">📄</div>
+							<h3 class="mb-2 text-lg font-medium text-gray-900">No documents yet</h3>
 							<p class="text-gray-600">Documents will appear here once generated.</p>
 						</div>
 					{:else}
@@ -419,10 +444,10 @@
 													<div>
 														<h4 class="font-medium text-gray-900">{getDocumentTitle(type)}</h4>
 														{#if getDocumentVersions(type).length > 1}
-															<div class="flex items-center space-x-2 mt-1">
-																<select 
+															<div class="mt-1 flex items-center space-x-2">
+																<select
 																	bind:value={selectedVersions[type]}
-																	class="text-xs border border-gray-300 rounded px-2 py-1"
+																	class="rounded border border-gray-300 px-2 py-1 text-xs"
 																>
 																	{#each getDocumentVersions(type) as version}
 																		<option value={version.document.id}>
@@ -445,19 +470,19 @@
 											<div class="flex space-x-2">
 												<button
 													on:click={() => viewDocument(type)}
-													class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+													class="rounded-md bg-indigo-50 px-3 py-1 text-sm text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
 												>
 													View
 												</button>
 												<button
 													on:click={() => copyDocument(type)}
-													class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+													class="rounded-md bg-indigo-50 px-3 py-1 text-sm text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
 												>
 													Copy URL
 												</button>
 												<button
 													on:click={() => printDocument(type)}
-													class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+													class="rounded-md bg-indigo-50 px-3 py-1 text-sm text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
 												>
 													Print
 												</button>
@@ -476,14 +501,15 @@
 												<div>
 													<h4 class="font-medium text-gray-900">Application Letters</h4>
 													{#if applicationLetters.length > 1}
-														<div class="flex items-center space-x-2 mt-1">
-															<select 
+														<div class="mt-1 flex items-center space-x-2">
+															<select
 																bind:value={selectedVersions['application_letters']}
-																class="text-xs border border-gray-300 rounded px-2 py-1"
+																class="rounded border border-gray-300 px-2 py-1 text-xs"
 															>
 																{#each getDocumentVersions('application_letters') as version}
 																	<option value={version.document.id}>
-																		{version.version} - {version.document.company_name || 'Unknown'} - {version.date}
+																		{version.version} - {version.document.company_name || 'Unknown'}
+																		- {version.date}
 																	</option>
 																{/each}
 															</select>
@@ -492,9 +518,15 @@
 															</span>
 															<!-- Status badge for selected letter -->
 															{#if selectedVersions['application_letters']}
-																{@const selectedLetter = applicationLetters.find(l => l.id === selectedVersions['application_letters'])}
+																{@const selectedLetter = applicationLetters.find(
+																	(l) => l.id === selectedVersions['application_letters']
+																)}
 																{#if selectedLetter}
-																	<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {getApplicationStatusColor(selectedLetter.status)}">
+																	<span
+																		class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {getApplicationStatusColor(
+																			selectedLetter.status
+																		)}"
+																	>
 																		{getApplicationStatusLabel(selectedLetter.status)}
 																	</span>
 																{/if}
@@ -502,18 +534,28 @@
 																<!-- Status badge for latest letter -->
 																{@const latestLetter = applicationLetters[0]}
 																{#if latestLetter}
-																	<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {getApplicationStatusColor(latestLetter.status)}">
+																	<span
+																		class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {getApplicationStatusColor(
+																			latestLetter.status
+																		)}"
+																	>
 																		{getApplicationStatusLabel(latestLetter.status)}
 																	</span>
 																{/if}
 															{/if}
 														</div>
 													{:else}
-														<div class="flex items-center space-x-2 mt-1">
+														<div class="mt-1 flex items-center space-x-2">
 															<p class="text-sm text-gray-500">
-																{applicationLetters[0]?.company_name || 'Unknown Company'} - {formatDate(applicationLetters[0]?.created_at)}
+																{applicationLetters[0]?.company_name || 'Unknown Company'} - {formatDate(
+																	applicationLetters[0]?.created_at
+																)}
 															</p>
-															<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {getApplicationStatusColor(applicationLetters[0]?.status)}">
+															<span
+																class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {getApplicationStatusColor(
+																	applicationLetters[0]?.status
+																)}"
+															>
 																{getApplicationStatusLabel(applicationLetters[0]?.status)}
 															</span>
 														</div>
@@ -524,19 +566,19 @@
 										<div class="flex space-x-2">
 											<button
 												on:click={() => viewDocument('application_letters')}
-												class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+												class="rounded-md bg-indigo-50 px-3 py-1 text-sm text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
 											>
 												View
 											</button>
 											<button
 												on:click={() => copyDocument('application_letters')}
-												class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+												class="rounded-md bg-indigo-50 px-3 py-1 text-sm text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
 											>
 												Copy URL
 											</button>
 											<button
 												on:click={() => printDocument('application_letters')}
-												class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+												class="rounded-md bg-indigo-50 px-3 py-1 text-sm text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
 											>
 												Print
 											</button>
@@ -549,16 +591,16 @@
 				</div>
 
 				<!-- Sessions Section -->
-				<div class="bg-white rounded-lg shadow-sm">
-					<div class="px-6 py-4 border-b border-gray-200">
+				<div class="rounded-lg bg-white shadow-sm">
+					<div class="border-b border-gray-200 px-6 py-4">
 						<h2 class="text-xl font-semibold text-gray-900">Questionnaire Sessions</h2>
-						<p class="text-gray-600 mt-1">Track client progress through questionnaires</p>
+						<p class="mt-1 text-gray-600">Track client progress through questionnaires</p>
 					</div>
 
 					{#if sessions.length === 0}
 						<div class="p-8 text-center">
-							<div class="text-gray-400 text-4xl mb-4">📝</div>
-							<h3 class="text-lg font-medium text-gray-900 mb-2">No sessions yet</h3>
+							<div class="mb-4 text-4xl text-gray-400">📝</div>
+							<h3 class="mb-2 text-lg font-medium text-gray-900">No sessions yet</h3>
 							<p class="text-gray-600">Client hasn't started any questionnaires.</p>
 						</div>
 					{:else}
@@ -568,20 +610,21 @@
 									<div class="flex items-center justify-between">
 										<div>
 											<div class="flex items-center space-x-2">
-												<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {
-													session.status === 'completed' 
+												<span
+													class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {session.status ===
+													'completed'
 														? 'bg-green-100 text-green-800'
 														: session.status === 'in-progress'
-														? 'bg-yellow-100 text-yellow-800'
-														: 'bg-gray-100 text-gray-800'
-												}">
+															? 'bg-yellow-100 text-yellow-800'
+															: 'bg-gray-100 text-gray-800'}"
+												>
 													{session.status}
 												</span>
 												<span class="text-sm text-gray-500">
 													{formatDate(session.created_at)}
 												</span>
 											</div>
-											<p class="text-sm text-gray-600 mt-1">
+											<p class="mt-1 text-sm text-gray-600">
 												Session ID: {session.id}
 											</p>
 										</div>
@@ -589,7 +632,7 @@
 											{#if session.status === 'completed'}
 												<button
 													on:click={() => generateClientSummary(session.id)}
-													class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md text-sm transition-colors"
+													class="rounded-md bg-indigo-50 px-3 py-1 text-sm text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
 												>
 													Generate Summary
 												</button>
@@ -603,17 +646,19 @@
 				</div>
 
 				<!-- Activities Section -->
-				<div class="bg-white rounded-lg shadow-sm">
-					<div class="px-6 py-4 border-b border-gray-200">
+				<div class="rounded-lg bg-white shadow-sm">
+					<div class="border-b border-gray-200 px-6 py-4">
 						<h2 class="text-xl font-semibold text-gray-900">Agency Activities</h2>
-						<p class="text-gray-600 mt-1">Track all interactions with this client</p>
+						<p class="mt-1 text-gray-600">Track all interactions with this client</p>
 					</div>
 
 					{#if activities.length === 0}
 						<div class="p-8 text-center">
-							<div class="text-gray-400 text-4xl mb-4">📊</div>
-							<h3 class="text-lg font-medium text-gray-900 mb-2">No activities yet</h3>
-							<p class="text-gray-600">Activities will appear here as you interact with this client.</p>
+							<div class="mb-4 text-4xl text-gray-400">📊</div>
+							<h3 class="mb-2 text-lg font-medium text-gray-900">No activities yet</h3>
+							<p class="text-gray-600">
+								Activities will appear here as you interact with this client.
+							</p>
 						</div>
 					{:else}
 						<div class="divide-y divide-gray-200">
@@ -623,15 +668,17 @@
 										<div class="flex-shrink-0 text-2xl">
 											{getActivityIcon(activity.activity_type)}
 										</div>
-										<div class="flex-1 min-w-0">
+										<div class="min-w-0 flex-1">
 											<p class="text-sm font-medium text-gray-900">
-												{activity.activity_type.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+												{activity.activity_type
+													.replace('_', ' ')
+													.replace(/\b\w/g, (l: string) => l.toUpperCase())}
 											</p>
 											<p class="text-sm text-gray-500">
 												{formatDate(activity.created_at)}
 											</p>
 											{#if activity.metadata}
-												<p class="text-sm text-gray-600 mt-1">
+												<p class="mt-1 text-sm text-gray-600">
 													{formatActivityMetadata(activity.metadata)}
 												</p>
 											{/if}
@@ -645,4 +692,4 @@
 			</div>
 		{/if}
 	</div>
-</div> 
+</div>

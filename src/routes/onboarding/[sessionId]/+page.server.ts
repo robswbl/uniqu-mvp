@@ -4,4 +4,4 @@ export const load: PageServerLoad = async ({ params }: { params: { sessionId: st
 	return {
 		sessionId: params.sessionId
 	};
-}; 
+};

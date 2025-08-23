@@ -18,19 +18,55 @@
 	let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	const situations = [
-		{ id: 'laid-off', titleKey: 'onboarding.option_laid_off', descKey: 'onboarding.option_laid_off_desc', icon: '💔', tone: 'supportive' },
-		{ id: 'quit', titleKey: 'onboarding.option_quit', descKey: 'onboarding.option_quit_desc', icon: '🦁', tone: 'encouraging' },
-		{ id: 'career-change', titleKey: 'onboarding.option_career_change', descKey: 'onboarding.option_career_change_desc', icon: '🔄', tone: 'inspiring' },
-		{ id: 'retirement', titleKey: 'onboarding.option_retirement', descKey: 'onboarding.option_retirement_desc', icon: '🌟', tone: 'celebratory' },
-		{ id: 'burnout', titleKey: 'onboarding.option_burnout', descKey: 'onboarding.option_burnout_desc', icon: '🕯️', tone: 'gentle' },
-		{ id: 'other', titleKey: 'onboarding.option_other', descKey: 'onboarding.option_other_desc', icon: '💭', tone: 'open' }
+		{
+			id: 'laid-off',
+			titleKey: 'onboarding.option_laid_off',
+			descKey: 'onboarding.option_laid_off_desc',
+			icon: '💔',
+			tone: 'supportive'
+		},
+		{
+			id: 'quit',
+			titleKey: 'onboarding.option_quit',
+			descKey: 'onboarding.option_quit_desc',
+			icon: '🦁',
+			tone: 'encouraging'
+		},
+		{
+			id: 'career-change',
+			titleKey: 'onboarding.option_career_change',
+			descKey: 'onboarding.option_career_change_desc',
+			icon: '🔄',
+			tone: 'inspiring'
+		},
+		{
+			id: 'retirement',
+			titleKey: 'onboarding.option_retirement',
+			descKey: 'onboarding.option_retirement_desc',
+			icon: '🌟',
+			tone: 'celebratory'
+		},
+		{
+			id: 'burnout',
+			titleKey: 'onboarding.option_burnout',
+			descKey: 'onboarding.option_burnout_desc',
+			icon: '🕯️',
+			tone: 'gentle'
+		},
+		{
+			id: 'other',
+			titleKey: 'onboarding.option_other',
+			descKey: 'onboarding.option_other_desc',
+			icon: '💭',
+			tone: 'open'
+		}
 	];
 
 	onMount(async () => {
 		// Get current user ID from localStorage
 		const currentUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
 		console.log('Current user ID from localStorage:', currentUserId);
-		
+
 		// Fetch session data to get user info
 		console.log('Fetching session data for sessionId:', sessionId);
 		const { data: sessionData, error: sessionError } = await supabase
@@ -41,7 +77,7 @@
 
 		if (sessionData?.user_id) {
 			userId = sessionData.user_id;
-			
+
 			// Security check: ensure current user can access this session
 			if (currentUserId && currentUserId !== userId) {
 				// Redirect to current user's session if available
@@ -50,7 +86,7 @@
 					.select('id')
 					.eq('user_id', currentUserId)
 					.maybeSingle();
-				
+
 				if (userSession) {
 					goto(`/onboarding/${userSession.id}`);
 					return;
@@ -59,14 +95,14 @@
 					return;
 				}
 			}
-			
+
 			// Fetch user first name for personalization (robust, like dashboard)
 			const { data: user, error: userError } = await supabase
 				.from('users')
 				.select('user_firstname')
 				.eq('user_uuid', sessionData.user_id)
 				.single();
-			
+
 			if (user && user.user_firstname) {
 				userFirstName = user.user_firstname;
 			} else {
@@ -96,11 +132,11 @@
 
 	async function startJourney() {
 		isSubmitting = true;
-		
+
 		// Save situation and where_now
 		await supabase
 			.from('questionnaire_sessions')
-			.update({ 
+			.update({
 				user_situation: selectedSituation,
 				onboarding_completed: true,
 				where_now: whereNow
@@ -134,15 +170,14 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-	<div class="max-w-4xl mx-auto px-4 py-8">
-		
+	<div class="mx-auto max-w-4xl px-4 py-8">
 		<!-- Back Button -->
-		<button 
+		<button
 			on:click={goBack}
-			class="inline-flex items-center text-gray-600 hover:text-gray-800 transition-colors duration-200 mb-8"
+			class="mb-8 inline-flex items-center text-gray-600 transition-colors duration-200 hover:text-gray-800"
 			type="button"
 		>
-			<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
 			</svg>
 			{$t('buttons.back')}
@@ -150,46 +185,52 @@
 
 		{#if currentStep === 0}
 			<!-- Step 1: Welcome and Situation Selection -->
-			<div class="text-center mb-12">
+			<div class="mb-12 text-center">
 				{#if !userLoaded}
 					<div class="mb-8">
-						<div class="animate-spin w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+						<div
+							class="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"
+						></div>
 						<p class="text-gray-600">Loading user data...</p>
 					</div>
 				{:else}
 					<div class="mb-8">
-						<h1 class="text-4xl font-bold text-gray-900 mb-4">
-							{userFirstName ? `Welcome to UniqU, ${userFirstName}!` : `Welcome to UniqU, ${$t('onboarding.generic_name')}!`}
+						<h1 class="mb-4 text-4xl font-bold text-gray-900">
+							{userFirstName
+								? `Welcome to UniqU, ${userFirstName}!`
+								: `Welcome to UniqU, ${$t('onboarding.generic_name')}!`}
 						</h1>
 
-						<p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+						<p class="mx-auto max-w-3xl text-xl leading-relaxed text-gray-600">
 							{$t('app.subtitle')}
 						</p>
 					</div>
 				{/if}
 
-				<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-					<h2 class="text-2xl font-semibold text-gray-800 mb-6">
+				<div class="mb-8 rounded-2xl bg-white p-8 shadow-lg">
+					<h2 class="mb-6 text-2xl font-semibold text-gray-800">
 						{$t('onboarding.question')}
 					</h2>
-					<p class="text-gray-600 mb-8">
+					<p class="mb-8 text-gray-600">
 						{$t('onboarding.understanding_situation')}
 					</p>
 
-					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 						{#each situations as situation}
 							<button
 								on:click={() => selectSituation(situation.id)}
-								class="text-left p-6 rounded-xl border-2 border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200 group"
+								class="group rounded-xl border-2 border-gray-200 p-6 text-left transition-all duration-200 hover:border-indigo-300 hover:shadow-md"
 								type="button"
 							>
 								<div class="flex items-start space-x-4">
 									<span class="text-3xl">{situation.icon}</span>
 									<div class="flex-1">
-										<h3 class="font-semibold text-gray-800 group-hover:text-indigo-600 transition-colors">
+										<h3
+											class="font-semibold text-gray-800 transition-colors group-hover:text-indigo-600"
+										>
 											{$t(situation.titleKey)}
 										</h3>
-										<p class="text-sm text-gray-600 mt-1">
+										<p class="mt-1 text-sm text-gray-600">
 											{$t(situation.descKey)}
 										</p>
 									</div>
@@ -199,80 +240,97 @@
 					</div>
 				</div>
 
-				<div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+				<div class="rounded-xl border border-blue-200 bg-blue-50 p-6">
 					<div class="flex items-start space-x-4">
-						<svg class="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+						<svg
+							class="mt-1 h-6 w-6 flex-shrink-0 text-blue-600"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+							/>
 						</svg>
 						<div>
-							<h3 class="font-medium text-blue-900 mb-2">{$t('onboarding.what_to_expect_title')}</h3>
-							<p class="text-blue-700 text-sm">
+							<h3 class="mb-2 font-medium text-blue-900">
+								{$t('onboarding.what_to_expect_title')}
+							</h3>
+							<p class="text-sm text-blue-700">
 								{$t('onboarding.what_to_expect_desc')}
 							</p>
 						</div>
 					</div>
 				</div>
 			</div>
-
 		{:else if currentStep === 1}
 			<!-- Step 2: Confirmation and Next Steps -->
-			<div class="max-w-2xl mx-auto text-center">
+			<div class="mx-auto max-w-2xl text-center">
 				{#if selectedSituation}
-					{@const situation = situations.find(s => s.id === selectedSituation)}
+					{@const situation = situations.find((s) => s.id === selectedSituation)}
 					{#if situation}
 						<div class="mb-8">
-							<span class="text-6xl mb-4 block">{situation.icon}</span>
-							<h1 class="text-3xl font-bold text-gray-900 mb-4">
+							<span class="mb-4 block text-6xl">{situation.icon}</span>
+							<h1 class="mb-4 text-3xl font-bold text-gray-900">
 								{$t(situation.titleKey)}
 							</h1>
-							<p class="text-xl text-gray-600 leading-relaxed mb-8">
+							<p class="mb-8 text-xl leading-relaxed text-gray-600">
 								{$t(situation.titleKey)}
 							</p>
 						</div>
 
 						<!-- New where_now textarea -->
 						<textarea
-							class="w-full rounded-xl border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 resize-none p-4 text-gray-700 placeholder-gray-400 mb-8"
+							class="mb-8 w-full resize-none rounded-xl border-gray-300 p-4 text-gray-700 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
 							rows="3"
 							placeholder={$t('onboarding.where_now_placeholder')}
 							bind:value={whereNow}
 							on:input={handleWhereNowInput}
 						></textarea>
 
-						<div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-							<h2 class="text-2xl font-semibold text-gray-800 mb-6">
+						<div class="mb-8 rounded-2xl bg-white p-8 shadow-lg">
+							<h2 class="mb-6 text-2xl font-semibold text-gray-800">
 								{$t('onboarding.step2_title')}
 							</h2>
-							<p class="text-gray-600 mb-6">
+							<p class="mb-6 text-gray-600">
 								{$t('onboarding.step2_desc')}
 							</p>
-							
+
 							<div class="space-y-4 text-left">
 								<div class="flex items-start space-x-3">
-									<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-										<span class="text-indigo-600 text-sm font-medium">1</span>
+									<div
+										class="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100"
+									>
+										<span class="text-sm font-medium text-indigo-600">1</span>
 									</div>
 									<p class="text-gray-700">{$t('onboarding.step2_point1')}</p>
 								</div>
 								<div class="flex items-start space-x-3">
-									<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-										<span class="text-indigo-600 text-sm font-medium">2</span>
+									<div
+										class="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100"
+									>
+										<span class="text-sm font-medium text-indigo-600">2</span>
 									</div>
 									<p class="text-gray-700">{$t('onboarding.step2_point2')}</p>
 								</div>
 								<div class="flex items-start space-x-3">
-									<div class="w-6 h-6 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-										<span class="text-indigo-600 text-sm font-medium">3</span>
+									<div
+										class="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100"
+									>
+										<span class="text-sm font-medium text-indigo-600">3</span>
 									</div>
 									<p class="text-gray-700">{$t('onboarding.step2_point3')}</p>
 								</div>
 							</div>
 						</div>
 
-						<div class="flex flex-col sm:flex-row gap-4 justify-center">
+						<div class="flex flex-col justify-center gap-4 sm:flex-row">
 							<button
-								on:click={() => currentStep = 0}
-								class="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:border-gray-400 transition-colors"
+								on:click={() => (currentStep = 0)}
+								class="rounded-lg border-2 border-gray-300 px-8 py-3 text-gray-700 transition-colors hover:border-gray-400"
 								type="button"
 							>
 								{$t('buttons.go_back')}
@@ -280,13 +338,29 @@
 							<button
 								on:click={startJourney}
 								disabled={isSubmitting}
-								class="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400 transition-colors flex items-center justify-center"
+								class="flex items-center justify-center rounded-lg bg-indigo-600 px-8 py-3 text-white transition-colors hover:bg-indigo-700 disabled:bg-indigo-400"
 								type="button"
 							>
 								{#if isSubmitting}
-									<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-										<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-										<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+									<svg
+										class="mr-3 -ml-1 h-5 w-5 animate-spin text-white"
+										xmlns="http://www.w3.org/2000/svg"
+										fill="none"
+										viewBox="0 0 24 24"
+									>
+										<circle
+											class="opacity-25"
+											cx="12"
+											cy="12"
+											r="10"
+											stroke="currentColor"
+											stroke-width="4"
+										></circle>
+										<path
+											class="opacity-75"
+											fill="currentColor"
+											d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+										></path>
 									</svg>
 									{$t('onboarding.starting_journey')}
 								{:else}
@@ -299,4 +373,4 @@
 			</div>
 		{/if}
 	</div>
-</div> 
+</div>

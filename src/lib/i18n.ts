@@ -8,12 +8,12 @@ register('it', () => import('./i18n/it.json'));
 register('es', () => import('./i18n/es.json'));
 
 export function setupI18n(userLang?: string) {
-  init({
-    fallbackLocale: 'en',
-    initialLocale: userLang || getLocaleFromNavigator(),
-    loadingDelay: 200,
-    warnOnMissingMessages: true
-  });
+	init({
+		fallbackLocale: 'en',
+		initialLocale: userLang || getLocaleFromNavigator(),
+		loadingDelay: 200,
+		warnOnMissingMessages: true
+	});
 }
 
-export { locale, waitLocale }; 
+export { locale, waitLocale };

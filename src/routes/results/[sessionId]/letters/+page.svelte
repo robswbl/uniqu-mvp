@@ -2333,7 +2333,8 @@
 			{/if}
 
 			<!-- Letters List -->
-			{#if applicationLetters.length === 0}
+			<div class="container mx-auto px-4 py-6">
+				{#if applicationLetters.length === 0}
 				<div class="text-center py-12">
 					<div class="bg-white rounded-xl shadow-lg p-8 max-w-md mx-auto">
 						<div class="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">

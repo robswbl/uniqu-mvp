@@ -2079,6 +2079,18 @@
 						}, 5000);
 					}
 
+					// Check if CV enhancement fields were added/updated
+					if (
+						payload.new.cv_tagline ||
+						payload.new.cv_keywords ||
+						payload.new.cv_managementsummary ||
+						payload.new.cv_tips
+					) {
+						console.log('[Realtime] CV enhancement fields updated for letter:', payload.new.id);
+						// Force UI update to show CV section
+						applicationLetters = [...applicationLetters];
+					}
+
 					// Handle pain points analysis completion
 					if (payload.new.pain_points && !payload.old?.pain_points) {
 						console.log('[Realtime] Pain points analysis completed for letter:', payload.new.id);
@@ -2111,7 +2123,12 @@
 								? {
 										...letter,
 										content_html: payload.new.content_html,
-										letter_content_html: payload.new.letter_content_html
+										letter_content_html: payload.new.letter_content_html,
+										// Also check for CV enhancement fields that might be in the generated document
+										cv_tagline: payload.new.cv_tagline || letter.cv_tagline,
+										cv_keywords: payload.new.cv_keywords || letter.cv_keywords,
+										cv_managementsummary: payload.new.cv_managementsummary || letter.cv_managementsummary,
+										cv_tips: payload.new.cv_tips || letter.cv_tips
 									}
 								: letter
 						);

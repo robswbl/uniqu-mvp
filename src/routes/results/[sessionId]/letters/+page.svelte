@@ -1234,6 +1234,7 @@
 	let changeRequestComment = '';
 	let showChangeRequestField = false;
 	let showRegenerationSection = false;
+	let showFullChangeRequest = false;
 
 	// Function to get language display name
 	function getLanguageDisplayName(languageCode) {
@@ -1677,6 +1678,7 @@
 							targetLength = 100;
 							changeRequestComment = '';
 							showChangeRequestField = false;
+							showFullChangeRequest = false; // Reset change request display
 							
 							// Show success message
 							successMessage = `✅ New letter version generated successfully!`;
@@ -3149,8 +3151,14 @@
 	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 	<div 
 		class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" 
-		on:click={() => showLetterModal = false}
-		on:keydown={(e) => e.key === 'Escape' && (showLetterModal = false)}
+		on:click={() => {
+			showLetterModal = false;
+			showFullChangeRequest = false; // Reset to collapsed state
+		}}
+		on:keydown={(e) => e.key === 'Escape' && (() => {
+			showLetterModal = false;
+			showFullChangeRequest = false; // Reset to collapsed state
+		})()}
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="modal-title"
@@ -3186,6 +3194,7 @@
 								on:change={() => {
 									if (selectedVersion[currentLetterId]) {
 										currentLetterContent = selectedVersion[currentLetterId].content_html;
+										showFullChangeRequest = false; // Reset to collapsed state
 									}
 								}}
 							>
@@ -3199,8 +3208,32 @@
 							
 							<!-- Change Request Comment Display -->
 							{#if selectedVersion[currentLetterId] && selectedVersion[currentLetterId].change_request_comment}
+								{@const comment = selectedVersion[currentLetterId].change_request_comment}
+								{@const isLongComment = comment.length > 100}
+								{@const shortComment = comment.substring(0, 100) + '...'}
 								<div class="text-xs text-gray-600 bg-blue-50 px-3 py-2 rounded border border-blue-200">
-									<strong>Change Request:</strong> {selectedVersion[currentLetterId].change_request_comment}
+									<strong>Change Request:</strong> 
+									{#if isLongComment && !showFullChangeRequest}
+										{shortComment}
+										<button
+											on:click={() => showFullChangeRequest = true}
+											class="ml-2 text-blue-600 hover:text-blue-800 underline text-xs"
+											type="button"
+										>
+											Show more
+										</button>
+									{:else if isLongComment && showFullChangeRequest}
+										{comment}
+										<button
+											on:click={() => showFullChangeRequest = false}
+											class="ml-2 text-blue-600 hover:text-blue-800 underline text-xs"
+											type="button"
+										>
+											Show less
+										</button>
+									{:else}
+										{comment}
+									{/if}
 								</div>
 							{/if}
 						</div>
@@ -3264,7 +3297,10 @@
 					{/if}
 					
 					<button 
-						on:click={() => showLetterModal = false}
+						on:click={() => {
+							showLetterModal = false;
+							showFullChangeRequest = false; // Reset to collapsed state
+						}}
 						class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
 						type="button"
 						aria-label="Close modal"

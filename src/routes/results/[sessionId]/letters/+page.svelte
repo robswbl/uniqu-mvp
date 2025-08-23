@@ -3188,7 +3188,7 @@
 						<div class="flex flex-col space-y-2 items-start">
 							<select 
 								bind:value={selectedVersion[currentLetterId]}
-								class="pl-0 pr-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+								class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
 								on:change={() => {
 									if (selectedVersion[currentLetterId]) {
 										currentLetterContent = selectedVersion[currentLetterId].content_html;
@@ -3205,7 +3205,7 @@
 							
 							<!-- Change Request Comment Display -->
 							{#if selectedVersion[currentLetterId] && selectedVersion[currentLetterId].change_request_comment}
-								<div class="text-xs text-blue-600 mt-1">
+								<div class="text-xs text-blue-600 mt-1 pl-3">
 									<button
 										on:click={() => showChangeInstructionsPopup = true}
 										class="text-blue-600 hover:text-blue-800 underline"

@@ -178,7 +178,7 @@
     "change_request_comment": "Comentario de solicitud de cambio",
     "change_request_comment_placeholder": "ej. No menciones mi rol anterior, Enfócate en habilidades de liderazgo...",
     "change_request_comment_hint": "Opcional: Agrega instrucciones específicas para la reescritura de la carta",
-    "add_change_request": "Dar instrucciones de cambio",
+    "add_change_request": "Añadir instrucciones específicas",
     "change_request_optional": "Opcional",
     "length_percentage": "Porcentaje de longitud",
     "version": "Versión",

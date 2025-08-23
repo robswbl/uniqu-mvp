@@ -2700,7 +2700,7 @@
 									<div class="flex items-center space-x-8">
 										<!-- Status Dropdown with Label -->
 										<div class="flex flex-col">
-											<label class="text-xs text-gray-500 mb-1 pl-4">{$t('letters.set_application_status')}</label>
+											<span class="text-xs text-gray-500 mb-1 pl-4">{$t('letters.set_application_status')}</span>
 											<select 
 												value={letter.status}
 												on:change={(e) => handleStatusChange(letter.id, e)}
@@ -2832,12 +2832,12 @@
 												<div class="space-y-2">
 													<div class="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-4 min-h-[100px] relative shadow-sm hover:shadow-md transition-shadow duration-200">
 														<div class="flex items-center justify-between mb-3">
-															<label class="text-sm font-semibold text-blue-800 flex items-center">
+															<h5 class="text-sm font-semibold text-blue-800 flex items-center">
 																<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
 																</svg>
 																CV Tagline
-															</label>
+															</h5>
 															<button 
 																on:click={(e) => {
 																	navigator.clipboard.writeText(letter.cv_tagline);
@@ -2872,12 +2872,12 @@
 												<div class="space-y-2">
 													<div class="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-4 min-h-[100px] relative shadow-sm hover:shadow-md transition-shadow duration-200">
 														<div class="flex items-center justify-between mb-3">
-															<label class="text-sm font-semibold text-green-800 flex items-center">
+															<h5 class="text-sm font-semibold text-green-800 flex items-center">
 																<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7.732A4 4 0 0115.732 4h1.086a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V15.732A4 4 0 0112.268 20H7.268A4 4 0 013 15.732V8.268a1 1 0 01.293-.707L6.707 4.293A1 1 0 017.414 4H8.268A4 4 0 0112 7.732z" />
 																</svg>
 																{$t('letters.cv_keywords')}
-															</label>
+															</h5>
 															<button 
 																on:click={(e) => {
 																	navigator.clipboard.writeText(letter.cv_keywords);
@@ -2918,12 +2918,12 @@
 												<div class="space-y-2 lg:col-span-2">
 													<div class="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-4 min-h-[140px] relative shadow-sm hover:shadow-md transition-shadow duration-200">
 														<div class="flex items-center justify-between mb-3">
-															<label class="text-sm font-semibold text-purple-800 flex items-center">
+															<h5 class="text-sm font-semibold text-purple-800 flex items-center">
 																<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
 																</svg>
 																{$t('letters.cv_management_summary')}
-															</label>
+															</h5>
 															<button 
 																on:click={(e) => {
 																	navigator.clipboard.writeText(letter.cv_managementsummary);
@@ -2957,12 +2957,12 @@
 												<div class="space-y-2 lg:col-span-2">
 													<div class="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-4 min-h-[160px] relative shadow-sm hover:shadow-md transition-shadow duration-200">
 														<div class="flex items-center justify-between mb-3">
-															<label class="text-sm font-semibold text-orange-800 flex items-center">
+															<h5 class="text-sm font-semibold text-orange-800 flex items-center">
 																<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 																	<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
 																</svg>
 																{$t('letters.cv_enhancement_tips')}
-															</label>
+															</h5>
 															<button 
 																on:click={(e) => {
 																	navigator.clipboard.writeText(letter.cv_tips);

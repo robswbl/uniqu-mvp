@@ -3161,20 +3161,6 @@
 					>
 						{$t('letters.create_new_version')}
 					</button>
-					
-					<!-- Cleanup Duplicates Button (for debugging) -->
-					<button 
-						type="button" 
-						class="px-3 py-2 text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
-						on:click={async () => {
-							await cleanupDuplicateOriginalVersions(currentLetterId);
-							await fetchLetterVersions(currentLetterId);
-						}}
-						aria-label="Cleanup duplicate versions"
-						title="Clean up duplicate original versions for this letter"
-					>
-						Cleanup Duplicates
-					</button>
 					{/if}
 					
 					<!-- Version Selector (Dropdown) -->

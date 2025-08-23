@@ -3409,7 +3409,14 @@
 			role="document"
 		>
 			<div class="flex items-center justify-between p-4 border-b border-gray-200">
-				<h3 id="change-instructions-title" class="text-lg font-semibold text-gray-900">Change Instructions Used</h3>
+				<h3 id="change-instructions-title" class="text-lg font-semibold text-gray-900">
+					Change Instructions Used - 
+					{#if selectedVersion[currentLetterId]}
+						{selectedVersion[currentLetterId].version_type === 'original' ? 'Original Version' : 'Regenerated Version'} - 
+						{selectedVersion[currentLetterId].tone} - 
+						{selectedVersion[currentLetterId].length_percentage}%
+					{/if}
+				</h3>
 				<button 
 					on:click={() => showChangeInstructionsPopup = false}
 					class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"

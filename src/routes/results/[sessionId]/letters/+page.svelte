@@ -3347,7 +3347,7 @@
 									<button
 										on:click={() => showChangeRequestField = false}
 										type="button"
-										class="absolute top-0 right-0 p-1 text-gray-400 hover:text-gray-600 transition-colors"
+										class="absolute top-0 right-0 p-1 text-red-500 hover:text-red-700 transition-colors"
 										aria-label="Close instructions field"
 									>
 										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3363,7 +3363,7 @@
 										rows="2"
 										maxlength="500"
 									></textarea>
-									<p class="text-xs text-gray-500 mt-1">{$t('letters.change_request_comment_hint')}</p>
+									<p class="text-xs text-gray-500 mt-0.5">{$t('letters.change_request_comment_hint')}</p>
 								</div>
 							</div>
 						{/if}

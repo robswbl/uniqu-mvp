@@ -21,6 +21,9 @@
 	let editingNotes = {};
 	let jobUrl = '';
 
+	// Real-time subscription
+	let subscription = null;
+
 	// Modal variables
 	let showLetterModal = false;
 	let currentLetterContent = '';
@@ -1990,9 +1993,6 @@
 
 		return firstTwoLines;
 	}
-
-	// Real-time subscription for application letters
-	let subscription = null;
 
 	function openNewLetterForm(type) {
 		newLetterType = type;

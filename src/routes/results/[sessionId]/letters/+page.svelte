@@ -2123,12 +2123,7 @@
 								? {
 										...letter,
 										content_html: payload.new.content_html,
-										letter_content_html: payload.new.letter_content_html,
-										// Also check for CV enhancement fields that might be in the generated document
-										cv_tagline: payload.new.cv_tagline || letter.cv_tagline,
-										cv_keywords: payload.new.cv_keywords || letter.cv_keywords,
-										cv_managementsummary: payload.new.cv_managementsummary || letter.cv_managementsummary,
-										cv_tips: payload.new.cv_tips || letter.cv_tips
+										letter_content_html: payload.new.letter_content_html
 									}
 								: letter
 						);

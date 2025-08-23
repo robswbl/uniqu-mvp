@@ -3939,6 +3939,7 @@
 			tabindex="0"
 		>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
+			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<div
 				class="mx-4 max-h-[80vh] w-full max-w-2xl overflow-hidden rounded-lg bg-white"
 				on:click|stopPropagation

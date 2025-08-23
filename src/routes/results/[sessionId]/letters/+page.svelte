@@ -3280,90 +3280,86 @@
 				<!-- Regeneration Controls - Hidden by default -->
 				{#if currentLetterId && showRegenerationSection}
 				<div class="px-6 py-4 border-b border-gray-200 bg-gray-50 mb-6">
-					<div class="flex items-center space-x-4">
-						<div class="flex-1">
-							<h4 class="text-sm font-medium text-gray-700 mb-2">{$t('letters.create_new_version')}</h4>
-							<div class="flex items-center space-x-4">
-								<!-- Target Tone -->
-								<div>
-									<label for="target-tone" class="block text-xs text-gray-600 mb-1">{$t('letters.target_tone')}</label>
-									<select
-										id="target-tone"
-										bind:value={targetTone}
-										class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
-									>
-										{#each availableLetterTones as tone}
-											<option value={tone.value}>{tone.label}</option>
-										{/each}
-									</select>
-								</div>
-								
-								<!-- Target Length -->
-								<div>
-									<label for="target-length" class="block text-xs text-gray-600 mb-1">{$t('letters.target_length')}</label>
-									<select
-										id="target-length"
-										bind:value={targetLength}
-										class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
-									>
-										{#each availableLengthPercentages as length}
-											<option value={length.value}>{length.label}</option>
-										{/each}
-									</select>
-								</div>
-								
-								<!-- Change Request Comment Toggle -->
-								<div class="flex items-end">
-									<button
-										on:click={() => showChangeRequestField = !showChangeRequestField}
-										type="button"
-										class="px-3 py-2 text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded border border-indigo-200 hover:border-indigo-300 transition-colors"
-									>
-										{#if showChangeRequestField}
-											{$t('letters.change_request_optional')}
-										{:else}
-											{$t('letters.add_change_request')}
-										{/if}
-									</button>
-								</div>
-								
-								<!-- Regenerate Button -->
-								<button
-									on:click={() => regenerateLetter(currentLetterId)}
-									disabled={regeneratingVersion || !currentLetterId}
-									class="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-									type="button"
-									aria-label="{$t('letters.create_new_version')}"
+					<div>
+						<h4 class="text-sm font-medium text-gray-700 mb-4">{$t('letters.create_new_version')}</h4>
+						<div class="flex items-end space-x-4">
+							<!-- Target Tone -->
+							<div>
+								<label for="target-tone" class="block text-xs text-gray-600 mb-1">{$t('letters.target_tone')}</label>
+								<select
+									id="target-tone"
+									bind:value={targetTone}
+									class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
 								>
-									{#if regeneratingVersion}
-										<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-										{$t('letters.generating_version')}
-									{:else}
-										{$t('letters.create_new_version')}
-									{/if}
-								</button>
+									{#each availableLetterTones as tone}
+										<option value={tone.value}>{tone.label}</option>
+									{/each}
+								</select>
 							</div>
 							
-							<!-- Collapsible Change Request Field -->
-							{#if showChangeRequestField}
-								<div class="mt-4 pt-4 border-t border-gray-200">
-									<div>
-										<label for="change-request-comment" class="block text-xs text-gray-600 mb-1">
-											{$t('letters.change_request_comment')} <span class="text-gray-400">({$t('letters.change_request_optional')})</span>
-										</label>
-										<textarea
-											id="change-request-comment"
-											bind:value={changeRequestComment}
-											placeholder="{$t('letters.change_request_comment_placeholder')}"
-											class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 resize-none"
-											rows="2"
-											maxlength="500"
-										></textarea>
-										<p class="text-xs text-gray-500 mt-1">{$t('letters.change_request_comment_hint')}</p>
-									</div>
-								</div>
-							{/if}
+							<!-- Target Length -->
+							<div>
+								<label for="target-length" class="block text-xs text-gray-600 mb-1">{$t('letters.target_length')}</label>
+								<select
+									id="target-length"
+									bind:value={targetLength}
+									class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500"
+								>
+									{#each availableLengthPercentages as length}
+										<option value={length.value}>{length.label}</option>
+									{/each}
+								</select>
+							</div>
+							
+							<!-- Change Request Comment Toggle -->
+							<button
+								on:click={() => showChangeRequestField = !showChangeRequestField}
+								type="button"
+								class="px-3 py-2 text-xs text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded border border-indigo-200 hover:border-indigo-300 transition-colors"
+							>
+								{#if showChangeRequestField}
+									{$t('letters.change_request_optional')}
+								{:else}
+									{$t('letters.add_change_request')}
+								{/if}
+							</button>
+							
+							<!-- Regenerate Button -->
+							<button
+								on:click={() => regenerateLetter(currentLetterId)}
+								disabled={regeneratingVersion || !currentLetterId}
+								class="px-4 py-2 bg-indigo-600 text-white text-sm rounded hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+								type="button"
+								aria-label="{$t('letters.create_new_version')}"
+							>
+								{#if regeneratingVersion}
+									<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+									{$t('letters.generating_version')}
+								{:else}
+									{$t('letters.create_new_version')}
+								{/if}
+							</button>
 						</div>
+						
+						<!-- Collapsible Change Request Field -->
+						{#if showChangeRequestField}
+							<div class="mt-4 pt-4 border-t border-gray-200">
+								<div>
+									<label for="change-request-comment" class="block text-xs text-gray-600 mb-1">
+										{$t('letters.change_request_comment')} <span class="text-gray-400">({$t('letters.change_request_optional')})</span>
+									</label>
+									<textarea
+										id="change-request-comment"
+										bind:value={changeRequestComment}
+										placeholder="{$t('letters.change_request_comment_placeholder')}"
+										class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 resize-none"
+										rows="2"
+										maxlength="500"
+									></textarea>
+									<p class="text-xs text-gray-500 mt-1">{$t('letters.change_request_comment_hint')}</p>
+								</div>
+							</div>
+						{/if}
 					</div>
 				</div>
 				{/if}

@@ -118,7 +118,7 @@
     "change_request_comment": "Change Request Comment",
     "change_request_comment_placeholder": "e.g., Don't mention my previous role, Focus on leadership skills...",
     "change_request_comment_hint": "Optional: Add specific instructions for the letter rewrite",
-    "add_change_request": "Add Change Request",
+    "add_change_request": "Give Change Instructions",
     "change_request_optional": "Optional",
     "length_percentage": "Length Percentage",
     "version": "Version",

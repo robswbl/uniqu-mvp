@@ -1669,6 +1669,15 @@
 								}
 							}
 							
+							// Close the regeneration section
+							showRegenerationSection = false;
+							
+							// Reset regeneration form
+							targetTone = 'professional';
+							targetLength = 100;
+							changeRequestComment = '';
+							showChangeRequestField = false;
+							
 							// Show success message
 							successMessage = `✅ New letter version generated successfully!`;
 							showSuccessMessage = true;
@@ -1676,6 +1685,9 @@
 								showSuccessMessage = false;
 								successMessage = '';
 							}, 5000); // Hide after 5 seconds
+							
+							// Stop regenerating state
+							regeneratingVersion = false;
 							
 							return;
 						}
@@ -1687,6 +1699,8 @@
 					} else {
 						console.error('Version generation timed out');
 						alert('Version generation timed out. Please check back later.');
+						// Reset regenerating state on timeout
+						regeneratingVersion = false;
 					}
 				} catch (pollError) {
 					console.error('Error during version polling:', pollError);

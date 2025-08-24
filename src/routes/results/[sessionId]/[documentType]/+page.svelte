@@ -149,43 +149,9 @@
 					</svg>
 					{$t('document.back_to_results')}
 				</button>
-				<div class="flex items-center justify-between">
-					<div>
-						<h1 class="mb-1 text-xl font-bold text-gray-900">{getDocumentTitle(documentType)}</h1>
-						<p class="text-sm text-gray-600">{getDocumentDescription(documentType)}</p>
-					</div>
-					<div class="flex items-center space-x-2">
-						<button
-							on:click={() => goto(`/dashboard/${sessionId}`)}
-							class="flex items-center space-x-1 rounded-lg px-3 py-2 text-sm text-indigo-600 transition-colors hover:bg-indigo-50 hover:text-indigo-800"
-							type="button"
-						>
-							<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-								/>
-							</svg>
-							<span>Dashboard</span>
-						</button>
-						<button
-							on:click={() => goto(`/questionnaire/${sessionId}`)}
-							class="flex items-center space-x-1 rounded-lg bg-orange-500 px-3 py-2 text-sm text-white transition-colors hover:bg-orange-600"
-							type="button"
-						>
-							<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-								/>
-							</svg>
-							<span>Edit Answers</span>
-						</button>
-					</div>
+				<div>
+					<h1 class="mb-1 text-xl font-bold text-gray-900">{getDocumentTitle(documentType)}</h1>
+					<p class="text-sm text-gray-600">{getDocumentDescription(documentType)}</p>
 				</div>
 			</div>
 		{/if}

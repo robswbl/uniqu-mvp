@@ -453,7 +453,7 @@
 			{/if}
 
 			<!-- Enhanced Additional Actions (Temporarily Hidden) -->
-			<!-- {#if false} -->
+			{#if false}
 			<div class="rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
 				<div class="mb-6 flex items-center justify-between">
 					<div class="flex items-center space-x-3">
@@ -651,7 +651,7 @@
 					</div>
 				</div>
 			</div>
-			<!-- {/if} -->
+			{/if}
 		{/if}
 	</div>
 </div>

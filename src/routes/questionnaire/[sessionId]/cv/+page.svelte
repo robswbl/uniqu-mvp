@@ -186,7 +186,7 @@
 		await saveProgress();
 
 		// Navigate to step 2
-		await goto(`/questionnaire/${sessionId}/ikigai`);
+		await goto(`/questionnaire/${sessionId}/compass`);
 	}
 
 	// Determine context from query param
@@ -204,9 +204,9 @@
 
 	function goToNext() {
 		if (fromOnboarding) {
-			goto(`/questionnaire/${sessionId}/ikigai/love`);
+			goto(`/questionnaire/${sessionId}/compass/love`);
 		} else {
-			goto(`/questionnaire/${sessionId}/ikigai`);
+			goto(`/questionnaire/${sessionId}/compass`);
 		}
 	}
 </script>

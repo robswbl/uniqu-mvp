@@ -25,10 +25,10 @@
 		},
 		{
 			id: 'step3',
-			name: 'Step 3: Ikigai',
+			name: 'Step 3: Your Compass',
 			questions: [
-				{ id: 'ikigai_intro', label: 'Ikigai Introduction' },
-				{ id: 'ikigai_questions', label: 'Ikigai Questions' }
+				{ id: 'ikigai_intro', label: 'Your Compass Introduction' },
+				{ id: 'ikigai_questions', label: 'Your Compass Questions' }
 			]
 		}
 	];

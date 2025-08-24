@@ -32,7 +32,7 @@
 		},
 		{
 			id: 'step3',
-			name: 'Step 3: Your Ikigai',
+			name: 'Step 3: Your Compass',
 			questions: ['love', 'good_at', 'care_about', 'inspires', 'want_to_be']
 		}
 	];

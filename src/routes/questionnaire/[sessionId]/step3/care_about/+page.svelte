@@ -107,7 +107,7 @@
 </script>
 
 <svelte:head>
-	<title>Step 3: What do you care about? - Ikigai</title>
+	<title>Step 3: What do you care about? - Your Compass</title>
 </svelte:head>
 
 <QuestionCard

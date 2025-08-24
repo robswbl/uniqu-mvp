@@ -77,8 +77,8 @@
 		goto(`/dashboard/${sessionId}`);
 	}
 
-	function goToIkigai() {
-		goto(`/questionnaire/${sessionId}/ikigai`);
+	function goToCompass() {
+		goto(`/questionnaire/${sessionId}/compass`);
 	}
 
 	const handleSubmit: SubmitFunction = () => {

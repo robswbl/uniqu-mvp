@@ -1,7 +1,7 @@
 <!-- src/routes/agency/[agencyId]/client/[userId]/+page.svelte -->
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { supabase } from '$lib/supabaseClient';
 	import { t } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
@@ -18,6 +18,7 @@
 	let loading = true;
 	let error = '';
 	let selectedVersions: Record<string, string> = {};
+	let realtimeSubscription: any = null;
 
 	// Main document types to show
 	const mainDocumentTypes = [
@@ -253,6 +254,55 @@
 		}
 	}
 
+	// Cleanup on component destroy
+	onDestroy(() => {
+		cleanupRealtimeSubscription();
+	});
+
+	// Setup realtime subscription for client summary updates
+	function setupRealtimeSubscription() {
+		// Clean up existing subscription
+		if (realtimeSubscription) {
+			supabase.removeChannel(realtimeSubscription);
+		}
+
+		// Subscribe to changes on client_summaries table
+		realtimeSubscription = supabase
+			.channel('client_summaries')
+			.on('postgres_changes', 
+				{ 
+					event: 'UPDATE', 
+					schema: 'uniqu', 
+					table: 'client_summaries',
+					filter: `agency_id=eq.${agencyId} AND user_id=eq.${userId}`
+				},
+				(payload) => {
+					console.log('Client summary updated:', payload);
+					// Update the local clientSummary state
+					if (payload.new) {
+						clientSummary = payload.new;
+					}
+				}
+			)
+			.on('postgres_changes',
+				{
+					event: 'INSERT',
+					schema: 'uniqu',
+					table: 'client_summaries',
+					filter: `agency_id=eq.${agencyId} AND user_id=eq.${userId}`
+				},
+				(payload) => {
+					console.log('New client summary created:', payload);
+					if (payload.new) {
+						clientSummary = payload.new;
+					}
+				}
+			)
+			.subscribe((status) => {
+				console.log('Realtime subscription status:', status);
+			});
+	}
+
 	async function generateClientSummary(sessionId: string) {
 		try {
 			// Create initial summary record
@@ -346,7 +396,7 @@
 		}
 	}
 
-	async function downloadClientSummary() {
+		async function downloadClientSummary() {
 		if (clientSummary?.pdf_url) {
 			try {
 				const response = await fetch(clientSummary.pdf_url);
@@ -359,9 +409,17 @@
 				a.click();
 				document.body.removeChild(a);
 				window.URL.revokeObjectURL(url);
-					} catch (err: any) {
-			alert('Error downloading PDF: ' + err.message);
+			} catch (err: any) {
+				alert('Error downloading PDF: ' + err.message);
+			}
 		}
+	}
+
+	// Cleanup realtime subscription
+	function cleanupRealtimeSubscription() {
+		if (realtimeSubscription) {
+			supabase.removeChannel(realtimeSubscription);
+			realtimeSubscription = null;
 		}
 	}
 

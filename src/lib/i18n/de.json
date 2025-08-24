@@ -704,6 +704,54 @@
 		"sign_up": "Registrieren",
 		"signing_up": "Registrierung..."
 	},
+	"agency": {
+		"dashboard": {
+			"title": "Agentur-Dashboard",
+			"clients": "Deine Kunden",
+			"clients_desc": "Verwalte und verfolge den Fortschritt deiner Kunden",
+			"no_clients": "Noch keine Kunden",
+			"no_clients_desc": "Kunden werden hier angezeigt, sobald sie deiner Agentur zugewiesen sind.",
+			"active_clients": "Aktive Kunden",
+			"client": "Kunde",
+			"status": "Status",
+			"last_activity": "Letzte Aktivität",
+			"actions": "Aktionen",
+			"generate_summary": "Zusammenfassung generieren",
+			"view_details": "Details anzeigen",
+			"back_to_dashboard": "Zurück zum Agentur-Dashboard"
+		},
+		"client": {
+			"title": "Kunden-Details",
+			"summary": {
+				"title": "Kunden-Zusammenfassung",
+				"description": "KI-generierte Zusammenfassung des Kunden-Karriereprofils und Erkenntnisse",
+				"no_summary": "Noch keine Zusammenfassung generiert",
+				"no_summary_desc": "Generiere eine umfassende Kunden-Zusammenfassung, um Erkenntnisse über Karriere-Themen, Job-Titel, Unternehmen und mehr zu erhalten.",
+				"generate_button": "Kunden-Zusammenfassung generieren",
+				"complete_first": "Kunde muss zuerst den Fragebogen abschließen",
+				"generating": "Generiere...",
+				"completed": "Abgeschlossen",
+				"failed": "Fehlgeschlagen",
+				"view_summary": "Zusammenfassung anzeigen",
+				"download_pdf": "PDF herunterladen",
+				"regenerate": "Neu generieren",
+				"retry": "Generierung wiederholen",
+				"generated": "Generiert",
+				"completed_at": "Abgeschlossen"
+			},
+			"sessions": "Fragebogen-Sitzungen",
+			"sessions_desc": "Verfolge den Fortschritt des Kunden durch Fragebögen",
+			"activities": "Agentur-Aktivitäten",
+			"activities_desc": "Verfolge alle Interaktionen mit diesem Kunden",
+			"no_sessions": "Noch keine Sitzungen",
+			"no_sessions_desc": "Kunde hat noch keine Fragebögen gestartet.",
+			"no_activities": "Noch keine Aktivitäten",
+			"no_activities_desc": "Aktivitäten werden hier angezeigt, sobald du mit diesem Kunden interagierst.",
+			"session_id": "Sitzungs-ID",
+			"summary_generated": "Zusammenfassung-Generierung gestartet! Du erhältst sie in Kürze.",
+			"error_generating": "Fehler beim Generieren der Zusammenfassung: "
+		}
+	},
 	"admin": {
 		"signup_codes": {
 			"heading": "Registrierungscodes verwalten",

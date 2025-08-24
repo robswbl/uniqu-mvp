@@ -14,6 +14,7 @@
 	let activities: any[] = [];
 	let documents: any[] = [];
 	let applicationLetters: any[] = [];
+	let clientSummary: any = null;
 	let loading = true;
 	let error = '';
 	let selectedVersions: Record<string, string> = {};
@@ -231,6 +232,19 @@
 			if (!lettersError && lettersData) {
 				applicationLetters = lettersData;
 			}
+
+			// Load client summary for this client
+			const { data: summaryData, error: summaryError } = await supabase
+				.from('client_summaries')
+				.select('*')
+				.eq('agency_id', agencyId)
+				.eq('user_id', userId)
+				.order('created_at', { ascending: false })
+				.limit(1);
+
+			if (!summaryError && summaryData && summaryData.length > 0) {
+				clientSummary = summaryData[0];
+			}
 		} catch (err: any) {
 			error = err.message;
 			console.error('Error loading client data:', err);
@@ -241,6 +255,21 @@
 
 	async function generateClientSummary(sessionId: string) {
 		try {
+			// Create initial summary record
+			const { data: summaryData, error: insertError } = await supabase
+				.from('client_summaries')
+				.insert({
+					agency_id: agencyId,
+					user_id: userId,
+					session_id: sessionId,
+					summary_content: 'Generating...',
+					status: 'generating'
+				})
+				.select()
+				.single();
+
+			if (insertError) throw insertError;
+
 			// Call the n8n webhook to generate summary
 			const response = await fetch(
 				'https://manage.app.n8n.cloud/webhook/clients/uniqu-agentsummary',
@@ -252,7 +281,8 @@
 					body: JSON.stringify({
 						user_id: userId,
 						session_id: sessionId,
-						agency_id: agencyId
+						agency_id: agencyId,
+						summary_id: summaryData.id
 					})
 				}
 			);
@@ -262,19 +292,76 @@
 				await supabase.from('agency_activities').insert({
 					agency_id: agencyId,
 					user_id: userId,
-					activity_type: 'results_generated',
+					activity_type: 'summary_generated',
 					session_id: sessionId,
-					metadata: { action: 'summary_generated' }
+					metadata: { action: 'summary_generated', summary_id: summaryData.id }
 				});
 
-				alert('Summary generation started! You will receive it shortly.');
-				// Reload activities
+				alert($t('agency.client.summary_generated'));
+				// Reload data to show the new summary
 				await loadClientData();
 			} else {
 				throw new Error('Failed to generate summary');
 			}
 		} catch (err: any) {
 			alert('Error generating summary: ' + err.message);
+		}
+	}
+
+	async function regenerateClientSummary() {
+		if (clientSummary?.session_id) {
+			await generateClientSummary(clientSummary.session_id);
+		}
+	}
+
+	function viewClientSummary() {
+		if (clientSummary?.summary_html) {
+			// Open summary in new window/tab
+			const newWindow = window.open('', '_blank');
+			if (newWindow) {
+				newWindow.document.write(`
+					<!DOCTYPE html>
+					<html>
+					<head>
+						<title>Client Summary - ${client?.user_firstname} ${client?.user_lastname}</title>
+						<style>
+							body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+							h1 { color: #374151; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+							.summary-content { max-width: 800px; margin: 0 auto; }
+						</style>
+					</head>
+					<body>
+						<div class="summary-content">
+							<h1>Client Summary</h1>
+							${clientSummary.summary_html}
+						</div>
+					</body>
+					</html>
+				`);
+				newWindow.document.close();
+			}
+		} else if (clientSummary?.summary_content) {
+			// Show plain text content
+			alert('Summary Content:\n\n' + clientSummary.summary_content);
+		}
+	}
+
+	async function downloadClientSummary() {
+		if (clientSummary?.pdf_url) {
+			try {
+				const response = await fetch(clientSummary.pdf_url);
+				const blob = await response.blob();
+				const url = window.URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `client_summary_${client?.user_firstname}_${client?.user_lastname}.pdf`;
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				window.URL.revokeObjectURL(url);
+					} catch (err: any) {
+			alert('Error downloading PDF: ' + err.message);
+		}
 		}
 	}
 
@@ -588,6 +675,105 @@
 							{/if}
 						</div>
 					{/if}
+				</div>
+
+				<!-- Client Summary Section -->
+				<div class="rounded-lg bg-white shadow-sm">
+					<div class="border-b border-gray-200 px-6 py-4">
+						<h2 class="text-xl font-semibold text-gray-900">{$t('agency.client.summary.title')}</h2>
+						<p class="mt-1 text-gray-600">{$t('agency.client.summary.description')}</p>
+					</div>
+
+					<div class="p-6">
+						{#if clientSummary}
+							<div class="space-y-4">
+								<div class="flex items-center justify-between">
+									<div class="flex items-center space-x-3">
+										<span class="text-2xl">📋</span>
+										<div>
+											<h4 class="font-medium text-gray-900">{$t('agency.client.summary.title')}</h4>
+											<p class="text-sm text-gray-500">
+												{$t('agency.client.summary.generated')}: {formatDate(clientSummary.created_at)}
+												{#if clientSummary.generated_at}
+													<br>{$t('agency.client.summary.completed_at')}: {formatDate(clientSummary.generated_at)}
+												{/if}
+											</p>
+										</div>
+									</div>
+									<div class="flex items-center space-x-2">
+										{#if clientSummary.status === 'generating'}
+											<span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+												<div class="mr-1.5 h-2 w-2 animate-spin rounded-full border border-yellow-600 border-t-transparent"></div>
+												{$t('agency.client.summary.generating')}
+											</span>
+										{:else if clientSummary.status === 'completed'}
+											<span class="inline-flex rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+												✅ {$t('agency.client.summary.completed')}
+											</span>
+										{:else if clientSummary.status === 'failed'}
+											<span class="inline-flex rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+												❌ {$t('agency.client.summary.failed')}
+											</span>
+										{/if}
+									</div>
+								</div>
+
+								{#if clientSummary.status === 'completed'}
+									<div class="flex space-x-2">
+										<button
+											on:click={() => viewClientSummary()}
+											class="rounded-md bg-indigo-50 px-3 py-1 text-sm text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
+										>
+											{$t('agency.client.summary.view_summary')}
+										</button>
+										{#if clientSummary.pdf_url}
+											<button
+												on:click={() => downloadClientSummary()}
+												class="rounded-md bg-green-50 px-3 py-1 text-sm text-green-600 transition-colors hover:bg-green-100 hover:text-green-900"
+											>
+												{$t('agency.client.summary.download_pdf')}
+											</button>
+										{/if}
+										<button
+											on:click={() => regenerateClientSummary()}
+											class="rounded-md bg-orange-50 px-3 py-1 text-sm text-orange-600 transition-colors hover:bg-orange-100 hover:text-orange-900"
+										>
+											{$t('agency.client.summary.regenerate')}
+										</button>
+									</div>
+								{:else if clientSummary.status === 'failed'}
+									<div class="flex space-x-2">
+										<button
+											on:click={() => regenerateClientSummary()}
+											class="rounded-md bg-red-50 px-3 py-1 text-sm text-red-600 transition-colors hover:bg-red-100 hover:text-red-900"
+										>
+											{$t('agency.client.summary.retry')}
+										</button>
+									</div>
+								{/if}
+							</div>
+						{:else}
+							<div class="text-center">
+								<div class="mb-4 text-4xl text-gray-400">📋</div>
+								<h3 class="mb-2 text-lg font-medium text-gray-900">{$t('agency.client.summary.no_summary')}</h3>
+								<p class="mb-4 text-gray-600">
+									{$t('agency.client.summary.no_summary_desc')}
+								</p>
+								<button
+									on:click={() => generateClientSummary(sessions[0]?.id)}
+									disabled={!sessions[0]?.id || sessions[0]?.status !== 'completed'}
+									class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+								>
+									{$t('agency.client.summary.generate_button')}
+								</button>
+								{#if !sessions[0]?.id || sessions[0]?.status !== 'completed'}
+									<p class="mt-2 text-xs text-gray-500">
+										{$t('agency.client.summary.complete_first')}
+									</p>
+								{/if}
+							</div>
+						{/if}
+					</div>
 				</div>
 
 				<!-- Sessions Section -->

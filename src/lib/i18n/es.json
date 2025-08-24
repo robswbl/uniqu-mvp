@@ -684,6 +684,54 @@
 		"sign_up": "Registrarse",
 		"signing_up": "Registrando..."
 	},
+	"agency": {
+		"dashboard": {
+			"title": "Panel de Control de la Agencia",
+			"clients": "Tus clientes",
+			"clients_desc": "Gestiona y rastrea el progreso de tus clientes",
+			"no_clients": "Aún no hay clientes",
+			"no_clients_desc": "Los clientes aparecerán aquí una vez que sean asignados a tu agencia.",
+			"active_clients": "Clientes activos",
+			"client": "Cliente",
+			"status": "Estado",
+			"last_activity": "Última actividad",
+			"actions": "Acciones",
+			"generate_summary": "Generar resumen",
+			"view_details": "Ver detalles",
+			"back_to_dashboard": "Volver al Panel de Control de la Agencia"
+		},
+		"client": {
+			"title": "Detalles del Cliente",
+			"summary": {
+				"title": "Resumen del Cliente",
+				"description": "Resumen generado por IA del perfil de carrera del cliente y perspectivas",
+				"no_summary": "Aún no se ha generado ningún resumen",
+				"no_summary_desc": "Genera un resumen completo del cliente para obtener perspectivas sobre temas de carrera, títulos de trabajo, empresas y más.",
+				"generate_button": "Generar Resumen del Cliente",
+				"complete_first": "El cliente debe completar primero el cuestionario",
+				"generating": "Generando...",
+				"completed": "Completado",
+				"failed": "Fallido",
+				"view_summary": "Ver Resumen",
+				"download_pdf": "Descargar PDF",
+				"regenerate": "Regenerar",
+				"retry": "Reintentar Generación",
+				"generated": "Generado",
+				"completed_at": "Completado"
+			},
+			"sessions": "Sesiones del Cuestionario",
+			"sessions_desc": "Rastrea el progreso del cliente a través de los cuestionarios",
+			"activities": "Actividades de la Agencia",
+			"activities_desc": "Rastrea todas las interacciones con este cliente",
+			"no_sessions": "Aún no hay sesiones",
+			"no_sessions_desc": "El cliente aún no ha comenzado ningún cuestionario.",
+			"no_activities": "Aún no hay actividades",
+			"no_activities_desc": "Las actividades aparecerán aquí mientras interactúes con este cliente.",
+			"session_id": "ID de Sesión",
+			"summary_generated": "¡Generación del resumen iniciada! Lo recibirás pronto.",
+			"error_generating": "Error al generar el resumen: "
+		}
+	},
 	"admin": {
 		"signup_codes": {
 			"heading": "Gestión de códigos de registro",

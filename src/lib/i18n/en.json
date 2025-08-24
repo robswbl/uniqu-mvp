@@ -697,6 +697,23 @@
 		},
 		"client": {
 			"title": "Client Details",
+			"summary": {
+				"title": "Client Summary",
+				"description": "AI-generated summary of client's career profile and insights",
+				"no_summary": "No summary generated yet",
+				"no_summary_desc": "Generate a comprehensive client summary to get insights about career themes, job titles, companies, and more.",
+				"generate_button": "Generate Client Summary",
+				"complete_first": "Client must complete the questionnaire first",
+				"generating": "Generating...",
+				"completed": "Completed",
+				"failed": "Failed",
+				"view_summary": "View Summary",
+				"download_pdf": "Download PDF",
+				"regenerate": "Regenerate",
+				"retry": "Retry Generation",
+				"generated": "Generated",
+				"completed_at": "Completed"
+			},
 			"sessions": "Questionnaire Sessions",
 			"sessions_desc": "Track client progress through questionnaires",
 			"activities": "Agency Activities",

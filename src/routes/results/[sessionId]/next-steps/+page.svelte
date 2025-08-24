@@ -25,7 +25,7 @@
 			{$t('next_steps.description')}
 		</p>
 		<button
-			class="flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-10 py-4 text-xl font-bold text-white shadow-lg transition-all duration-200 hover:from-indigo-600 hover:to-purple-600 disabled:cursor-not-allowed disabled:opacity-60"
+			class="mx-auto flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-10 py-4 text-xl font-bold text-white shadow-lg transition-all duration-200 hover:from-indigo-600 hover:to-purple-600 disabled:cursor-not-allowed disabled:opacity-60"
 			on:click={goToLetters}
 		>
 			{$t('next_steps.go_to_application_letters')}

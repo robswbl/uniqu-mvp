@@ -186,36 +186,7 @@
 				</div>
 			</div>
 
-			<!-- Explore More Section -->
-			{#if !fromOnboarding}
-				<div class="mt-6 rounded-xl bg-white p-6 text-center shadow-lg">
-					<h3 class="mb-2 text-lg font-semibold text-gray-800">✨ {$t('document.explore_more')}</h3>
-					<p class="mb-4 text-sm text-gray-600">{$t('document.explore_more_desc')}</p>
-					<div class="flex flex-wrap justify-center space-x-3 gap-y-2">
-						<button
-							on:click={() => goto(`/results/${sessionId}`)}
-							class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
-							type="button"
-						>
-							{$t('document.view_all_results')}
-						</button>
-						<button
-							on:click={() => goto(`/questionnaire/${sessionId}`)}
-							class="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-600"
-							type="button"
-						>
-							{$t('document.update_profile')}
-						</button>
-						<button
-							on:click={() => goto(`/dashboard/${sessionId}`)}
-							class="rounded-lg bg-gray-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gray-600"
-							type="button"
-						>
-							{$t('document.dashboard')}
-						</button>
-					</div>
-				</div>
-			{/if}
+
 			<div class="mt-8 flex justify-center">
 				{#if documentType === 'reflection_letter'}
 					<button

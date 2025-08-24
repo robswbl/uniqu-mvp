@@ -389,9 +389,6 @@
 								<h3 class="text-xl font-semibold text-gray-900">
 									{$t('results.application_letters_title')}
 								</h3>
-								<span class="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800"
-									>{$t('results.new')}</span
-								>
 							</div>
 						</div>
 

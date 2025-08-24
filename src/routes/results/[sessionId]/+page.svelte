@@ -451,6 +451,207 @@
 					</div>
 				</div>
 			{/if}
-		</div>
+
+			<!-- Enhanced Additional Actions (Temporarily Hidden) -->
+			<!-- {#if false} -->
+			<div class="rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
+				<div class="mb-6 flex items-center justify-between">
+					<div class="flex items-center space-x-3">
+						<div
+							class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600"
+						>
+							<svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"
+								/>
+							</svg>
+						</div>
+						<h3 class="text-xl font-semibold text-gray-900">{$t('results.additional_actions')}</h3>
+					</div>
+				</div>
+
+				<div class="grid gap-4 md:grid-cols-3">
+					<!-- Top Row: Dashboard, Update Profile, Refresh -->
+
+					<!-- Dashboard -->
+					<button
+						on:click={() => goto(`/dashboard/${sessionId}`)}
+						class="group flex items-center space-x-3 rounded-lg border border-gray-200 bg-gradient-to-r from-gray-50 to-slate-50 p-4 transition-all duration-300 hover:from-gray-100 hover:to-slate-100"
+						type="button"
+						aria-label="View Dashboard"
+					>
+						<div
+							class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-500 transition-transform group-hover:scale-110"
+						>
+							<svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+								/>
+							</svg>
+						</div>
+						<div class="text-left">
+							<div class="font-medium text-gray-900">{$t('results.dashboard')}</div>
+							<div class="text-xs text-gray-700">{$t('results.dashboard_desc')}</div>
+						</div>
+					</button>
+
+					<!-- Update Profile -->
+					<button
+						on:click={() => goto(`/questionnaire/${sessionId}`)}
+						class="group flex items-center space-x-3 rounded-lg border border-orange-200 bg-gradient-to-r from-orange-50 to-red-50 p-4 transition-all duration-300 hover:from-orange-100 hover:to-red-100"
+						type="button"
+						aria-label="Update Responses and Regenerate"
+					>
+						<div
+							class="flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 transition-transform group-hover:scale-110"
+						>
+							<svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+								/>
+							</svg>
+						</div>
+						<div class="text-left">
+							<div class="font-medium text-orange-900">{$t('results.update_profile')}</div>
+							<div class="text-xs text-orange-700">{$t('results.update_profile_desc')}</div>
+						</div>
+					</button>
+
+					<!-- Refresh Documents -->
+					<button
+						on:click={fetchDocuments}
+						class="group flex items-center space-x-3 rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-4 transition-all duration-300 hover:from-blue-100 hover:to-indigo-100"
+						type="button"
+						aria-label="Refresh Documents"
+					>
+						<div
+							class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 transition-transform group-hover:scale-110"
+						>
+							<svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+								/>
+							</svg>
+						</div>
+						<div class="text-left">
+							<div class="font-medium text-blue-900">{$t('results.refresh')}</div>
+							<div class="text-xs text-blue-700">{$t('results.refresh_desc')}</div>
+						</div>
+					</button>
+				</div>
+
+				<!-- Bottom Row: Coming Soon Features -->
+				<div class="mt-4 border-t border-gray-200 pt-4">
+					<h4 class="mb-3 text-sm font-medium text-gray-500">{$t('results.coming_soon')}</h4>
+					<div class="grid gap-4 md:grid-cols-3">
+						<!-- Download All (Coming Soon) -->
+						<button
+							disabled
+							class="flex cursor-not-allowed items-center space-x-3 rounded-lg border border-gray-300 bg-gradient-to-r from-gray-100 to-gray-200 p-4 opacity-60"
+							type="button"
+							aria-label="Download All Documents (Coming Soon)"
+						>
+							<div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400">
+								<svg
+									class="h-4 w-4 text-white"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+									/>
+								</svg>
+							</div>
+							<div class="text-left">
+								<div class="font-medium text-gray-600">{$t('results.download_all')}</div>
+								<div class="text-xs text-gray-500">{$t('results.download_all_desc')}</div>
+								<div class="mt-1 text-xs font-medium text-blue-600">
+									{$t('results.coming_soon_label')}
+								</div>
+							</div>
+						</button>
+
+						<!-- Share Results (Coming Soon) -->
+						<button
+							disabled
+							class="flex cursor-not-allowed items-center space-x-3 rounded-lg border border-gray-300 bg-gradient-to-r from-gray-100 to-gray-200 p-4 opacity-60"
+							type="button"
+							aria-label="Share Results (Coming Soon)"
+						>
+							<div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400">
+								<svg
+									class="h-4 w-4 text-white"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+									/>
+								</svg>
+							</div>
+							<div class="text-left">
+								<div class="font-medium text-gray-600">{$t('results.share_results')}</div>
+								<div class="text-xs text-gray-500">{$t('results.share_results_desc')}</div>
+								<div class="mt-1 text-xs font-medium text-blue-600">
+									{$t('results.coming_soon_label')}
+								</div>
+							</div>
+						</button>
+
+						<!-- Help & Support (Coming Soon) -->
+						<button
+							disabled
+							class="flex cursor-not-allowed items-center space-x-3 rounded-lg border border-gray-300 bg-gradient-to-r from-gray-100 to-gray-200 p-4 opacity-60"
+							type="button"
+							aria-label="Help & Support (Coming Soon)"
+						>
+							<div class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400">
+								<svg
+									class="h-4 w-4 text-white"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+							</div>
+							<div class="text-left">
+								<div class="font-medium text-gray-600">{$t('results.help')}</div>
+								<div class="text-xs text-gray-500">{$t('results.help_desc')}</div>
+								<div class="mt-1 text-xs font-medium text-blue-600">
+									{$t('results.coming_soon_label')}
+								</div>
+							</div>
+						</button>
+					</div>
+				</div>
+			</div>
+			<!-- {/if} -->
+		{/if}
 	</div>
 </div>

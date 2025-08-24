@@ -12,7 +12,6 @@
 	let ikigai_care_about = '';
 	let ikigai_inspires = '';
 	let ikigai_want_to_be = '';
-	let saveStatus = '';
 	let isSaving = false;
 	let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 	let showInspiration = {
@@ -36,14 +35,12 @@
 			ikigai_care_about = data.ikigai_care_about || '';
 			ikigai_inspires = data.ikigai_inspires || '';
 			ikigai_want_to_be = data.ikigai_want_to_be || '';
-			saveStatus = $t('step3.loaded_existing_data');
 		}
 	});
 
 	function markAsChanged() {
 		if (saveTimeout) clearTimeout(saveTimeout);
 		isSaving = true;
-		saveStatus = $t('step3.saving');
 		saveTimeout = setTimeout(saveProgress, 600);
 	}
 
@@ -59,12 +56,12 @@
 			})
 			.eq('id', sessionId);
 		if (error) {
-			saveStatus = $t('step3.error_saving');
-		} else {
-			saveStatus = $t('step3.saved');
+			// Error occurred, but we don't need to display it
 		}
 		isSaving = false;
-		setTimeout(() => (saveStatus = ''), 1200);
+		setTimeout(() => {
+			// Reset saving state
+		}, 1200);
 	}
 
 	async function goToNext() {
@@ -105,9 +102,6 @@
 			</p>
 		</div>
 		<div class="mb-8 flex min-h-[500px] flex-col space-y-8 rounded-2xl bg-white p-8 shadow-xl">
-			{#if saveStatus}
-				<span class="absolute top-4 right-4 text-sm text-gray-500">{saveStatus}</span>
-			{/if}
 
 			<!-- Ikigai: What do you love? -->
 			<div class="rounded-xl border-l-4 border-red-400 bg-red-50 p-6">

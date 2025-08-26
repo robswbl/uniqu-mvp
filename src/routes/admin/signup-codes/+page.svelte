@@ -389,7 +389,7 @@
 					<!-- Status Filter -->
 					<select
 						bind:value={statusFilter}
-						class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
+						class="min-w-[140px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
 					>
 						<option value="all">{$t('admin.signup_codes.all_status')}</option>
 						<option value="used">{$t('admin.signup_codes.used')}</option>
@@ -399,7 +399,7 @@
 					<!-- Given Out Filter -->
 					<select
 						bind:value={givenOutFilter}
-						class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
+						class="min-w-[160px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
 					>
 						<option value="all">{$t('admin.signup_codes.all_distribution')}</option>
 						<option value="given_out">{$t('admin.signup_codes.given_out')}</option>
@@ -498,7 +498,7 @@
 											<span class="font-mono text-sm">{code.code}</span>
 											<button
 												on:click={() => copyToClipboard(code.code)}
-												class="rounded-md bg-indigo-50 px-2 py-1 text-xs text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
+												class="px-2 py-1 text-xs text-gray-600 transition-colors hover:text-gray-900 hover:scale-110"
 												title="Copy code"
 											>
 												📋
@@ -508,12 +508,12 @@
 									<td class="px-4 py-2">
 										{#if code.used}
 											<span
-												class="inline-flex rounded-full bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700"
+												class="inline-flex items-center justify-center rounded-full bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700"
 												>Used</span
 											>
 										{:else}
 											<span
-												class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800"
+												class="inline-flex items-center justify-center rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800"
 												>Unused</span
 											>
 										{/if}
@@ -521,12 +521,12 @@
 									<td class="px-4 py-2">
 										{#if code.given_out}
 											<span
-												class="inline-flex rounded-full bg-orange-100 px-2 py-1 text-xs font-semibold text-orange-800"
+												class="inline-flex items-center justify-center rounded-full bg-orange-100 px-2 py-1 text-xs font-semibold text-orange-800"
 												>{$t('admin.signup_codes.given_out')}</span
 											>
 										{:else}
 											<span
-												class="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800"
+												class="inline-flex items-center justify-center rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800"
 												>{$t('admin.signup_codes.available')}</span
 											>
 										{/if}
@@ -572,6 +572,13 @@
 									</td>
 									<td class="px-4 py-2">
 										<div class="flex space-x-2">
+											<button
+												on:click={() => deleteCode(code.code)}
+												class="rounded-md bg-red-50 px-3 py-1 text-xs text-red-600 transition-colors hover:bg-red-100 hover:text-red-900"
+												title="Delete code"
+											>
+												🗑️
+											</button>
 											{#if !code.used}
 												{#if code.given_out}
 													<button
@@ -589,13 +596,6 @@
 													>
 												{/if}
 											{/if}
-											<button
-												on:click={() => deleteCode(code.code)}
-												class="rounded-md bg-red-50 px-3 py-1 text-xs text-red-600 transition-colors hover:bg-red-100 hover:text-red-900"
-												title="Delete code"
-											>
-												🗑️
-											</button>
 										</div>
 									</td>
 								</tr>

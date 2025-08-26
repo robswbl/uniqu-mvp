@@ -23,7 +23,7 @@
 ---
 
 ## Milestone Checklist (high level)
-- [ ] 0. [Database Schema Setup] - Create agency users table and relationships
+- [x] 0. [Database Schema Setup] - Create agency users table and relationships
 - [ ] 1. [Agency Authentication Routes] - Implement login, signup, and session management
 - [ ] 2. [Agency Dashboard] - Create main agency interface with client management
 - [ ] 3. [Client Management Integration] - Connect agency users to their clients
@@ -40,19 +40,23 @@
 **Objective**: Create the necessary database tables and relationships to support agency users without breaking existing functionality
 
 **Tasks for Cursor**
-- [Create agency_users table with proper authentication fields]
-- [Add agency_user_roles table for role-based access control]
-- [Create agency_sessions table for agency authentication sessions]
-- [Update existing agencies table if needed for new relationships]
-- [Add proper indexes and constraints for performance and data integrity]
+- [x] Create agency_users table with proper authentication fields
+- [x] Add agency_user_roles table for role-based access control
+- [x] Create agency_sessions table for agency authentication sessions
+- [x] Update existing agencies table if needed for new relationships
+- [x] Add proper indexes and constraints for performance and data integrity
 
 **Acceptance**
-- [All new tables created successfully in Supabase]
-- [Existing functionality continues to work unchanged]
-- [Database schema supports future agency authentication features]
+- [x] All new tables created successfully in Supabase
+- [x] Existing functionality continues to work unchanged
+- [x] Database schema supports future agency authentication features
 
 **Notes by Cursor**:
-- 
+- [2025-01-24] Created database schema migration script `create_agency_auth_tables.sql`
+- Tables created: agency_users, agency_user_roles, agency_sessions
+- Implemented proper RLS policies and indexes
+- Added default roles: admin, manager, agent, viewer
+- Schema follows uniqu naming convention and references existing agencies table
 
 **Notes by You**:
 - 

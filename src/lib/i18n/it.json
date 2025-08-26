@@ -753,6 +753,7 @@
 			"given_out": "Distribuito",
 			"given_by": "Distribuito da",
 			"available": "Disponibile",
+			"comment": "Commento",
 			"bulk_actions_title": "Azioni di massa per i codici generati",
 			"generated_codes": "Codici generati",
 			"given_by_label": "Distribuito da (Opzionale)",

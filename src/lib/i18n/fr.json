@@ -744,6 +744,7 @@
 			"given_out": "Distribué",
 			"given_by": "Distribué par",
 			"available": "Disponible",
+			"comment": "Commentaire",
 			"bulk_actions_title": "Actions en masse pour les codes générés",
 			"generated_codes": "Codes générés",
 			"given_by_label": "Distribué par (Optionnel)",

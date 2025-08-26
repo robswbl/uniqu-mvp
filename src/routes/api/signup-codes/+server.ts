@@ -28,14 +28,27 @@ export const GET: RequestHandler = async () => {
 
 // PUT: Mark code as given out
 export const PUT: RequestHandler = async ({ request }) => {
-	const { code, given_out, given_by } = await request.json();
+	const { code, given_out, given_by, comment } = await request.json();
 
 	const updateData: any = { given_out };
 	if (given_by !== undefined) {
 		updateData.given_by = given_by;
 	}
+	if (comment !== undefined) {
+		updateData.comment = comment;
+	}
 
 	const { error } = await supabase.from('signup_codes').update(updateData).eq('code', code);
+
+	if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+	return new Response(JSON.stringify({ success: true }), { status: 200 });
+};
+
+// DELETE: Delete a code
+export const DELETE: RequestHandler = async ({ request }) => {
+	const { code } = await request.json();
+
+	const { error } = await supabase.from('signup_codes').delete().eq('code', code);
 
 	if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
 	return new Response(JSON.stringify({ success: true }), { status: 200 });

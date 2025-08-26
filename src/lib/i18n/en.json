@@ -773,6 +773,7 @@
 			"given_out": "Given Out",
 			"given_by": "Given By",
 			"available": "Available",
+			"comment": "Comment",
 			"bulk_actions_title": "Bulk Actions for Generated Codes",
 			"generated_codes": "Generated Codes",
 			"given_by_label": "Given By (Optional)",

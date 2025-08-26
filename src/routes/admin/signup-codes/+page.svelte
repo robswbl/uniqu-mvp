@@ -9,6 +9,7 @@
 	let messageType = '';
 	let markingCode = '';
 	let bulkGivenBy = '';
+	let bulkComment = '';
 	let bulkGeneratedCodes: string[] = [];
 	let showBulkActions = false;
 
@@ -18,6 +19,9 @@
 	let statusFilter = 'all';
 	let givenOutFilter = 'all';
 	let searchTerm = '';
+
+	// Predefined options for given_by dropdown
+	const givenByOptions = ['Adrian', 'Antonio', 'Arbela', 'Carron', 'John', 'Rob'];
 
 	// Computed filtered and sorted codes
 	$: filteredCodes = codes.filter((code) => {
@@ -35,7 +39,8 @@
 			return (
 				code.code.toLowerCase().includes(searchLower) ||
 				(code.given_by && code.given_by.toLowerCase().includes(searchLower)) ||
-				(code.used_by && code.used_by.toLowerCase().includes(searchLower))
+				(code.used_by && code.used_by.toLowerCase().includes(searchLower)) ||
+				(code.comment && code.comment.toLowerCase().includes(searchLower))
 			);
 		}
 
@@ -142,88 +147,93 @@
 		messageType = 'success';
 	}
 
-	async function markAsGivenOut(code: string, given_out: boolean) {
+	async function markAsGivenOut(code: string, given_out: boolean, given_by?: string, comment?: string) {
 		markingCode = code;
+		message = '';
 		try {
 			const res = await fetch('/api/signup-codes', {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ code, given_out })
+				body: JSON.stringify({ code, given_out, given_by, comment })
 			});
 			const data = await res.json();
 			if (data.success) {
-				message = `Code ${code} marked as ${given_out ? 'given out' : 'not given out'}.`;
+				message = `Code ${code} marked as ${given_out ? 'given out' : 'available'}.`;
 				messageType = 'success';
 				await fetchCodes();
 			} else {
-				message = data.error || 'Failed to update code status.';
+				message = data.error || 'Failed to mark code.';
 				messageType = 'error';
 			}
 		} catch (err: any) {
-			message = err.message || 'Failed to update code status.';
+			message = err.message || 'Failed to mark code.';
 			messageType = 'error';
 		} finally {
 			markingCode = '';
 		}
 	}
 
-	function copyAllCodes() {
-		const codesText = bulkGeneratedCodes.join('\n');
-		navigator.clipboard.writeText(codesText);
-		message = `Copied ${bulkGeneratedCodes.length} codes to clipboard.`;
-		messageType = 'success';
-	}
-
-	async function markAllAsGivenOut() {
-		if (!bulkGivenBy.trim()) {
+	async function markBulkAsGivenOut() {
+		if (!bulkGivenBy) {
 			message = 'Please enter who gave out the codes.';
 			messageType = 'error';
 			return;
 		}
 
-		markingCode = 'bulk';
+		message = '';
 		try {
-			// Mark each code as given out
-			for (const code of bulkGeneratedCodes) {
-				const res = await fetch('/api/signup-codes', {
+			const promises = bulkGeneratedCodes.map((code) =>
+				fetch('/api/signup-codes', {
 					method: 'PUT',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						code,
-						given_out: true,
-						given_by: bulkGivenBy.trim() || null
-					})
-				});
-				const data = await res.json();
-				if (!data.success) {
-					message = `Failed to mark code ${code} as given out.`;
-					messageType = 'error';
-					return;
-				}
-			}
+					body: JSON.stringify({ code, given_out: true, given_by: bulkGivenBy, comment: bulkComment })
+				})
+			);
 
+			await Promise.all(promises);
 			message = `Marked ${bulkGeneratedCodes.length} codes as given out by: ${bulkGivenBy}`;
 			messageType = 'success';
-			bulkGeneratedCodes = [];
 			showBulkActions = false;
+			bulkGeneratedCodes = [];
 			bulkGivenBy = '';
+			bulkComment = '';
 			await fetchCodes();
 		} catch (err: any) {
 			message = err.message || 'Failed to mark codes as given out.';
 			messageType = 'error';
-		} finally {
-			markingCode = '';
 		}
 	}
 
-	function clearBulkActions() {
-		bulkGeneratedCodes = [];
-		showBulkActions = false;
-		bulkGivenBy = '';
+	async function deleteCode(code: string) {
+		if (!confirm(`Are you sure you want to delete code "${code}"? This action cannot be undone.`)) {
+			return;
+		}
+
 		message = '';
+		try {
+			const res = await fetch('/api/signup-codes', {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ code })
+			});
+			const data = await res.json();
+			if (data.success) {
+				message = `Code ${code} deleted successfully.`;
+				messageType = 'success';
+				await fetchCodes();
+			} else {
+				message = data.error || 'Failed to delete code.';
+				messageType = 'error';
+			}
+		} catch (err: any) {
+			message = err.message || 'Failed to delete code.';
+			messageType = 'error';
+		}
 	}
 
-	onMount(fetchCodes);
+	onMount(() => {
+		fetchCodes();
+	});
 </script>
 
 <svelte:head>
@@ -303,7 +313,7 @@
 				<h3 class="mb-4 text-lg font-semibold text-blue-900">
 					{$t('admin.signup_codes.bulk_actions_title')}
 				</h3>
-				<div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+				<div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-4">
 					<div>
 						<label class="mb-2 block text-sm font-medium text-blue-700"
 							>{$t('admin.signup_codes.generated_codes')} ({bulkGeneratedCodes.length})</label
@@ -318,35 +328,44 @@
 						<label for="bulk-given-by" class="mb-2 block text-sm font-medium text-blue-700"
 							>{$t('admin.signup_codes.given_by_label')}</label
 						>
-						<input
+						<select
 							id="bulk-given-by"
-							type="text"
 							bind:value={bulkGivenBy}
-							placeholder={$t('admin.signup_codes.given_by_placeholder')}
+							class="w-full rounded-lg border border-blue-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+						>
+							<option value="">Select person...</option>
+							{#each givenByOptions as option}
+								<option value={option}>{option}</option>
+							{/each}
+						</select>
+					</div>
+					<div>
+						<label for="bulk-comment" class="mb-2 block text-sm font-medium text-blue-700">{$t('admin.signup_codes.comment')}</label>
+						<input
+							id="bulk-comment"
+							type="text"
+							bind:value={bulkComment}
+							placeholder="Optional comment..."
 							class="w-full rounded-lg border border-blue-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
 						/>
 					</div>
 					<div class="flex flex-col justify-end space-y-2">
 						<button
-							on:click={copyAllCodes}
+							on:click={() => {
+								const codesText = bulkGeneratedCodes.join('\n');
+								navigator.clipboard.writeText(codesText);
+								message = 'All codes copied to clipboard!';
+								messageType = 'success';
+							}}
 							class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-blue-700"
 						>
 							{$t('admin.signup_codes.copy_all_codes')}
 						</button>
 						<button
-							on:click={markAllAsGivenOut}
-							disabled={markingCode === 'bulk'}
-							class="rounded-lg bg-orange-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-orange-700 disabled:opacity-50"
+							on:click={markBulkAsGivenOut}
+							class="rounded-lg bg-orange-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-orange-700"
 						>
-							{markingCode === 'bulk'
-								? $t('admin.signup_codes.marking')
-								: $t('admin.signup_codes.mark_all_given_out')}
-						</button>
-						<button
-							on:click={clearBulkActions}
-							class="rounded-lg bg-gray-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-gray-700"
-						>
-							{$t('admin.signup_codes.clear')}
+							{$t('admin.signup_codes.mark_all_given_out')}
 						</button>
 					</div>
 				</div>
@@ -467,13 +486,25 @@
 										{getSortIcon('used_at')}
 									</div>
 								</th>
+								<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">{$t('admin.signup_codes.comment')}</th>
 								<th class="px-4 py-2"></th>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-gray-100 bg-white">
 							{#each sortedCodes as code}
 								<tr>
-									<td class="px-4 py-2 font-mono text-sm">{code.code}</td>
+									<td class="px-4 py-2">
+										<div class="flex items-center gap-2">
+											<span class="font-mono text-sm">{code.code}</span>
+											<button
+												on:click={() => copyToClipboard(code.code)}
+												class="rounded-md bg-indigo-50 px-2 py-1 text-xs text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
+												title="Copy code"
+											>
+												📋
+											</button>
+										</div>
+									</td>
 									<td class="px-4 py-2">
 										{#if code.used}
 											<span
@@ -500,35 +531,71 @@
 											>
 										{/if}
 									</td>
-									<td class="px-4 py-2 text-sm">{code.given_by || '-'}</td>
+									<td class="px-4 py-2">
+										{#if !code.used}
+											<select
+												value={code.given_by || ''}
+												on:change={(e) => {
+													const target = e.target as HTMLSelectElement;
+													markAsGivenOut(code.code, code.given_out, target.value, code.comment);
+												}}
+												class="rounded border border-gray-300 px-2 py-1 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
+											>
+												<option value="">-</option>
+												{#each givenByOptions as option}
+													<option value={option}>{option}</option>
+												{/each}
+											</select>
+										{:else}
+											<span class="text-sm">{code.given_by || '-'}</span>
+										{/if}
+									</td>
 									<td class="px-4 py-2 text-sm">{code.used_by || '-'}</td>
 									<td class="px-4 py-2 text-sm"
 										>{code.used_at ? new Date(code.used_at).toLocaleString() : '-'}</td
 									>
 									<td class="px-4 py-2">
+										{#if !code.used}
+											<input
+												type="text"
+												value={code.comment || ''}
+												on:blur={(e) => {
+													const target = e.target as HTMLInputElement;
+													markAsGivenOut(code.code, code.given_out, code.given_by, target.value);
+												}}
+												placeholder={$t('admin.signup_codes.comment')}
+												class="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
+											/>
+										{:else}
+											<span class="text-sm text-gray-600">{code.comment || '-'}</span>
+										{/if}
+									</td>
+									<td class="px-4 py-2">
 										<div class="flex space-x-2">
-											<button
-												on:click={() => copyToClipboard(code.code)}
-												class="rounded-md bg-indigo-50 px-3 py-1 text-xs text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
-												>{$t('admin.signup_codes.copy')}</button
-											>
 											{#if !code.used}
 												{#if code.given_out}
 													<button
-														on:click={() => markAsGivenOut(code.code, false)}
+														on:click={() => markAsGivenOut(code.code, false, code.given_by, code.comment)}
 														disabled={markingCode === code.code}
 														class="rounded-md bg-blue-50 px-3 py-1 text-xs text-blue-600 transition-colors hover:bg-blue-100 hover:text-blue-900 disabled:opacity-50"
 														>{$t('admin.signup_codes.mark_available')}</button
 													>
 												{:else}
 													<button
-														on:click={() => markAsGivenOut(code.code, true)}
+														on:click={() => markAsGivenOut(code.code, true, code.given_by, code.comment)}
 														disabled={markingCode === code.code}
 														class="rounded-md bg-orange-50 px-3 py-1 text-xs text-orange-600 transition-colors hover:bg-orange-100 hover:text-orange-900 disabled:opacity-50"
 														>{$t('admin.signup_codes.mark_given_out')}</button
 													>
 												{/if}
 											{/if}
+											<button
+												on:click={() => deleteCode(code.code)}
+												class="rounded-md bg-red-50 px-3 py-1 text-xs text-red-600 transition-colors hover:bg-red-100 hover:text-red-900"
+												title="Delete code"
+											>
+												🗑️
+											</button>
 										</div>
 									</td>
 								</tr>
@@ -540,3 +607,4 @@
 		</div>
 	</div>
 </div>
+

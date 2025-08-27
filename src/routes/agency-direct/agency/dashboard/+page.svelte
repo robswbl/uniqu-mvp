@@ -32,7 +32,7 @@
 		try {
 			session = getAgencySession();
 			if (!session) {
-				goto('/agency-auth/login');
+				goto('/agency/login');
 				return;
 			}
 
@@ -40,14 +40,14 @@
 			const isValid = await validateAgencySession(session);
 			if (!isValid) {
 				await clearAgencySession(session);
-				goto('/agency-auth/login');
+				goto('/agency/login');
 				return;
 			}
 
 			isLoading = false;
 		} catch (error) {
 			console.error('Authentication check error:', error);
-			goto('/agency-auth/login');
+			goto('/agency/login');
 		}
 	}
 
@@ -104,12 +104,7 @@
 		}
 	}
 
-	async function handleLogout() {
-		if (session) {
-			await clearAgencySession(session);
-		}
-		goto('/agency-auth/login');
-	}
+
 
 	function goToClient(clientId: string) {
 		goto(`/agency/${session?.user.agencyId}/client/${clientId}`);
@@ -125,41 +120,15 @@
 </svelte:head>
 
 {#if isLoading}
-	<div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center">
+	<div class="flex items-center justify-center min-h-[400px]">
 		<div class="text-center">
 			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
 			<p class="text-gray-600">Loading dashboard...</p>
 		</div>
 	</div>
 {:else if session}
-	<div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
-		<!-- Header -->
-		<header class="bg-white shadow-sm border-b border-gray-200">
-			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div class="flex justify-between items-center py-4">
-					<div class="flex items-center">
-						<h1 class="text-2xl font-bold text-gray-900">Agency Dashboard</h1>
-						<span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-							{session.user.agencyName}
-						</span>
-					</div>
-					<div class="flex items-center space-x-4">
-						<div class="text-right">
-							<p class="text-sm font-medium text-gray-900">
-								{session.user.firstName} {session.user.lastName}
-							</p>
-							<p class="text-xs text-gray-500 capitalize">{session.user.role}</p>
-						</div>
-						<button
-							on:click={handleLogout}
-							class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
-						>
-							Logout
-						</button>
-					</div>
-				</div>
-			</div>
-		</header>
+	<div>
+
 
 		<!-- Main Content -->
 		<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

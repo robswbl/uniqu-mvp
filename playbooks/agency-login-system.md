@@ -67,8 +67,8 @@
 **Objective**: Implement complete agency authentication system with login, signup, and session management
 
 **Tasks for Cursor**
-- [x] Create /agency-auth/login route with agency login form
-- [x] Create /agency-auth/signup route for agency registration
+- [x] Create /agency/login route with agency login form
+- [x] Create /agency/signup route for agency registration
 - [x] Implement agency session management and validation
 - [x] Create agency authentication middleware and guards
 - [x] Add agency logout functionality
@@ -80,7 +80,7 @@
 - [x] Logout properly clears agency sessions
 
 **Notes by Cursor**:
-- [2025-01-24] Created agency authentication routes: /agency-auth/login and /agency-auth/signup
+- [2025-01-24] Created agency authentication routes: /agency/login and /agency/signup
 - Implemented agency session management with localStorage and database validation
 - Created agencyAuth.ts utility library for session management, permissions, and validation
 - Added logout functionality that clears both localStorage and database sessions

@@ -29,15 +29,15 @@
 	let confirmPassword = '';
 
 	// Agencies for dropdown
-	let agencies: Array<{ id: string; agency_name: string }> = [];
+	let agencies: Array<{ id: string; name: string }> = [];
 
 	onMount(async () => {
 		const { data, error } = await supabase
 			.from('agencies')
-			.select('id, agency_name')
-			.order('agency_name', { ascending: true });
+			.select('id, name')
+			.order('name', { ascending: true });
 		if (!error && data) {
-			agencies = data as Array<{ id: string; agency_name: string }>;
+			agencies = data as Array<{ id: string; name: string }>;
 		}
 	});
 
@@ -293,7 +293,7 @@
 					>
 						<option value="">None</option>
 						{#each agencies as a}
-							<option value={a.id}>{a.agency_name}</option>
+							<option value={a.id}>{a.name}</option>
 						{/each}
 					</select>
 				</div>

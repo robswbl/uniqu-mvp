@@ -199,173 +199,167 @@
 		<!-- Form -->
 		<div class="rounded-xl border border-gray-200 bg-white p-8 shadow-lg">
 			<form on:submit|preventDefault={createUser} class="space-y-6">
-				<!-- First Name -->
-				<div>
-					<label for="firstName" class="mb-2 block text-sm font-medium text-gray-700">
-						{$t('create_user.first_name_label')} *
-					</label>
-					<input
-						id="firstName"
-						type="text"
-						bind:value={firstName}
-						required
-						class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-						placeholder={$t('create_user.first_name_placeholder')}
-					/>
+				<div class="grid gap-6 md:grid-cols-2">
+					<!-- First Name -->
+					<div>
+						<label for="firstName" class="mb-2 block text-sm font-medium text-gray-700">
+							{$t('create_user.first_name_label')} *
+						</label>
+						<input
+							id="firstName"
+							type="text"
+							bind:value={firstName}
+							required
+							class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+							placeholder={$t('create_user.first_name_placeholder')}
+						/>
+					</div>
+					<!-- Last Name -->
+					<div>
+						<label for="lastName" class="mb-2 block text-sm font-medium text-gray-700">
+							{$t('create_user.last_name_label')} *
+						</label>
+						<input
+							id="lastName"
+							type="text"
+							bind:value={lastName}
+							required
+							class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+							placeholder={$t('create_user.last_name_placeholder')}
+						/>
+					</div>
+					<!-- Gender -->
+					<div>
+						<label for="gender" class="mb-2 block text-sm font-medium text-gray-700">
+							{$t('create_user.gender_label')} *
+						</label>
+						<select
+							id="gender"
+							bind:value={gender}
+							required
+							class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+						>
+							<option value="">{$t('create_user.gender_select')}</option>
+							<option value="male">{$t('create_user.gender_male')}</option>
+							<option value="female">{$t('create_user.gender_female')}</option>
+						</select>
+					</div>
+					<!-- Email -->
+					<div>
+						<label for="email" class="mb-2 block text-sm font-medium text-gray-700">
+							{$t('create_user.email_label')} *
+						</label>
+						<input
+							id="email"
+							type="email"
+							bind:value={email}
+							required
+							class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+							placeholder={$t('create_user.email_placeholder')}
+						/>
+					</div>
 				</div>
-
-				<!-- Last Name -->
-				<div>
-					<label for="lastName" class="mb-2 block text-sm font-medium text-gray-700">
-						{$t('create_user.last_name_label')} *
-					</label>
-					<input
-						id="lastName"
-						type="text"
-						bind:value={lastName}
-						required
-						class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-						placeholder={$t('create_user.last_name_placeholder')}
-					/>
+				<div class="grid gap-6 md:grid-cols-2">
+					<!-- Language -->
+					<div>
+						<label for="language" class="mb-2 block text-sm font-medium text-gray-700">
+							{$t('create_user.language_label')} *
+						</label>
+						<select
+							id="language"
+							bind:value={language}
+							required
+							class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+						>
+							<option value="">{$t('create_user.language_select')}</option>
+							<option value="en">{$t('create_user.language_english')}</option>
+							<option value="de">{$t('create_user.language_german')}</option>
+							<option value="fr">{$t('create_user.language_french')}</option>
+							<option value="it">{$t('create_user.language_italian')}</option>
+							<option value="es">{$t('create_user.language_spanish')}</option>
+						</select>
+					</div>
+					<!-- Agency -->
+					<div>
+						<label for="agency" class="mb-2 block text-sm font-medium text-gray-700">
+							{$t('create_user.agency_label')}
+						</label>
+						<select
+							id="agency"
+							bind:value={agency}
+							class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+						>
+							<option value="">None</option>
+							{#each agencies as a}
+								<option value={a.id}>{a.name}</option>
+							{/each}
+						</select>
+					</div>
+					<!-- User Search Regions -->
+					<div>
+						<label for="user_search_regions" class="mb-2 block text-sm font-medium text-gray-700">
+							In which city/cities or region(s) is the user looking for work?
+						</label>
+						<input
+							id="user_search_regions"
+							type="text"
+							bind:value={user_search_regions}
+							class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+							placeholder="e.g. Berlin, Hamburg, Bavaria, remote, ..."
+						/>
+					</div>
+					<!-- User Search Industries -->
+					<div>
+						<label for="user_search_industries" class="mb-2 block text-sm font-medium text-gray-700">
+							Which are the preferred industries of the user?
+						</label>
+						<input
+							id="user_search_industries"
+							type="text"
+							bind:value={user_search_industries}
+							class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
+							placeholder="e.g. Tech, Healthcare, Education, ..."
+						/>
+					</div>
 				</div>
-
-				<!-- Gender -->
-				<div>
-					<label for="gender" class="mb-2 block text-sm font-medium text-gray-700">
-						{$t('create_user.gender_label')} *
-					</label>
-					<select
-						id="gender"
-						bind:value={gender}
-						required
-						class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-					>
-						<option value="">{$t('create_user.gender_select')}</option>
-						<option value="male">{$t('create_user.gender_male')}</option>
-						<option value="female">{$t('create_user.gender_female')}</option>
-					</select>
+				<div class="grid gap-6 md:grid-cols-2">
+					<!-- Street (optional) -->
+					<div>
+						<label for="street" class="mb-2 block text-sm font-medium text-gray-700">Street</label>
+						<input id="street" type="text" bind:value={street} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
+					<!-- Zip (optional) -->
+					<div>
+						<label for="zip" class="mb-2 block text-sm font-medium text-gray-700">Zip</label>
+						<input id="zip" type="text" bind:value={zip} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
+					<!-- City (optional) -->
+					<div>
+						<label for="city" class="mb-2 block text-sm font-medium text-gray-700">City</label>
+						<input id="city" type="text" bind:value={city} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
+					<!-- Country (optional) -->
+					<div>
+						<label for="country" class="mb-2 block text-sm font-medium text-gray-700">Country</label>
+						<input id="country" type="text" bind:value={country} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
+					<!-- Phone Number (optional) -->
+					<div>
+						<label for="phoneNumber" class="mb-2 block text-sm font-medium text-gray-700">Phone Number</label>
+						<input id="phoneNumber" type="tel" bind:value={phoneNumber} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
 				</div>
-
-				<!-- Email -->
-				<div>
-					<label for="email" class="mb-2 block text-sm font-medium text-gray-700">
-						{$t('create_user.email_label')} *
-					</label>
-					<input
-						id="email"
-						type="email"
-						bind:value={email}
-						required
-						class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-						placeholder={$t('create_user.email_placeholder')}
-					/>
-				</div>
-
-				<!-- Language -->
-				<div>
-					<label for="language" class="mb-2 block text-sm font-medium text-gray-700">
-						{$t('create_user.language_label')} *
-					</label>
-					<select
-						id="language"
-						bind:value={language}
-						required
-						class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-					>
-						<option value="">{$t('create_user.language_select')}</option>
-						<option value="en">{$t('create_user.language_english')}</option>
-						<option value="de">{$t('create_user.language_german')}</option>
-						<option value="fr">{$t('create_user.language_french')}</option>
-						<option value="it">{$t('create_user.language_italian')}</option>
-						<option value="es">{$t('create_user.language_spanish')}</option>
-					</select>
-				</div>
-
-				<!-- Agency (dropdown) -->
-				<div>
-					<label for="agency" class="mb-2 block text-sm font-medium text-gray-700">
-						{$t('create_user.agency_label')}
-					</label>
-					<select
-						id="agency"
-						bind:value={agency}
-						class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-					>
-						<option value="">None</option>
-						{#each agencies as a}
-							<option value={a.id}>{a.name}</option>
-						{/each}
-					</select>
-				</div>
-
-				<!-- Street (optional) -->
-				<div>
-					<label for="street" class="mb-2 block text-sm font-medium text-gray-700">Street</label>
-					<input id="street" type="text" bind:value={street} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-				</div>
-
-				<!-- Zip (optional) -->
-				<div>
-					<label for="zip" class="mb-2 block text-sm font-medium text-gray-700">Zip</label>
-					<input id="zip" type="text" bind:value={zip} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-				</div>
-
-				<!-- City (optional) -->
-				<div>
-					<label for="city" class="mb-2 block text-sm font-medium text-gray-700">City</label>
-					<input id="city" type="text" bind:value={city} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-				</div>
-
-				<!-- Country (optional) -->
-				<div>
-					<label for="country" class="mb-2 block text-sm font-medium text-gray-700">Country</label>
-					<input id="country" type="text" bind:value={country} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-				</div>
-
-				<!-- Phone Number (optional) -->
-				<div>
-					<label for="phoneNumber" class="mb-2 block text-sm font-medium text-gray-700">Phone Number</label>
-					<input id="phoneNumber" type="tel" bind:value={phoneNumber} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-				</div>
-
-				<!-- Password (mandatory) -->
-				<div>
-					<label for="password" class="mb-2 block text-sm font-medium text-gray-700">Password *</label>
-					<input id="password" type="password" bind:value={password} required class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-				</div>
-
-				<!-- Confirm Password (mandatory) -->
-				<div>
-					<label for="confirmPassword" class="mb-2 block text-sm font-medium text-gray-700">Repeat Password *</label>
-					<input id="confirmPassword" type="password" bind:value={confirmPassword} required class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-				</div>
-
-				<!-- User Search Regions -->
-				<div>
-					<label for="user_search_regions" class="mb-2 block text-sm font-medium text-gray-700">
-						In which city/cities or region(s) is the user looking for work?
-					</label>
-					<input
-						id="user_search_regions"
-						type="text"
-						bind:value={user_search_regions}
-						class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-						placeholder="e.g. Berlin, Hamburg, Bavaria, remote, ..."
-					/>
-				</div>
-
-				<!-- User Search Industries -->
-				<div>
-					<label for="user_search_industries" class="mb-2 block text-sm font-medium text-gray-700">
-						Which are the preferred industries of the user?
-					</label>
-					<input
-						id="user_search_industries"
-						type="text"
-						bind:value={user_search_industries}
-						class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-						placeholder="e.g. Tech, Healthcare, Education, ..."
-					/>
+				<div class="grid gap-6 md:grid-cols-2">
+					<!-- Password (mandatory) -->
+					<div>
+						<label for="password" class="mb-2 block text-sm font-medium text-gray-700">Password *</label>
+						<input id="password" type="password" bind:value={password} required class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
+					<!-- Confirm Password (mandatory) -->
+					<div>
+						<label for="confirmPassword" class="mb-2 block text-sm font-medium text-gray-700">Repeat Password *</label>
+						<input id="confirmPassword" type="password" bind:value={confirmPassword} required class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
 				</div>
 
 				<!-- Message -->

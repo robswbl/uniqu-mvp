@@ -286,12 +286,11 @@
 				matchedCompanies = extractCompanyNames(companiesDoc.content_html);
 			}
 
-			// Fetch versions for all letters
-			if (applicationLetters.length > 0) {
-				for (const letter of applicationLetters) {
-					await fetchLetterVersions(letter.id);
-				}
-			}
+		// OPTIMIZED: Batch load all letter versions for performance
+		if (applicationLetters.length > 0) {
+			console.log(`[FetchData] Using optimized batch loading for ${applicationLetters.length} letters`);
+			await batchLoadAllLetterVersions();
+		}
 		} catch (err) {
 			console.error('Error fetching data:', err);
 			error = {
@@ -1122,8 +1121,13 @@
 				return;
 			}
 
-			// Fetch versions for this letter (this will also clean up duplicates)
+		// Check if versions are already loaded, if not, fetch them
+		if (!letterVersions[letterId]) {
+			console.log(`[ViewLetter] Versions not cached for letter ${letterId}, fetching...`);
 			await fetchLetterVersions(letterId);
+		} else {
+			console.log(`[ViewLetter] Using cached versions for letter ${letterId}`);
+		}
 
 			// Show in modal
 			currentLetterContent = letterData.content_html || letterData.letter_content_html;
@@ -1602,6 +1606,112 @@
 		}
 	}
 
+	// OPTIMIZED: Batch load all letter versions for all letters in one query
+	async function batchLoadAllLetterVersions() {
+		try {
+			console.log('[BatchLoad] Starting batch load of all letter versions...');
+			const startTime = performance.now();
+
+			// Get all letter IDs from the current applicationLetters array
+			const letterIds = applicationLetters.map(letter => letter.id);
+			
+			if (letterIds.length === 0) {
+				console.log('[BatchLoad] No letters to load versions for');
+				return;
+			}
+
+			console.log(`[BatchLoad] Loading versions for ${letterIds.length} letters...`);
+
+			// Batch load all versions for all letters in one query
+			const { data: allVersions, error: versionsError } = await supabase
+				.from('application_letter_versions')
+				.select('*')
+				.in('application_letter_id', letterIds)
+				.order('created_at', { ascending: false });
+
+			if (versionsError) {
+				console.error('[BatchLoad] Error fetching versions:', versionsError);
+				return;
+			}
+
+			console.log(`[BatchLoad] Loaded ${allVersions?.length || 0} total versions`);
+
+			// Group versions by letter ID
+			const versionsByLetter = {};
+			if (allVersions) {
+				allVersions.forEach(version => {
+					if (!versionsByLetter[version.application_letter_id]) {
+						versionsByLetter[version.application_letter_id] = [];
+					}
+					versionsByLetter[version.application_letter_id].push(version);
+				});
+			}
+
+			// Process each letter
+			for (const letter of applicationLetters) {
+				const letterId = letter.id;
+				const rewriteVersions = versionsByLetter[letterId] || [];
+
+				// Check if we have any versions (original or rewrite)
+				if (rewriteVersions.length > 0) {
+					// Check if there's already an original version in the versions
+					const existingOriginal = rewriteVersions.find((v) => v.version_type === 'original');
+
+					if (existingOriginal) {
+						// Use the existing original version from the database
+						letterVersions[letterId] = rewriteVersions;
+						selectedVersion[letterId] = rewriteVersions[0] || null;
+					} else {
+						// No original version exists, create a virtual one from the letter data we already have
+						const virtualOriginalVersion = {
+							id: `virtual_${letterId}`,
+							application_letter_id: letterId,
+							version_type: 'original',
+							tone: letter.tone || 'professional',
+							language: letter.language || 'en',
+							length_percentage: 100,
+							content_html: letter.content_html || letter.letter_content_html,
+							created_at: new Date().toISOString(),
+							isVirtual: true
+						};
+
+						// Combine virtual original with actual rewrite versions
+						const allVersions = [virtualOriginalVersion, ...rewriteVersions];
+						letterVersions[letterId] = allVersions;
+						selectedVersion[letterId] = allVersions[0] || null;
+					}
+				} else {
+					// No versions exist, create a virtual original version from the letter data we already have
+					const virtualOriginalVersion = {
+						id: `virtual_${letterId}`,
+						application_letter_id: letterId,
+						version_type: 'original',
+						tone: letter.tone || 'professional',
+						language: letter.language || 'en',
+						length_percentage: 100,
+						content_html: letter.content_html || letter.letter_content_html,
+						created_at: new Date().toISOString(),
+						isVirtual: true
+					};
+
+					letterVersions[letterId] = [virtualOriginalVersion];
+					selectedVersion[letterId] = virtualOriginalVersion;
+				}
+			}
+
+			// Force reactivity
+			letterVersions = { ...letterVersions };
+			selectedVersion = { ...selectedVersion };
+
+			const endTime = performance.now();
+			console.log(`[BatchLoad] Completed in ${(endTime - startTime).toFixed(2)}ms`);
+			console.log(`[BatchLoad] Loaded versions for ${Object.keys(letterVersions).length} letters`);
+
+		} catch (err) {
+			console.error('[BatchLoad] Error in batch loading:', err);
+		}
+	}
+
 	// Function to regenerate letter with new tone/length
 	async function regenerateLetter(letterId) {
 		try {
@@ -1756,8 +1866,9 @@
 
 						if (newVersions.length > 0) {
 							console.log(`[Polling] New version detected! Refreshing...`);
-							// Refresh versions
-							await fetchLetterVersions(letterId);
+							// Optimized: Update the cached versions directly instead of refetching
+							letterVersions[letterId] = versions;
+							letterVersions = { ...letterVersions };
 							console.log(`[Polling] After refresh - letterVersions:`, letterVersions[letterId]);
 							console.log(`[Polling] After refresh - selectedVersion:`, letterVersions[letterId]);
 							console.log(`[Polling] Current letterVersions state:`, letterVersions);
@@ -2146,8 +2257,9 @@
 			});
 	}
 
-	onMount(() => {
-		fetchData();
+
+	onMount(async () => {
+		await fetchData();
 		setupRealtimeSubscription();
 	});
 
@@ -2982,9 +3094,9 @@
 															stroke-linejoin="round"
 															stroke-width="2"
 															d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-														/>
-													</svg>
-													<span class="ml-1">{$t('buttons.delete')}</span>
+															/>
+														</svg>
+														<span class="ml-1">{$t('buttons.delete')}</span>
 												</button>
 
 												<!-- Update Placeholder Button (only show for job letters with placeholder) -->

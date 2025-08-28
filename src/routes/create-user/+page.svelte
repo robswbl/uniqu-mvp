@@ -203,7 +203,7 @@
 					<!-- First Name -->
 					<div>
 						<label for="firstName" class="mb-2 block text-sm font-medium text-gray-700">
-							{$t('create_user.first_name_label')} *
+							{$t('signup.first_name_label')} *
 						</label>
 						<input
 							id="firstName"
@@ -217,7 +217,7 @@
 					<!-- Last Name -->
 					<div>
 						<label for="lastName" class="mb-2 block text-sm font-medium text-gray-700">
-							{$t('create_user.last_name_label')} *
+							{$t('signup.last_name_label')} *
 						</label>
 						<input
 							id="lastName"
@@ -231,7 +231,7 @@
 					<!-- Gender -->
 					<div>
 						<label for="gender" class="mb-2 block text-sm font-medium text-gray-700">
-							{$t('create_user.gender_label')} *
+							{$t('signup.gender_label')} *
 						</label>
 						<select
 							id="gender"
@@ -239,15 +239,15 @@
 							required
 							class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
 						>
-							<option value="">{$t('create_user.gender_select')}</option>
-							<option value="male">{$t('create_user.gender_male')}</option>
-							<option value="female">{$t('create_user.gender_female')}</option>
+							<option value="">{$t('signup.gender_select')}</option>
+							<option value="male">{$t('signup.gender_male')}</option>
+							<option value="female">{$t('signup.gender_female')}</option>
 						</select>
 					</div>
 					<!-- Email -->
 					<div>
 						<label for="email" class="mb-2 block text-sm font-medium text-gray-700">
-							{$t('create_user.email_label')} *
+							{$t('signup.email_label')} *
 						</label>
 						<input
 							id="email"
@@ -263,7 +263,7 @@
 					<!-- Language -->
 					<div>
 						<label for="language" class="mb-2 block text-sm font-medium text-gray-700">
-							{$t('create_user.language_label')} *
+							{$t('signup.language_label')} *
 						</label>
 						<select
 							id="language"
@@ -271,12 +271,12 @@
 							required
 							class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
 						>
-							<option value="">{$t('create_user.language_select')}</option>
-							<option value="en">{$t('create_user.language_english')}</option>
-							<option value="de">{$t('create_user.language_german')}</option>
-							<option value="fr">{$t('create_user.language_french')}</option>
-							<option value="it">{$t('create_user.language_italian')}</option>
-							<option value="es">{$t('create_user.language_spanish')}</option>
+							<option value="">{$t('signup.language_select')}</option>
+							<option value="en">{$t('signup.language_english')}</option>
+							<option value="de">{$t('signup.language_german')}</option>
+							<option value="fr">{$t('signup.language_french')}</option>
+							<option value="it">{$t('signup.language_italian')}</option>
+							<option value="es">{$t('signup.language_spanish')}</option>
 						</select>
 					</div>
 					<!-- Agency -->
@@ -295,10 +295,40 @@
 							{/each}
 						</select>
 					</div>
+				</div>
+				<div class="grid gap-6 md:grid-cols-2">
+					<!-- Street (optional) -->
+					<div>
+						<label for="street" class="mb-2 block text-sm font-medium text-gray-700">{$t('signup.street_label')}</label>
+						<input id="street" type="text" bind:value={street} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
+					<!-- Zip (optional) -->
+					<div>
+						<label for="zip" class="mb-2 block text-sm font-medium text-gray-700">{$t('signup.zip_label')}</label>
+						<input id="zip" type="text" bind:value={zip} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
+					<!-- City (optional) -->
+					<div>
+						<label for="city" class="mb-2 block text-sm font-medium text-gray-700">{$t('signup.city_label')}</label>
+						<input id="city" type="text" bind:value={city} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
+					<!-- Country (optional) -->
+					<div>
+						<label for="country" class="mb-2 block text-sm font-medium text-gray-700">{$t('signup.country_label')}</label>
+						<input id="country" type="text" bind:value={country} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
+					<!-- Phone Number (optional) -->
+					<div>
+						<label for="phoneNumber" class="mb-2 block text-sm font-medium text-gray-700">{$t('signup.phone_label')}</label>
+						<input id="phoneNumber" type="tel" bind:value={phoneNumber} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+					</div>
+				</div>
+				<!-- Search fields placed after phone and before password -->
+				<div class="grid gap-6 md:grid-cols-2">
 					<!-- User Search Regions -->
 					<div>
 						<label for="user_search_regions" class="mb-2 block text-sm font-medium text-gray-700">
-							In which city/cities or region(s) is the user looking for work?
+							{$t('signup.search_regions_label')}
 						</label>
 						<input
 							id="user_search_regions"
@@ -311,7 +341,7 @@
 					<!-- User Search Industries -->
 					<div>
 						<label for="user_search_industries" class="mb-2 block text-sm font-medium text-gray-700">
-							Which are the preferred industries of the user?
+							{$t('signup.search_industries_label')}
 						</label>
 						<input
 							id="user_search_industries"
@@ -323,41 +353,14 @@
 					</div>
 				</div>
 				<div class="grid gap-6 md:grid-cols-2">
-					<!-- Street (optional) -->
-					<div>
-						<label for="street" class="mb-2 block text-sm font-medium text-gray-700">Street</label>
-						<input id="street" type="text" bind:value={street} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-					</div>
-					<!-- Zip (optional) -->
-					<div>
-						<label for="zip" class="mb-2 block text-sm font-medium text-gray-700">Zip</label>
-						<input id="zip" type="text" bind:value={zip} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-					</div>
-					<!-- City (optional) -->
-					<div>
-						<label for="city" class="mb-2 block text-sm font-medium text-gray-700">City</label>
-						<input id="city" type="text" bind:value={city} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-					</div>
-					<!-- Country (optional) -->
-					<div>
-						<label for="country" class="mb-2 block text-sm font-medium text-gray-700">Country</label>
-						<input id="country" type="text" bind:value={country} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-					</div>
-					<!-- Phone Number (optional) -->
-					<div>
-						<label for="phoneNumber" class="mb-2 block text-sm font-medium text-gray-700">Phone Number</label>
-						<input id="phoneNumber" type="tel" bind:value={phoneNumber} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
-					</div>
-				</div>
-				<div class="grid gap-6 md:grid-cols-2">
 					<!-- Password (mandatory) -->
 					<div>
-						<label for="password" class="mb-2 block text-sm font-medium text-gray-700">Password *</label>
+						<label for="password" class="mb-2 block text-sm font-medium text-gray-700">{$t('signup.password_label')} *</label>
 						<input id="password" type="password" bind:value={password} required class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
 					</div>
 					<!-- Confirm Password (mandatory) -->
 					<div>
-						<label for="confirmPassword" class="mb-2 block text-sm font-medium text-gray-700">Repeat Password *</label>
+						<label for="confirmPassword" class="mb-2 block text-sm font-medium text-gray-700">{$t('signup.confirm_password_label')} *</label>
 						<input id="confirmPassword" type="password" bind:value={confirmPassword} required class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
 					</div>
 				</div>

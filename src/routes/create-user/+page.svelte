@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { t } from 'svelte-i18n';
 	import { supabase } from '$lib/supabaseClient';
+	import { onMount } from 'svelte';
 
 	let firstName = '';
 	let lastName = '';
@@ -15,6 +16,30 @@
 	let isSubmitting = false;
 	let message = '';
 	let messageType = '';
+
+	// Optional address/contact fields (non-mandatory)
+	let street = '';
+	let zip = '';
+	let city = '';
+	let country = '';
+	let phoneNumber = '';
+
+	// Password fields (mandatory)
+	let password = '';
+	let confirmPassword = '';
+
+	// Agencies for dropdown
+	let agencies: Array<{ id: string; agency_name: string }> = [];
+
+	onMount(async () => {
+		const { data, error } = await supabase
+			.from('agencies')
+			.select('id, agency_name')
+			.order('agency_name', { ascending: true });
+		if (!error && data) {
+			agencies = data as Array<{ id: string; agency_name: string }>;
+		}
+	});
 
 	// Generate UUID function
 	function generateUUID() {
@@ -47,6 +72,18 @@
 			return;
 		}
 
+		// Password validation
+		if (!password || !confirmPassword) {
+			message = 'Please set and confirm a password.';
+			messageType = 'error';
+			return;
+		}
+		if (password !== confirmPassword) {
+			message = 'Passwords do not match.';
+			messageType = 'error';
+			return;
+		}
+
 		isSubmitting = true;
 		message = '';
 
@@ -60,7 +97,13 @@
 				language,
 				agency,
 				user_search_regions,
-				user_search_industries
+				user_search_industries,
+				street,
+				zip,
+				city,
+				country,
+				phoneNumber,
+				password
 			};
 
 			const response = await fetch(
@@ -99,6 +142,13 @@
 						agency = '';
 						user_search_regions = '';
 						user_search_industries = '';
+						street = '';
+						zip = '';
+						city = '';
+						country = '';
+						phoneNumber = '';
+						password = '';
+						confirmPassword = '';
 					}
 				} else {
 					message = 'User created, but could not find user UUID to create session.';
@@ -231,18 +281,63 @@
 					</select>
 				</div>
 
-				<!-- Agency -->
+				<!-- Agency (dropdown) -->
 				<div>
 					<label for="agency" class="mb-2 block text-sm font-medium text-gray-700">
 						{$t('create_user.agency_label')}
 					</label>
-					<input
+					<select
 						id="agency"
-						type="text"
 						bind:value={agency}
 						class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500"
-						placeholder={$t('create_user.agency_placeholder')}
-					/>
+					>
+						<option value="">None</option>
+						{#each agencies as a}
+							<option value={a.id}>{a.agency_name}</option>
+						{/each}
+					</select>
+				</div>
+
+				<!-- Street (optional) -->
+				<div>
+					<label for="street" class="mb-2 block text-sm font-medium text-gray-700">Street</label>
+					<input id="street" type="text" bind:value={street} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+				</div>
+
+				<!-- Zip (optional) -->
+				<div>
+					<label for="zip" class="mb-2 block text-sm font-medium text-gray-700">Zip</label>
+					<input id="zip" type="text" bind:value={zip} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+				</div>
+
+				<!-- City (optional) -->
+				<div>
+					<label for="city" class="mb-2 block text-sm font-medium text-gray-700">City</label>
+					<input id="city" type="text" bind:value={city} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+				</div>
+
+				<!-- Country (optional) -->
+				<div>
+					<label for="country" class="mb-2 block text-sm font-medium text-gray-700">Country</label>
+					<input id="country" type="text" bind:value={country} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+				</div>
+
+				<!-- Phone Number (optional) -->
+				<div>
+					<label for="phoneNumber" class="mb-2 block text-sm font-medium text-gray-700">Phone Number</label>
+					<input id="phoneNumber" type="tel" bind:value={phoneNumber} class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+				</div>
+
+				<!-- Password (mandatory) -->
+				<div>
+					<label for="password" class="mb-2 block text-sm font-medium text-gray-700">Password *</label>
+					<input id="password" type="password" bind:value={password} required class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
+				</div>
+
+				<!-- Confirm Password (mandatory) -->
+				<div>
+					<label for="confirmPassword" class="mb-2 block text-sm font-medium text-gray-700">Repeat Password *</label>
+					<input id="confirmPassword" type="password" bind:value={confirmPassword} required class="w-full rounded-lg border border-gray-300 px-4 py-3 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500" />
 				</div>
 
 				<!-- User Search Regions -->

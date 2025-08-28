@@ -22,6 +22,38 @@
 		pendingActions: 0
 	};
 
+	// Agency performance metrics
+	let agencyPerformance = {
+		totalDocuments: 0,
+		totalApplicationLetters: 0,
+		applicationFunnel: {
+			created: 0,
+			sent: 0,
+			responded: 0,
+			interview: 0,
+			rejected: 0,
+			accepted: 0,
+			sentPercentage: 0,
+			respondedPercentage: 0,
+			interviewPercentage: 0,
+			rejectedPercentage: 0,
+			acceptedPercentage: 0,
+			conversionRate: 0,
+			successRate: 0
+		},
+		clientSummaries: {
+			total: 0,
+			completed: 0,
+			generating: 0,
+			failed: 0
+		},
+		monthlyGrowth: {
+			newClients: 0,
+			completedSessions: 0,
+			generatedDocuments: 0
+		}
+	};
+
 	onMount(async () => {
 		try {
 			console.log('Dashboard: onMount started');
@@ -119,7 +151,202 @@
 		}
 	}
 
+	async function loadAgencyPerformanceData() {
+		if (!session) return;
 
+		try {
+			const clientIds = clients.map(c => c.user_id);
+			if (clientIds.length === 0) {
+				// Initialize with zeros if no clients
+				agencyPerformance = {
+					totalDocuments: 0,
+					totalApplicationLetters: 0,
+					applicationFunnel: {
+						created: 0,
+						sent: 0,
+						responded: 0,
+						interview: 0,
+						rejected: 0,
+						accepted: 0,
+						sentPercentage: 0,
+						respondedPercentage: 0,
+						interviewPercentage: 0,
+						rejectedPercentage: 0,
+						acceptedPercentage: 0,
+						conversionRate: 0,
+						successRate: 0
+					},
+					clientSummaries: {
+						total: 0,
+						completed: 0,
+						generating: 0,
+						failed: 0
+					},
+					monthlyGrowth: {
+						newClients: 0,
+						completedSessions: 0,
+						generatedDocuments: 0
+					}
+				};
+				return;
+			}
+
+			// Load all documents across all clients - need to get session IDs first
+			const { data: sessionsData, error: sessionsError } = await supabase
+				.from('questionnaire_sessions')
+				.select('id, user_id')
+				.in('user_id', clientIds);
+
+			if (!sessionsError && sessionsData) {
+				const sessionIds = sessionsData.map(s => s.id);
+				
+				// Load all documents across all client sessions
+				const { data: documentsData, error: documentsError } = await supabase
+					.from('generated_documents')
+					.select('*')
+					.in('session_id', sessionIds);
+
+				if (!documentsError && documentsData) {
+					agencyPerformance.totalDocuments = documentsData.length;
+				}
+
+				// Load all application letters across all client sessions
+				const { data: lettersData, error: lettersError } = await supabase
+					.from('application_letters')
+					.select('*')
+					.in('session_id', sessionIds);
+
+			if (!lettersError && lettersData) {
+				agencyPerformance.totalApplicationLetters = lettersData.length;
+				
+				// Calculate application funnel metrics
+				const total = lettersData.length;
+				const sent = lettersData.filter((letter: any) => letter.status === 'sent').length;
+				const responded = lettersData.filter((letter: any) => letter.status === 'responded').length;
+				const interview = lettersData.filter((letter: any) => letter.status === 'interview').length;
+				const rejected = lettersData.filter((letter: any) => letter.status === 'rejected').length;
+				const accepted = lettersData.filter((letter: any) => letter.status === 'accepted').length;
+
+				agencyPerformance.applicationFunnel = {
+					created: total,
+					sent,
+					responded,
+					interview,
+					rejected,
+					accepted,
+					sentPercentage: total > 0 ? Math.round((sent / total) * 100) : 0,
+					respondedPercentage: total > 0 ? Math.round((responded / total) * 100) : 0,
+					interviewPercentage: total > 0 ? Math.round((interview / total) * 100) : 0,
+					rejectedPercentage: total > 0 ? Math.round((rejected / total) * 100) : 0,
+					acceptedPercentage: total > 0 ? Math.round((accepted / total) * 100) : 0,
+					conversionRate: sent > 0 ? Math.round((interview / sent) * 100) : 0,
+					successRate: interview > 0 ? Math.round((accepted / interview) * 100) : 0
+				};
+			}
+
+			// Load all client summaries across all clients
+			const { data: summariesData, error: summariesError } = await supabase
+				.from('client_summaries')
+				.select('*')
+				.eq('agency_id', session.user.agencyId);
+
+			if (!summariesError && summariesData) {
+				agencyPerformance.clientSummaries.total = summariesData.length;
+				agencyPerformance.clientSummaries.completed = summariesData.filter((s: any) => s.status === 'completed').length;
+				agencyPerformance.clientSummaries.generating = summariesData.filter((s: any) => s.status === 'generating').length;
+				agencyPerformance.clientSummaries.failed = summariesData.filter((s: any) => s.status === 'failed').length;
+			}
+
+			// Calculate monthly growth (last 30 days)
+			const thirtyDaysAgo = new Date();
+			thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+			// New clients in last 30 days
+			const newClients = clients.filter((c: any) => new Date(c.created_at) >= thirtyDaysAgo).length;
+			agencyPerformance.monthlyGrowth.newClients = newClients;
+
+			// Load sessions data for monthly growth calculation
+			const { data: sessionsData, error: sessionsError } = await supabase
+				.from('questionnaire_sessions')
+				.select('id, status, user_id, created_at')
+				.in('user_id', clientIds);
+
+			// Completed sessions in last 30 days
+			if (!sessionsError && sessionsData) {
+				const recentSessions = sessionsData.filter((s: any) => 
+					s.status === 'completed' && new Date(s.created_at) >= thirtyDaysAgo
+				);
+				agencyPerformance.monthlyGrowth.completedSessions = recentSessions.length;
+			}
+
+			// Generated documents in last 30 days
+			if (documentsData) {
+				const recentDocuments = documentsData.filter((d: any) => 
+					new Date(d.created_at) >= thirtyDaysAgo
+				);
+				agencyPerformance.monthlyGrowth.generatedDocuments = recentDocuments.length;
+			}
+
+		} catch (error) {
+			console.error('Dashboard: Error loading agency performance data:', error);
+		}
+	}
+
+	async function loadDashboardData() {
+		if (!session) return;
+
+		try {
+			console.log('Dashboard: Loading dashboard data...');
+			// Load clients
+			const { data: clientsData, error: clientsError } = await supabase
+				.from('user_agencies')
+				.select(`
+					*,
+					users!user_id (
+						user_uuid,
+						user_firstname,
+						user_lastname,
+						user_email,
+						user_phone
+					)
+				`)
+				.eq('agency_id', session.user.agencyId)
+				.eq('is_active', true);
+
+			if (clientsError) throw clientsError;
+			clients = clientsData || [];
+
+			// Load questionnaire sessions for stats
+			const { data: sessionsData, error: sessionsError } = await supabase
+				.from('questionnaire_sessions')
+				.select('id, status, user_id')
+				.in('user_id', clients.map(c => c.user_id));
+
+			if (!sessionsError && sessionsData) {
+				stats.totalClients = clients.length;
+				stats.activeClients = sessionsData.filter(s => s.status === 'in-progress').length;
+				stats.completedQuestionnaires = sessionsData.filter(s => s.status === 'completed').length;
+				stats.pendingActions = sessionsData.filter(s => s.status === 'in-progress').length;
+			}
+
+			// Load agency performance data
+			await loadAgencyPerformanceData();
+
+			// Load recent activities
+			const { data: activitiesData, error: activitiesError } = await supabase
+				.from('agency_activities')
+				.select('*')
+				.eq('agency_id', session.user.agencyId)
+				.order('created_at', { ascending: false })
+				.limit(5);
+
+			if (!activitiesError && activitiesData) {
+				recentActivities = activitiesData;
+			}
+		} catch (error) {
+			console.error('Dashboard: Error loading data:', error);
+		}
+	}
 
 	function goToClient(clientId: string) {
 		goto(`/agency/${session?.user.agencyId}/client/${clientId}`);
@@ -193,8 +420,9 @@
 							</div>
 						</div>
 						<div class="ml-4">
-							<p class="text-sm font-medium text-gray-500">Active Clients</p>
-							<p class="text-2xl font-semibold text-gray-900">{stats.activeClients}</p>
+							<p class="text-sm font-medium text-gray-500">Completed Sessions</p>
+							<p class="text-2xl font-semibold text-gray-900">{stats.completedQuestionnaires}</p>
+							<p class="text-xs text-gray-500">Questionnaires finished</p>
 						</div>
 					</div>
 				</div>
@@ -209,8 +437,9 @@
 							</div>
 						</div>
 						<div class="ml-4">
-							<p class="text-sm font-medium text-gray-500">Completed</p>
-							<p class="text-2xl font-semibold text-gray-900">{stats.completedQuestionnaires}</p>
+							<p class="text-sm font-medium text-gray-500">Total Documents</p>
+							<p class="text-2xl font-semibold text-gray-900">{agencyPerformance.totalDocuments}</p>
+							<p class="text-xs text-gray-500">Generated for clients</p>
 						</div>
 					</div>
 				</div>
@@ -225,8 +454,225 @@
 							</div>
 						</div>
 						<div class="ml-4">
-							<p class="text-sm font-medium text-gray-500">Pending</p>
+							<p class="text-sm font-medium text-gray-500">In Progress</p>
 							<p class="text-2xl font-semibold text-gray-900">{stats.pendingActions}</p>
+							<p class="text-xs text-gray-500">Sessions ongoing</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Agency Performance Dashboard -->
+			<div class="bg-white rounded-lg shadow mb-8">
+				<div class="px-6 py-4 border-b border-gray-200">
+					<h2 class="text-lg font-medium text-gray-900">Agency Performance Dashboard</h2>
+					<p class="text-sm text-gray-600">Overview of your agency's performance across all clients</p>
+				</div>
+				<div class="p-6">
+					<!-- Performance Metrics Grid -->
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+						<div class="text-center">
+							<div class="text-3xl font-bold text-blue-600">{agencyPerformance.totalDocuments}</div>
+							<div class="text-sm text-gray-600">Total Documents</div>
+							<div class="text-xs text-gray-500">Generated across all clients</div>
+						</div>
+						<div class="text-center">
+							<div class="text-3xl font-bold text-indigo-600">{agencyPerformance.totalApplicationLetters}</div>
+							<div class="text-sm text-gray-600">Application Letters</div>
+							<div class="text-xs text-gray-500">Created for clients</div>
+						</div>
+						<div class="text-center">
+							<div class="text-3xl font-bold text-green-600">{agencyPerformance.clientSummaries.completed}</div>
+							<div class="text-sm text-gray-600">Client Summaries</div>
+							<div class="text-xs text-gray-500">Successfully generated</div>
+						</div>
+						<div class="text-center">
+							<div class="text-3xl font-bold text-purple-600">{agencyPerformance.monthlyGrowth.newClients}</div>
+							<div class="text-sm text-gray-600">New Clients</div>
+							<div class="text-xs text-gray-500">Last 30 days</div>
+						</div>
+					</div>
+
+					<!-- Application Funnel Visualization -->
+					<div class="mb-8">
+						<h3 class="text-lg font-medium text-gray-900 mb-4">Application Funnel Performance</h3>
+						<div class="flex flex-col items-center space-y-4">
+							<!-- Created -->
+							<div class="flex w-full max-w-md items-center justify-between rounded-lg bg-blue-50 p-4">
+								<div class="flex items-center space-x-3">
+									<div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+										<span class="text-lg font-bold text-blue-600">📝</span>
+									</div>
+									<div>
+										<p class="font-medium text-blue-900">Created</p>
+										<p class="text-sm text-blue-600">Application Letters</p>
+									</div>
+								</div>
+								<div class="text-right">
+									<div class="text-2xl font-bold text-blue-600">{agencyPerformance.applicationFunnel.created}</div>
+									<div class="text-xs text-blue-500">Total</div>
+								</div>
+							</div>
+
+							<!-- Arrow -->
+							<div class="flex h-6 w-6 items-center justify-center text-gray-400">
+								<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+								</svg>
+							</div>
+
+							<!-- Sent -->
+							<div class="flex w-full max-w-md items-center justify-between rounded-lg bg-indigo-50 p-4">
+								<div class="flex items-center space-x-3">
+									<div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
+										<span class="text-lg font-bold text-indigo-600">📤</span>
+									</div>
+									<div>
+										<p class="font-medium text-indigo-900">Sent</p>
+										<p class="text-sm text-indigo-600">Applications Sent</p>
+									</div>
+								</div>
+								<div class="text-right">
+									<div class="text-2xl font-bold text-indigo-600">{agencyPerformance.applicationFunnel.sent}</div>
+									<div class="text-xs text-indigo-500">{agencyPerformance.applicationFunnel.sentPercentage}%</div>
+								</div>
+							</div>
+
+							<!-- Arrow -->
+							<div class="flex h-6 w-6 items-center justify-center text-gray-400">
+								<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+								</svg>
+							</div>
+
+							<!-- Responses -->
+							<div class="flex w-full max-w-md items-center justify-between rounded-lg bg-yellow-50 p-4">
+								<div class="flex items-center space-x-3">
+									<div class="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100">
+										<span class="text-lg font-bold text-yellow-600">📨</span>
+									</div>
+									<div>
+										<p class="font-medium text-yellow-900">Responses</p>
+										<p class="text-sm text-yellow-600">Replies Received</p>
+									</div>
+								</div>
+								<div class="text-right">
+									<div class="text-2xl font-bold text-yellow-600">{agencyPerformance.applicationFunnel.responded}</div>
+									<div class="text-xs text-yellow-500">{agencyPerformance.applicationFunnel.respondedPercentage}%</div>
+								</div>
+							</div>
+
+							<!-- Arrow -->
+							<div class="flex h-6 w-6 items-center justify-center text-gray-400">
+								<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+								</svg>
+							</div>
+
+							<!-- Interviews -->
+							<div class="flex w-full max-w-md items-center justify-between rounded-lg bg-green-50 p-4">
+								<div class="flex items-center space-x-3">
+									<div class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+										<span class="text-lg font-bold text-green-600">🤝</span>
+									</div>
+									<div>
+										<p class="font-medium text-green-900">Interviews</p>
+										<p class="text-sm text-green-600">Scheduled</p>
+									</div>
+								</div>
+								<div class="text-right">
+									<div class="text-2xl font-bold text-green-600">{agencyPerformance.applicationFunnel.interview}</div>
+									<div class="text-xs text-green-500">{agencyPerformance.applicationFunnel.interviewPercentage}%</div>
+								</div>
+							</div>
+
+							<!-- Arrow -->
+							<div class="flex h-6 w-6 items-center justify-center text-gray-400">
+								<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+								</svg>
+							</div>
+
+							<!-- Outcomes Row -->
+							<div class="flex w-full max-w-md space-x-4">
+								<!-- Rejections -->
+								<div class="flex-1 rounded-lg bg-red-50 p-4 text-center">
+									<div class="mb-2 text-2xl font-bold text-red-600">{agencyPerformance.applicationFunnel.rejected}</div>
+									<div class="text-sm font-medium text-red-900">Rejections</div>
+									<div class="text-xs text-red-500">{agencyPerformance.applicationFunnel.rejectedPercentage}%</div>
+								</div>
+
+								<!-- Offers -->
+								<div class="flex-1 rounded-lg bg-purple-50 p-4 text-center">
+									<div class="mb-2 text-2xl font-bold text-purple-600">{agencyPerformance.applicationFunnel.accepted}</div>
+									<div class="text-sm font-medium text-purple-900">Offers</div>
+									<div class="text-xs text-purple-500">{agencyPerformance.applicationFunnel.acceptedPercentage}%</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Conversion Rates -->
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<div class="bg-gray-50 rounded-lg p-4 text-center">
+							<div class="text-2xl font-bold text-gray-900">{agencyPerformance.applicationFunnel.conversionRate}%</div>
+							<div class="text-sm font-medium text-gray-700">Conversion Rate</div>
+							<div class="text-xs text-gray-500">Sent to Interview</div>
+						</div>
+						<div class="bg-gray-50 rounded-lg p-4 text-center">
+							<div class="text-2xl font-bold text-gray-900">{agencyPerformance.applicationFunnel.successRate}%</div>
+							<div class="text-sm font-medium text-gray-700">Success Rate</div>
+							<div class="text-xs text-gray-500">Interview to Offer</div>
+						</div>
+					</div>
+
+					<!-- Client Summary Status Breakdown -->
+					<div class="mt-8 pt-6 border-t border-gray-200">
+						<h3 class="text-lg font-medium text-gray-900 mb-4">Client Summary Status</h3>
+						<p class="text-sm text-gray-600 mb-4">Overview of AI-generated client summaries across all clients</p>
+						<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+							<div class="bg-green-50 rounded-lg p-4 text-center">
+								<div class="text-2xl font-bold text-green-600">{agencyPerformance.clientSummaries.completed}</div>
+								<div class="text-sm font-medium text-green-900">Completed</div>
+								<div class="text-xs text-green-600">Ready for use</div>
+							</div>
+							<div class="bg-yellow-50 rounded-lg p-4 text-center">
+								<div class="text-2xl font-bold text-yellow-600">{agencyPerformance.clientSummaries.generating}</div>
+								<div class="text-sm font-medium text-yellow-900">Generating</div>
+								<div class="text-xs text-yellow-600">In progress</div>
+							</div>
+							<div class="bg-red-50 rounded-lg p-4 text-center">
+								<div class="text-2xl font-bold text-red-600">{agencyPerformance.clientSummaries.failed}</div>
+								<div class="text-sm font-medium text-red-900">Failed</div>
+								<div class="text-xs text-red-600">Needs attention</div>
+							</div>
+							<div class="bg-gray-50 rounded-lg p-4 text-center">
+								<div class="text-2xl font-bold text-gray-600">{agencyPerformance.clientSummaries.total}</div>
+								<div class="text-sm font-medium text-gray-900">Total</div>
+								<div class="text-xs text-gray-600">All summaries</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Monthly Growth Trends -->
+					<div class="mt-8 pt-6 border-t border-gray-200">
+						<h3 class="text-lg font-medium text-gray-900 mb-4">Monthly Growth Trends</h3>
+						<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+							<div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 text-center">
+								<div class="text-2xl font-bold text-blue-600">+{agencyPerformance.monthlyGrowth.newClients}</div>
+								<div class="text-sm font-medium text-blue-900">New Clients</div>
+								<div class="text-xs text-blue-600">Last 30 days</div>
+							</div>
+							<div class="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 text-center">
+								<div class="text-2xl font-bold text-green-600">+{agencyPerformance.monthlyGrowth.completedSessions}</div>
+								<div class="text-sm font-medium text-green-900">Completed Sessions</div>
+								<div class="text-xs text-green-600">Last 30 days</div>
+							</div>
+							<div class="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 text-center">
+								<div class="text-2xl font-bold text-purple-600">+{agencyPerformance.monthlyGrowth.generatedDocuments}</div>
+								<div class="text-sm font-medium text-purple-900">Generated Documents</div>
+								<div class="text-xs text-purple-600">Last 30 days</div>
+							</div>
 						</div>
 					</div>
 				</div>

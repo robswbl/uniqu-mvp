@@ -225,37 +225,33 @@
 
 				if (!lettersError && letters) {
 					lettersData = letters;
+					agencyPerformance.totalApplicationLetters = lettersData.length;
+					
+					// Calculate application funnel metrics
+					const total = lettersData.length;
+					const sent = lettersData.filter((letter: any) => letter.status === 'sent').length;
+					const responded = lettersData.filter((letter: any) => letter.status === 'responded').length;
+					const interview = lettersData.filter((letter: any) => letter.status === 'interview').length;
+					const rejected = lettersData.filter((letter: any) => letter.status === 'rejected').length;
+					const accepted = lettersData.filter((letter: any) => letter.status === 'accepted').length;
+
+					agencyPerformance.applicationFunnel = {
+						created: total,
+						sent,
+						responded,
+						interview,
+						rejected,
+						accepted,
+						sentPercentage: total > 0 ? Math.round((sent / total) * 100) : 0,
+						respondedPercentage: total > 0 ? Math.round((responded / total) * 100) : 0,
+						interviewPercentage: total > 0 ? Math.round((interview / total) * 100) : 0,
+						rejectedPercentage: total > 0 ? Math.round((rejected / total) * 100) : 0,
+						acceptedPercentage: total > 0 ? Math.round((accepted / total) * 100) : 0,
+						conversionRate: sent > 0 ? Math.round((interview / sent) * 100) : 0,
+						successRate: interview > 0 ? Math.round((accepted / interview) * 100) : 0
+					};
 				}
-
-			if (!lettersError && lettersData) {
-				agencyPerformance.totalApplicationLetters = lettersData.length;
-				
-				// Calculate application funnel metrics
-				const total = lettersData.length;
-				const sent = lettersData.filter((letter: any) => letter.status === 'sent').length;
-				const responded = lettersData.filter((letter: any) => letter.status === 'responded').length;
-				const interview = lettersData.filter((letter: any) => letter.status === 'interview').length;
-				const rejected = lettersData.filter((letter: any) => letter.status === 'rejected').length;
-				const accepted = lettersData.filter((letter: any) => letter.status === 'accepted').length;
-
-				agencyPerformance.applicationFunnel = {
-					created: total,
-					sent,
-					responded,
-					interview,
-					rejected,
-					accepted,
-					sentPercentage: total > 0 ? Math.round((sent / total) * 100) : 0,
-					respondedPercentage: total > 0 ? Math.round((responded / total) * 100) : 0,
-					interviewPercentage: total > 0 ? Math.round((interview / total) * 100) : 0,
-					rejectedPercentage: total > 0 ? Math.round((rejected / total) * 100) : 0,
-					acceptedPercentage: total > 0 ? Math.round((accepted / total) * 100) : 0,
-					conversionRate: sent > 0 ? Math.round((interview / sent) * 100) : 0,
-					successRate: interview > 0 ? Math.round((accepted / interview) * 100) : 0
-				};
 			}
-		}
-	}
 
 			// Load all client summaries across all clients
 			const { data: summariesData, error: summariesError } = await supabase

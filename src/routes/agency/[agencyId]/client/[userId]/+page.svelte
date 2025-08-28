@@ -6,7 +6,6 @@
 	import { t } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
 
-	export let data;
 	const { agencyId, userId } = $page.params;
 
 	let client: any = null;
@@ -171,6 +170,60 @@
 			accepted: 'Offer Received'
 		};
 		return statusLabels[status] || status;
+	}
+
+	function getApplicationFunnelData() {
+		if (!applicationLetters || applicationLetters.length === 0) {
+			return {
+				created: 0,
+				sent: 0,
+				responded: 0,
+				interview: 0,
+				rejected: 0,
+				accepted: 0,
+				sentPercentage: 0,
+				respondedPercentage: 0,
+				interviewPercentage: 0,
+				rejectedPercentage: 0,
+				acceptedPercentage: 0,
+				conversionRate: 0,
+				successRate: 0
+			};
+		}
+
+		const total = applicationLetters.length;
+		const sent = applicationLetters.filter(letter => letter.status === 'sent').length;
+		const responded = applicationLetters.filter(letter => letter.status === 'responded').length;
+		const interview = applicationLetters.filter(letter => letter.status === 'interview').length;
+		const rejected = applicationLetters.filter(letter => letter.status === 'rejected').length;
+		const accepted = applicationLetters.filter(letter => letter.status === 'accepted').length;
+
+		// Calculate percentages
+		const sentPercentage = total > 0 ? Math.round((sent / total) * 100) : 0;
+		const respondedPercentage = total > 0 ? Math.round((responded / total) * 100) : 0;
+		const interviewPercentage = total > 0 ? Math.round((interview / total) * 100) : 0;
+		const rejectedPercentage = total > 0 ? Math.round((rejected / total) * 100) : 0;
+		const acceptedPercentage = total > 0 ? Math.round((accepted / total) * 100) : 0;
+
+		// Calculate conversion rates
+		const conversionRate = sent > 0 ? Math.round((interview / sent) * 100) : 0;
+		const successRate = interview > 0 ? Math.round((accepted / interview) * 100) : 0;
+
+		return {
+			created: total,
+			sent,
+			responded,
+			interview,
+			rejected,
+			accepted,
+			sentPercentage,
+			respondedPercentage,
+			interviewPercentage,
+			rejectedPercentage,
+			acceptedPercentage,
+			conversionRate,
+			successRate
+		};
 	}
 
 	onMount(async () => {
@@ -735,6 +788,159 @@
 					{/if}
 				</div>
 
+				<!-- Application Funnel Section -->
+				<div class="rounded-lg bg-white shadow-sm">
+					<div class="border-b border-gray-200 px-6 py-4">
+						<h2 class="text-xl font-semibold text-gray-900">Application Funnel</h2>
+						<p class="mt-1 text-gray-600">Track application letter progression and outcomes</p>
+					</div>
+
+					<div class="p-6">
+						{#if applicationLetters.length > 0}
+							{@const funnelData = getApplicationFunnelData()}
+							<div class="space-y-6">
+								<!-- Funnel Visualization -->
+								<div class="flex flex-col items-center space-y-4">
+									<!-- Created -->
+									<div class="flex w-full max-w-md items-center justify-between rounded-lg bg-blue-50 p-4">
+										<div class="flex items-center space-x-3">
+											<div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+												<span class="text-lg font-bold text-blue-600">📝</span>
+											</div>
+											<div>
+												<p class="font-medium text-blue-900">Created</p>
+												<p class="text-sm text-blue-600">Application Letters</p>
+											</div>
+										</div>
+										<div class="text-right">
+											<div class="text-2xl font-bold text-blue-600">{funnelData.created}</div>
+											<div class="text-xs text-blue-500">Total</div>
+										</div>
+									</div>
+
+									<!-- Arrow -->
+									<div class="flex h-6 w-6 items-center justify-center text-gray-400">
+										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+										</svg>
+									</div>
+
+									<!-- Sent -->
+									<div class="flex w-full max-w-md items-center justify-between rounded-lg bg-indigo-50 p-4">
+										<div class="flex items-center space-x-3">
+											<div class="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-100">
+												<span class="text-lg font-bold text-indigo-600">📤</span>
+											</div>
+											<div>
+												<p class="font-medium text-indigo-900">Sent</p>
+												<p class="text-sm text-indigo-600">Applications Sent</p>
+											</div>
+										</div>
+										<div class="text-right">
+											<div class="text-2xl font-bold text-indigo-600">{funnelData.sent}</div>
+											<div class="text-xs text-indigo-500">{funnelData.sentPercentage}%</div>
+										</div>
+									</div>
+
+									<!-- Arrow -->
+									<div class="flex h-6 w-6 items-center justify-center text-gray-400">
+										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+										</svg>
+									</div>
+
+									<!-- Responses -->
+									<div class="flex w-full max-w-md items-center justify-between rounded-lg bg-yellow-50 p-4">
+										<div class="flex items-center space-x-3">
+											<div class="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100">
+												<span class="text-lg font-bold text-yellow-600">📨</span>
+											</div>
+											<div>
+												<p class="font-medium text-yellow-900">Responses</p>
+												<p class="text-sm text-yellow-600">Replies Received</p>
+											</div>
+										</div>
+										<div class="text-right">
+											<div class="text-2xl font-bold text-yellow-600">{funnelData.responded}</div>
+											<div class="text-xs text-yellow-500">{funnelData.respondedPercentage}%</div>
+										</div>
+									</div>
+
+									<!-- Arrow -->
+									<div class="flex h-6 w-6 items-center justify-center text-gray-400">
+										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+										</svg>
+									</div>
+
+									<!-- Interviews -->
+									<div class="flex w-full max-w-md items-center justify-between rounded-lg bg-green-50 p-4">
+										<div class="flex items-center space-x-3">
+											<div class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+												<span class="text-lg font-bold text-green-600">🤝</span>
+											</div>
+											<div>
+												<p class="font-medium text-green-900">Interviews</p>
+												<p class="text-sm text-green-600">Scheduled</p>
+											</div>
+										</div>
+										<div class="text-right">
+											<div class="text-2xl font-bold text-green-600">{funnelData.interview}</div>
+											<div class="text-xs text-green-500">{funnelData.interviewPercentage}%</div>
+										</div>
+									</div>
+
+									<!-- Arrow -->
+									<div class="flex h-6 w-6 items-center justify-center text-gray-400">
+										<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+										</svg>
+									</div>
+
+									<!-- Outcomes Row -->
+									<div class="flex w-full max-w-md space-x-4">
+										<!-- Rejections -->
+										<div class="flex-1 rounded-lg bg-red-50 p-4 text-center">
+											<div class="mb-2 text-2xl font-bold text-red-600">{funnelData.rejected}</div>
+											<div class="text-sm font-medium text-red-900">Rejections</div>
+											<div class="text-xs text-red-500">{funnelData.rejectedPercentage}%</div>
+										</div>
+
+										<!-- Offers -->
+										<div class="flex-1 rounded-lg bg-purple-50 p-4 text-center">
+											<div class="mb-2 text-2xl font-bold text-purple-600">{funnelData.accepted}</div>
+											<div class="text-sm font-medium text-purple-900">Offers</div>
+											<div class="text-xs text-purple-500">{funnelData.acceptedPercentage}%</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Summary Stats -->
+								<div class="mt-6 rounded-lg bg-gray-50 p-4">
+									<div class="grid grid-cols-2 gap-4 text-center">
+										<div>
+											<div class="text-lg font-semibold text-gray-900">{funnelData.conversionRate}%</div>
+											<div class="text-sm text-gray-600">Conversion Rate</div>
+											<div class="text-xs text-gray-500">Sent to Interview</div>
+										</div>
+										<div>
+											<div class="text-lg font-semibold text-gray-900">{funnelData.successRate}%</div>
+											<div class="text-sm text-gray-600">Success Rate</div>
+											<div class="text-xs text-gray-500">Interview to Offer</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						{:else}
+							<div class="text-center">
+								<div class="mb-4 text-4xl text-gray-400">📊</div>
+								<h3 class="mb-2 text-lg font-medium text-gray-900">No Application Letters Yet</h3>
+								<p class="text-gray-600">Application funnel will appear here once letters are created.</p>
+							</div>
+						{/if}
+					</div>
+				</div>
+
 				<!-- Client Summary Section -->
 				<div class="rounded-lg bg-white shadow-sm">
 					<div class="border-b border-gray-200 px-6 py-4">
@@ -811,83 +1017,80 @@
 								{/if}
 							</div>
 						{:else}
-							<div class="text-center">
-								<div class="mb-4 text-4xl text-gray-400">📋</div>
-								<h3 class="mb-2 text-lg font-medium text-gray-900">{$t('agency.client.summary.no_summary')}</h3>
-								<p class="mb-4 text-gray-600">
-									{$t('agency.client.summary.no_summary_desc')}
-								</p>
-								<button
-									on:click={() => generateClientSummary(sessions[0]?.id)}
-									disabled={!sessions[0]?.id || sessions[0]?.status !== 'completed'}
-									class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-								>
-									{$t('agency.client.summary.generate_button')}
-								</button>
-								{#if !sessions[0]?.id || sessions[0]?.status !== 'completed'}
-									<p class="mt-2 text-xs text-gray-500">
-										{$t('agency.client.summary.complete_first')}
+							<div class="space-y-4">
+								<!-- Questionnaire Sessions when no summary exists -->
+								<div class="border-t border-gray-200 pt-4">
+									<h4 class="mb-3 text-lg font-medium text-gray-900">Questionnaire Sessions</h4>
+									{#if sessions.length === 0}
+										<div class="text-center">
+											<div class="mb-4 text-4xl text-gray-400">📝</div>
+											<h3 class="mb-2 text-lg font-medium text-gray-900">No sessions yet</h3>
+											<p class="text-gray-600">Client hasn't started any questionnaires.</p>
+										</div>
+									{:else}
+										<div class="space-y-3">
+											{#each sessions as session}
+												<div class="flex items-center justify-between rounded-lg border border-gray-200 p-3">
+													<div>
+														<div class="flex items-center space-x-2">
+															<span
+																class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {session.status ===
+																'completed'
+																	? 'bg-green-100 text-green-800'
+																	: session.status === 'in-progress'
+																		? 'bg-yellow-100 text-yellow-800'
+																		: 'bg-gray-100 text-gray-800'}"
+															>
+																{session.status}
+															</span>
+															<span class="text-sm text-gray-500">
+																{formatDate(session.created_at)}
+															</span>
+														</div>
+														<p class="mt-1 text-sm text-gray-600">
+															Session ID: {session.id}
+														</p>
+													</div>
+													{#if session.status === 'completed'}
+														<button
+															on:click={() => generateClientSummary(session.id)}
+															class="rounded-md bg-indigo-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+														>
+															Generate Summary
+														</button>
+													{/if}
+												</div>
+											{/each}
+										</div>
+									{/if}
+								</div>
+
+								<!-- Generate Summary Button -->
+								<div class="text-center">
+									<div class="mb-4 text-4xl text-gray-400">📋</div>
+									<h3 class="mb-2 text-lg font-medium text-gray-900">{$t('agency.client.summary.no_summary')}</h3>
+									<p class="mb-4 text-gray-600">
+										{$t('agency.client.summary.no_summary_desc')}
 									</p>
-								{/if}
+									<button
+										on:click={() => generateClientSummary(sessions[0]?.id)}
+										disabled={!sessions[0]?.id || sessions[0]?.status !== 'completed'}
+										class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+									>
+										{$t('agency.client.summary.generate_button')}
+									</button>
+									{#if !sessions[0]?.id || sessions[0]?.status !== 'completed'}
+										<p class="mt-2 text-xs text-gray-500">
+											{$t('agency.client.summary.complete_first')}
+										</p>
+									{/if}
+								</div>
 							</div>
 						{/if}
 					</div>
 				</div>
 
-				<!-- Sessions Section -->
-				<div class="rounded-lg bg-white shadow-sm">
-					<div class="border-b border-gray-200 px-6 py-4">
-						<h2 class="text-xl font-semibold text-gray-900">Questionnaire Sessions</h2>
-						<p class="mt-1 text-gray-600">Track client progress through questionnaires</p>
-					</div>
 
-					{#if sessions.length === 0}
-						<div class="p-8 text-center">
-							<div class="mb-4 text-4xl text-gray-400">📝</div>
-							<h3 class="mb-2 text-lg font-medium text-gray-900">No sessions yet</h3>
-							<p class="text-gray-600">Client hasn't started any questionnaires.</p>
-						</div>
-					{:else}
-						<div class="divide-y divide-gray-200">
-							{#each sessions as session}
-								<div class="p-6">
-									<div class="flex items-center justify-between">
-										<div>
-											<div class="flex items-center space-x-2">
-												<span
-													class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {session.status ===
-													'completed'
-														? 'bg-green-100 text-green-800'
-														: session.status === 'in-progress'
-															? 'bg-yellow-100 text-yellow-800'
-															: 'bg-gray-100 text-gray-800'}"
-												>
-													{session.status}
-												</span>
-												<span class="text-sm text-gray-500">
-													{formatDate(session.created_at)}
-												</span>
-											</div>
-											<p class="mt-1 text-sm text-gray-600">
-												Session ID: {session.id}
-											</p>
-										</div>
-										<div class="flex space-x-2">
-											{#if session.status === 'completed'}
-												<button
-													on:click={() => generateClientSummary(session.id)}
-													class="rounded-md bg-indigo-50 px-3 py-1 text-sm text-indigo-600 transition-colors hover:bg-indigo-100 hover:text-indigo-900"
-												>
-													Generate Summary
-												</button>
-											{/if}
-										</div>
-									</div>
-								</div>
-							{/each}
-						</div>
-					{/if}
-				</div>
 
 				<!-- Activities Section -->
 				<div class="rounded-lg bg-white shadow-sm">

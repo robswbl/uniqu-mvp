@@ -814,7 +814,7 @@
 			"session_error": "Connexion réussie mais échec de création de session. Veuillez réessayer.",
 			"success_redirecting": "Connexion réussie ! Redirection vers le tableau de bord...",
 			"unexpected_error": "Une erreur inattendue s'est produite. Veuillez réessayer.",
-			"no_account": "Vous n'avez pas de compte ?",
+			"no_account": "Vous n'avez pas de compte d'agence ?",
 			"sign_up_here": "Inscrivez-vous ici"
 		},
 		"signup": {
@@ -848,7 +848,7 @@
 			"success_redirecting": "Compte créé avec succès ! Vous pouvez maintenant vous connecter.",
 			"unexpected_error": "Une erreur inattendue s'est produite. Veuillez réessayer.",
 			"failed_load_agencies": "Échec du chargement des agences. Veuillez réessayer.",
-			"already_have_account": "Vous avez déjà un compte ?",
+			"already_have_account": "Vous avez déjà un compte d'agence ?",
 			"sign_in_here": "Connectez-vous ici"
 		},
 		"admin": {

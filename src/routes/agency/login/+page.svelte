@@ -186,14 +186,14 @@
 	</form>
 
 	<div class="mt-6 text-center">
-		<p class="text-sm text-gray-600">
+		<p class="text-sm text-gray-600 mb-2">
 			{$t('agency.login.no_account')}
-			<button
-				on:click={goToSignup}
-				class="text-indigo-600 hover:text-indigo-500 font-medium"
-			>
-				{$t('agency.login.sign_up_here')}
-			</button>
 		</p>
+		<button
+			on:click={goToSignup}
+			class="text-indigo-600 hover:text-indigo-500 font-medium text-sm"
+		>
+			{$t('agency.login.sign_up_here')}
+		</button>
 	</div>
 </div>

@@ -901,7 +901,7 @@
 			"session_error": "Login successful but session creation failed. Please try again.",
 			"success_redirecting": "Login successful! Redirecting to dashboard...",
 			"unexpected_error": "An unexpected error occurred. Please try again.",
-			"no_account": "Don't have an account?",
+			"no_account": "Don't have an agency account?",
 			"sign_up_here": "Sign up here"
 		},
 		"signup": {
@@ -935,7 +935,7 @@
 			"success_redirecting": "Account created successfully! You can now sign in.",
 			"unexpected_error": "An unexpected error occurred. Please try again.",
 			"failed_load_agencies": "Failed to load agencies. Please try again.",
-			"already_have_account": "Already have an account?",
+			"already_have_account": "Already have an agency account?",
 			"sign_in_here": "Sign in here"
 		},
 		"admin": {

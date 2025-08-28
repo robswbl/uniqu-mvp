@@ -823,7 +823,7 @@
 			"session_error": "Accesso riuscito ma creazione sessione fallita. Riprova.",
 			"success_redirecting": "Accesso riuscito! Reindirizzamento alla dashboard...",
 			"unexpected_error": "Si è verificato un errore imprevisto. Riprova.",
-			"no_account": "Non hai un account?",
+			"no_account": "Non hai un account di agenzia?",
 			"sign_up_here": "Registrati qui"
 		},
 		"signup": {
@@ -857,7 +857,7 @@
 			"success_redirecting": "Account creato con successo! Ora puoi accedere.",
 			"unexpected_error": "Si è verificato un errore imprevisto. Riprova.",
 			"failed_load_agencies": "Caricamento agenzie fallito. Riprova.",
-			"already_have_account": "Hai già un account?",
+			"already_have_account": "Hai già un account di agenzia?",
 			"sign_in_here": "Accedi qui"
 		},
 		"admin": {

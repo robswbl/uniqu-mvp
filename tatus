@@ -1,0 +1,5 @@
+[33m7a0ab86[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Root: add agency login link under login form
+[33me7d69b3[m Create User: move search fields after phone and before password per layout request
+[33m75530de[m Create User: switch to 2-column grid layout similar to /signup; grouped fields into md:grid-cols-2 sections
+[33m6716706[m Create User: use agencies.name instead of agency_name for dropdown
+[33m65b0f54[m Create User: add agency dropdown, optional address/phone fields, and required password + confirmation with validation; include fields in submission payload

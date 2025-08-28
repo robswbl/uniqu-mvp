@@ -277,14 +277,14 @@
 	</form>
 
 	<div class="mt-6 text-center">
-		<p class="text-sm text-gray-600">
+		<p class="text-sm text-gray-600 mb-2">
 			{$t('agency.signup.already_have_account')}
-			<button
-				on:click={goToLogin}
-				class="text-indigo-600 hover:text-indigo-500 font-medium"
-			>
-				{$t('agency.signup.sign_in_here')}
-			</button>
 		</p>
+		<button
+			on:click={goToLogin}
+			class="text-indigo-600 hover:text-indigo-500 font-medium text-sm"
+		>
+			{$t('agency.signup.sign_in_here')}
+		</button>
 	</div>
 </div>

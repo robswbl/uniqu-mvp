@@ -838,7 +838,7 @@
 			"session_error": "Anmeldung erfolgreich, aber Sitzungserstellung fehlgeschlagen. Bitte versuchen Sie es erneut.",
 			"success_redirecting": "Anmeldung erfolgreich! Weiterleitung zum Dashboard...",
 			"unexpected_error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-			"no_account": "Haben Sie noch kein Konto?",
+			"no_account": "Haben Sie noch kein Agenturkonto?",
 			"sign_up_here": "Hier registrieren"
 		},
 		"signup": {
@@ -872,7 +872,7 @@
 			"success_redirecting": "Konto erfolgreich erstellt! Sie können sich jetzt anmelden.",
 			"unexpected_error": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
 			"failed_load_agencies": "Laden der Agenturen fehlgeschlagen. Bitte versuchen Sie es erneut.",
-			"already_have_account": "Haben Sie bereits ein Konto?",
+			"already_have_account": "Haben Sie bereits ein Agenturkonto?",
 			"sign_in_here": "Hier anmelden"
 		},
 		"admin": {

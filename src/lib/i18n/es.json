@@ -818,7 +818,7 @@
 			"session_error": "Inicio de sesión exitoso pero falló la creación de sesión. Por favor intenta de nuevo.",
 			"success_redirecting": "¡Inicio de sesión exitoso! Redirigiendo al panel...",
 			"unexpected_error": "Ocurrió un error inesperado. Por favor intenta de nuevo.",
-			"no_account": "¿No tienes una cuenta?",
+			"no_account": "¿No tienes una cuenta de agencia?",
 			"sign_up_here": "Regístrate aquí"
 		},
 		"signup": {
@@ -852,7 +852,7 @@
 			"success_redirecting": "¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.",
 			"unexpected_error": "Ocurrió un error inesperado. Por favor intenta de nuevo.",
 			"failed_load_agencies": "Falló la carga de agencias. Por favor intenta de nuevo.",
-			"already_have_account": "¿Ya tienes una cuenta?",
+			"already_have_account": "¿Ya tienes una cuenta de agencia?",
 			"sign_in_here": "Inicia sesión aquí"
 		},
 		"admin": {

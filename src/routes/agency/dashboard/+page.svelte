@@ -255,6 +255,7 @@
 				};
 			}
 		}
+	}
 
 			// Load all client summaries across all clients
 			const { data: summariesData, error: summariesError } = await supabase
@@ -268,7 +269,6 @@
 				agencyPerformance.clientSummaries.generating = summariesData.filter((s: any) => s.status === 'generating').length;
 				agencyPerformance.clientSummaries.failed = summariesData.filter((s: any) => s.status === 'failed').length;
 			}
-		}
 
 			// Calculate monthly growth (last 30 days)
 			const thirtyDaysAgo = new Date();

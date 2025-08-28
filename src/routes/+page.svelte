@@ -193,6 +193,16 @@
 					{feedbackMessage}
 				</p>
 			{/if}
+
+			<!-- Agency login link -->
+			<div class="mt-6 text-center">
+				<a
+					href="/agency/login"
+					class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline"
+				>
+					To log in as an agency, click here
+				</a>
+			</div>
 		</div>
 	</div>
 {/if}

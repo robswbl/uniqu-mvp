@@ -99,11 +99,16 @@
 			};
 
 			localStorage.setItem('agencySession', JSON.stringify(sessionData));
+			
+			// Debug: Log what we're storing
+			console.log('Login: Storing session data:', sessionData);
+			console.log('Login: Session data in localStorage:', localStorage.getItem('agencySession'));
 
 			successMessage = $t('agency.login.success_redirecting');
 			
 			// 7. Redirect to dashboard
 			setTimeout(() => {
+				console.log('Login: Redirecting to dashboard...');
 				goto('/agency/dashboard');
 			}, 1000);
 

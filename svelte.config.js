@@ -13,9 +13,9 @@ const config = {
 		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
 		adapter: adapter(),
 
-		// Disable CSRF protection to fix 403 errors in Docker
+		// CSRF protection configuration
 		csrf: {
-			checkOrigin: false
+			trustedOrigins: ['localhost', '127.0.0.1']
 		}
 	}
 };

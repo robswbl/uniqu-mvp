@@ -7,7 +7,7 @@
 	import { goto } from '$app/navigation';
 
 	export let data;
-	const { agencyId, userId } = data;
+	const { agencyId, userId } = $page.params;
 
 	let client: any = null;
 	let sessions: any[] = [];
@@ -514,7 +514,7 @@
 	<div class="mx-auto max-w-7xl px-4 py-8">
 		<!-- Back Button -->
 		<button
-			on:click={() => goto(`/agency/${agencyId}`)}
+			on:click={() => goto('/agency/dashboard')}
 			class="mb-6 inline-flex items-center text-gray-600 transition-colors duration-200 hover:text-gray-800"
 			type="button"
 		>

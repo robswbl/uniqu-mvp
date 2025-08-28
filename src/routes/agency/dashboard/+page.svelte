@@ -135,6 +135,9 @@
 				stats.pendingActions = sessionsData.filter(s => s.status === 'in-progress').length;
 			}
 
+			// Load agency performance data
+			await loadAgencyPerformanceData();
+
 			// Load recent activities
 			const { data: activitiesData, error: activitiesError } = await supabase
 				.from('agency_activities')
@@ -197,24 +200,32 @@
 				.select('id, user_id')
 				.in('user_id', clientIds);
 
+			let documentsData: any[] = [];
+			let lettersData: any[] = [];
+
 			if (!sessionsError && sessionsData) {
 				const sessionIds = sessionsData.map(s => s.id);
 				
 				// Load all documents across all client sessions
-				const { data: documentsData, error: documentsError } = await supabase
+				const { data: docsData, error: documentsError } = await supabase
 					.from('generated_documents')
 					.select('*')
 					.in('session_id', sessionIds);
 
-				if (!documentsError && documentsData) {
+				if (!documentsError && docsData) {
+					documentsData = docsData;
 					agencyPerformance.totalDocuments = documentsData.length;
 				}
 
 				// Load all application letters across all client sessions
-				const { data: lettersData, error: lettersError } = await supabase
+				const { data: letters, error: lettersError } = await supabase
 					.from('application_letters')
 					.select('*')
 					.in('session_id', sessionIds);
+
+				if (!lettersError && letters) {
+					lettersData = letters;
+				}
 
 			if (!lettersError && lettersData) {
 				agencyPerformance.totalApplicationLetters = lettersData.length;
@@ -243,6 +254,7 @@
 					successRate: interview > 0 ? Math.round((accepted / interview) * 100) : 0
 				};
 			}
+		}
 
 			// Load all client summaries across all clients
 			const { data: summariesData, error: summariesError } = await supabase
@@ -256,6 +268,7 @@
 				agencyPerformance.clientSummaries.generating = summariesData.filter((s: any) => s.status === 'generating').length;
 				agencyPerformance.clientSummaries.failed = summariesData.filter((s: any) => s.status === 'failed').length;
 			}
+		}
 
 			// Calculate monthly growth (last 30 days)
 			const thirtyDaysAgo = new Date();
@@ -266,14 +279,14 @@
 			agencyPerformance.monthlyGrowth.newClients = newClients;
 
 			// Load sessions data for monthly growth calculation
-			const { data: sessionsData, error: sessionsError } = await supabase
+			const { data: monthlySessionsData, error: monthlySessionsError } = await supabase
 				.from('questionnaire_sessions')
 				.select('id, status, user_id, created_at')
 				.in('user_id', clientIds);
 
 			// Completed sessions in last 30 days
-			if (!sessionsError && sessionsData) {
-				const recentSessions = sessionsData.filter((s: any) => 
+			if (!monthlySessionsError && monthlySessionsData) {
+				const recentSessions = monthlySessionsData.filter((s: any) => 
 					s.status === 'completed' && new Date(s.created_at) >= thirtyDaysAgo
 				);
 				agencyPerformance.monthlyGrowth.completedSessions = recentSessions.length;
@@ -292,61 +305,7 @@
 		}
 	}
 
-	async function loadDashboardData() {
-		if (!session) return;
 
-		try {
-			console.log('Dashboard: Loading dashboard data...');
-			// Load clients
-			const { data: clientsData, error: clientsError } = await supabase
-				.from('user_agencies')
-				.select(`
-					*,
-					users!user_id (
-						user_uuid,
-						user_firstname,
-						user_lastname,
-						user_email,
-						user_phone
-					)
-				`)
-				.eq('agency_id', session.user.agencyId)
-				.eq('is_active', true);
-
-			if (clientsError) throw clientsError;
-			clients = clientsData || [];
-
-			// Load questionnaire sessions for stats
-			const { data: sessionsData, error: sessionsError } = await supabase
-				.from('questionnaire_sessions')
-				.select('id, status, user_id')
-				.in('user_id', clients.map(c => c.user_id));
-
-			if (!sessionsError && sessionsData) {
-				stats.totalClients = clients.length;
-				stats.activeClients = sessionsData.filter(s => s.status === 'in-progress').length;
-				stats.completedQuestionnaires = sessionsData.filter(s => s.status === 'completed').length;
-				stats.pendingActions = sessionsData.filter(s => s.status === 'in-progress').length;
-			}
-
-			// Load agency performance data
-			await loadAgencyPerformanceData();
-
-			// Load recent activities
-			const { data: activitiesData, error: activitiesError } = await supabase
-				.from('agency_activities')
-				.select('*')
-				.eq('agency_id', session.user.agencyId)
-				.order('created_at', { ascending: false })
-				.limit(5);
-
-			if (!activitiesError && activitiesData) {
-				recentActivities = activitiesData;
-			}
-		} catch (error) {
-			console.error('Dashboard: Error loading data:', error);
-		}
-	}
 
 	function goToClient(clientId: string) {
 		goto(`/agency/${session?.user.agencyId}/client/${clientId}`);

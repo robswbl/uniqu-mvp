@@ -29,6 +29,16 @@
 	let currentLetterContent = '';
 	let currentLetterTitle = '';
 
+	// Stuck letter retry tracking
+	let retryingLetters = new Set();
+	let retryProgress = {};
+	let retryCountdowns = {};
+
+	// Toast notifications
+	let toastMessage = '';
+	let toastType = 'info'; // 'info', 'success', 'error'
+	let showToast = false;
+
 	// Status options for dropdown (reactive)
 	$: statusOptions = [
 		{ value: 'draft', label: $t('letters.status.draft'), color: 'bg-gray-100 text-gray-700' },
@@ -1173,6 +1183,314 @@
 		updateNotes(letterId, notes);
 	}
 
+	// Function to show toast notifications
+	function showToastNotification(message, type = 'info', duration = 4000) {
+		toastMessage = message;
+		toastType = type;
+		showToast = true;
+		
+		setTimeout(() => {
+			showToast = false;
+		}, duration);
+	}
+
+	// Function to start countdown timer for retry operations
+	function startRetryCountdown(letterId) {
+		// Start with 70 seconds but display as 60
+		let actualTime = 70;
+		let displayTime = 60;
+		
+		retryCountdowns[letterId] = { actual: actualTime, display: displayTime };
+		
+		const countdownInterval = setInterval(() => {
+			if (retryCountdowns[letterId]) {
+				retryCountdowns[letterId].actual--;
+				retryCountdowns[letterId].display = Math.max(0, retryCountdowns[letterId].actual - 10);
+				
+				// Force UI update
+				retryCountdowns = { ...retryCountdowns };
+				
+				// Stop countdown when it reaches 0
+				if (retryCountdowns[letterId].actual <= 0) {
+					clearInterval(countdownInterval);
+					delete retryCountdowns[letterId];
+					retryCountdowns = { ...retryCountdowns };
+				}
+			} else {
+				clearInterval(countdownInterval);
+			}
+		}, 1000);
+		
+		return countdownInterval;
+	}
+
+	// Function to extract clean text from HTML content
+	function extractCleanText(htmlContent) {
+		if (!htmlContent) return '';
+		
+		// Create a temporary DOM element to parse HTML
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = htmlContent;
+		
+		// Remove script and style elements completely
+		const scripts = tempDiv.querySelectorAll('script, style');
+		scripts.forEach(script => script.remove());
+		
+		// Get text content
+		let cleanText = tempDiv.textContent || tempDiv.innerText || '';
+		
+		// Clean up the text formatting
+		cleanText = cleanText
+			// Remove excessive whitespace
+			.replace(/\s+/g, ' ')
+			// Remove leading/trailing whitespace
+			.trim()
+			// Add proper line breaks after sentences
+			.replace(/([.!?])\s+/g, '$1\n\n')
+			// Add line breaks after colons (like "Dear Hiring Team:")
+			.replace(/([:])\s+/g, '$1\n\n')
+			// Clean up multiple consecutive line breaks
+			.replace(/\n{3,}/g, '\n\n')
+			// Remove any remaining HTML entities
+			.replace(/&nbsp;/g, ' ')
+			.replace(/&amp;/g, '&')
+			.replace(/&lt;/g, '<')
+			.replace(/&gt;/g, '>')
+			.replace(/&quot;/g, '"')
+			.replace(/&#39;/g, "'");
+		
+		return cleanText;
+	}
+
+	// Function to fix letters missing required settings
+	async function fixLetterSettings(letter) {
+		if (!confirm(`Fix missing settings for "${letter.company_name}"? This will set default tone and language.`)) {
+			return;
+		}
+
+		try {
+			const { error: updateError } = await supabase
+				.from('application_letters')
+				.update({
+					tone: 'professional',
+					language: 'en',
+					updated_at: new Date().toISOString()
+				})
+				.eq('id', letter.id);
+
+			if (updateError) throw updateError;
+
+			// Update local state
+			applicationLetters = applicationLetters.map((l) =>
+				l.id === letter.id ? { ...l, tone: 'professional', language: 'en' } : l
+			);
+
+			showToastNotification(`✅ Fixed settings for "${letter.company_name}"`, 'success');
+		} catch (err) {
+			console.error('Error fixing letter settings:', err);
+			showToastNotification(`❌ Error fixing settings: ${err.message}`, 'error');
+		}
+	}
+
+	// Function to handle stuck letters - retry generation
+	async function retryStuckLetter(letter) {
+		if (!confirm(`Retry generation for "${letter.company_name}"? This will attempt to regenerate the letter.`)) {
+			return;
+		}
+
+		const letterId = letter.id;
+		
+		try {
+			// Set retry state
+			retryingLetters.add(letterId);
+			retryProgress[letterId] = { step: 'Resetting letter...', progress: 25 };
+			applicationLetters = [...applicationLetters]; // Force UI update
+			
+			// Start countdown timer
+			startRetryCountdown(letterId);
+			
+			// Show immediate feedback
+			showToastNotification(`Starting retry for "${letter.company_name}"...`, 'info');
+
+			// Verify letter has required settings before proceeding
+			retryProgress[letterId] = { step: 'Verifying letter settings...', progress: 35 };
+			const { data: letterData, error: letterError } = await supabase
+				.from('application_letters')
+				.select('tone, language')
+				.eq('id', letterId)
+				.single();
+
+			if (letterError) throw new Error('Failed to retrieve letter settings');
+			if (!letterData.tone || !letterData.language) {
+				throw new Error('Letter is missing required tone or language settings');
+			}
+
+			// Reset the letter to a fresh state
+			retryProgress[letterId] = { step: 'Resetting letter...', progress: 50 };
+			const { error: resetError } = await supabase
+				.from('application_letters')
+				.update({
+					status: 'draft',
+					updated_at: new Date().toISOString()
+				})
+				.eq('id', letterId);
+
+			if (resetError) throw resetError;
+
+			// Clear any local tracking
+			delete localLetterCreatedAt[letterId];
+			delete pollingErrors[letterId];
+			
+			// Update local state
+			applicationLetters = applicationLetters.map((l) =>
+				l.id === letterId ? { ...l, status: 'draft' } : l
+			);
+
+			// Trigger regeneration based on letter type
+			if (letter.job_url) {
+				// Job-based letter - retry job analysis
+				retryProgress[letterId] = { step: 'Retrying job analysis...', progress: 75 };
+				showToastNotification(`Retrying job analysis for "${letter.company_name}"...`, 'info');
+				await retryJobAnalysis(letterId, letter.job_url);
+			} else if (letter.pain_points && letter.address) {
+				// Spontaneous letter - retry generation
+				retryProgress[letterId] = { step: 'Retrying generation...', progress: 75 };
+				showToastNotification(`Retrying generation for "${letter.company_name}"...`, 'info');
+				await retrySpontaneousGeneration(letterId, letter.pain_points, letter.address);
+			}
+
+			// Success state
+			retryProgress[letterId] = { step: 'Retry initiated!', progress: 100 };
+			applicationLetters = [...applicationLetters]; // Force UI update
+			
+			// Show success message
+			showToastNotification(`✅ Retry initiated for "${letter.company_name}"!`, 'success');
+			
+			// Show success message and clear retry state after delay
+			setTimeout(() => {
+				retryingLetters.delete(letterId);
+				delete retryProgress[letterId];
+				delete retryCountdowns[letterId];
+				applicationLetters = [...applicationLetters]; // Force UI update
+			}, 3000);
+
+		} catch (err) {
+			console.error('Error retrying stuck letter:', err);
+			
+			// Error state
+			retryProgress[letterId] = { step: 'Error occurred', progress: 0, error: true };
+			applicationLetters = [...applicationLetters]; // Force UI update
+			
+			// Show error message
+			showToastNotification(`❌ Error retrying "${letter.company_name}": ${err.message || 'Unknown error'}`, 'error');
+			
+			// Clear error state after delay
+			setTimeout(() => {
+				retryingLetters.delete(letterId);
+				delete retryProgress[letterId];
+				delete retryCountdowns[letterId];
+				applicationLetters = [...applicationLetters]; // Force UI update
+			}, 5000);
+		}
+	}
+
+	// Function to retry job analysis for stuck letters
+	async function retryJobAnalysis(letterId, jobUrl) {
+		try {
+			// Get session data
+			const { data: sessionData, error: sessionError } = await supabase
+				.from('questionnaire_sessions')
+				.select('user_id, generation_id')
+				.eq('id', sessionId)
+				.single();
+
+			if (sessionError) throw sessionError;
+
+			// Get the original letter to preserve its settings
+			const { data: letterData, error: letterError } = await supabase
+				.from('application_letters')
+				.select('tone, language')
+				.eq('id', letterId)
+				.single();
+
+			if (letterError) throw letterError;
+
+			// Call job analysis webhook with preserved settings
+			const webhookData = {
+				user_id: sessionData.user_id,
+				session_id: sessionId,
+				application_letter_id: letterId,
+				generation_id: sessionData.generation_id,
+				job_url: jobUrl,
+				language: letterData.language || 'en', // Use original language or default
+				tone: letterData.tone || 'professional' // Use original tone or default
+			};
+
+			const response = await fetch('/api/proxy-job-analysis', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(webhookData)
+			});
+
+			if (!response.ok) {
+				throw new Error(`Job analysis failed: ${response.status} ${response.statusText}`);
+			}
+
+			console.log('Job analysis retry initiated for letter:', letterId);
+		} catch (err) {
+			console.error('Error retrying job analysis:', err);
+			throw err;
+		}
+	}
+
+	// Function to retry spontaneous generation for stuck letters
+	async function retrySpontaneousGeneration(letterId, painPoints, address) {
+		try {
+			// Get session data
+			const { data: sessionData, error: sessionError } = await supabase
+				.from('questionnaire_sessions')
+				.select('user_id, generation_id')
+				.eq('id', sessionId)
+				.single();
+
+			if (sessionError) throw sessionError;
+
+			// Get the original letter to preserve its settings
+			const { data: letterData, error: letterError } = await supabase
+				.from('application_letters')
+				.select('tone, language')
+				.eq('id', letterId)
+				.single();
+
+			if (letterError) throw letterError;
+
+			// Call application letter webhook with preserved settings
+			const webhookData = {
+				user_id: sessionData.user_id,
+				session_id: sessionId,
+				application_letter_id: letterId,
+				generation_id: sessionData.generation_id,
+				language: letterData.language || 'en', // Use original language or default
+				tone: letterData.tone || 'professional' // Use original tone or default
+			};
+
+			const response = await fetch('/api/proxy-applicationletter', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(webhookData)
+			});
+
+			if (!response.ok) {
+				throw new Error(`Generation failed: ${response.status} ${response.statusText}`);
+			}
+
+			console.log('Spontaneous generation retry initiated for letter:', letterId);
+		} catch (err) {
+			console.error('Error retrying spontaneous generation:', err);
+			throw err;
+		}
+	}
+
 	// Function to manually update letters stuck with placeholder
 	async function updatePlaceholderLetter(letter) {
 		if (
@@ -1253,6 +1571,34 @@
 		const numericId = typeof letter.id === 'string' ? parseInt(letter.id, 10) : letter.id;
 		let created = localLetterCreatedAt[numericId] || new Date(letter.created_at).getTime();
 		return letter.status === 'draft' && Date.now() - created < GENERATION_TIME;
+	}
+
+	// Helper: Check if a letter is stuck (generating for too long)
+	function isLetterStuck(letter) {
+		const numericId = typeof letter.id === 'string' ? parseInt(letter.id, 10) : letter.id;
+		let created = localLetterCreatedAt[numericId] || new Date(letter.created_at).getTime();
+		const elapsed = Date.now() - created;
+		
+		// Consider a letter stuck if it's been generating for more than 5 minutes
+		return letter.status === 'draft' && 
+			   elapsed > 300000 && // 5 minutes
+			   (!letter.content_html && !letter.letter_content_html);
+	}
+
+	// Helper: Check if a letter is missing required settings
+	function isLetterMissingSettings(letter) {
+		return !letter.tone || !letter.language;
+	}
+
+	// Helper: Get stuck letter age in human-readable format
+	function getStuckLetterAge(letter) {
+		const numericId = typeof letter.id === 'string' ? parseInt(letter.id, 10) : letter.id;
+		let created = localLetterCreatedAt[numericId] || new Date(letter.created_at).getTime();
+		const elapsed = Date.now() - created;
+		
+		if (elapsed < 60000) return 'Less than 1 minute';
+		if (elapsed < 3600000) return `${Math.floor(elapsed / 60000)} minutes`;
+		return `${Math.floor(elapsed / 3600000)} hours`;
 	}
 
 	// Helper: Check if a generated document exists for this letter
@@ -2267,6 +2613,11 @@
 		if (subscription) {
 			subscription.unsubscribe();
 		}
+		
+		// Clear any remaining countdown timers
+		Object.keys(retryCountdowns).forEach(letterId => {
+			delete retryCountdowns[letterId];
+		});
 	});
 
 	// LinkedIn URL validation
@@ -2931,6 +3282,152 @@
 													</div>
 													<div class="mt-1 text-xs text-red-400">
 														{$t('letters.try_again_or_contact_support')}
+													</div>
+												</div>
+											{:else if isLetterStuck(letter)}
+												<!-- Stuck Letter Management -->
+												<div class="flex min-w-[200px] flex-col items-end">
+													{#if retryingLetters.has(letter.id)}
+														<!-- Retry in Progress -->
+														<div class="flex min-w-[200px] flex-col items-end">
+															<div class="mb-1 flex items-center space-x-2">
+																<svg
+																	class="h-5 w-5 animate-spin text-blue-500"
+																	fill="none"
+																	stroke="currentColor"
+																	viewBox="0 0 24 24"
+																>
+																	<path
+																		stroke-linecap="round"
+																		stroke-linejoin="round"
+																		stroke-width="2"
+																		d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+																	/>
+																</svg>
+																<span class="font-medium text-blue-600">Retrying...</span>
+															</div>
+															<div class="mb-2 text-xs text-blue-600">
+																{retryProgress[letter.id]?.step || 'Processing...'}
+															</div>
+															<!-- Countdown Timer -->
+															{#if retryCountdowns[letter.id]}
+																<div class="mb-2 flex items-center space-x-2">
+																	<svg
+																		class="h-4 w-4 text-blue-500"
+																		fill="none"
+																		stroke="currentColor"
+																		viewBox="0 0 24 24"
+																	>
+																		<path
+																			stroke-linecap="round"
+																			stroke-linejoin="round"
+																			stroke-width="2"
+																			d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+																		/>
+																	</svg>
+																	<span class="text-xs font-medium text-blue-600">
+																		{retryCountdowns[letter.id].display}s remaining
+																	</span>
+																</div>
+															{/if}
+															<div class="w-40 rounded-full bg-gray-200">
+																<div
+																	class="h-2 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-300"
+																	style="width: {retryProgress[letter.id]?.progress || 0}%"
+																></div>
+															</div>
+															{#if retryProgress[letter.id]?.error}
+																<div class="mt-1 text-xs text-red-500">
+																	{retryProgress[letter.id]?.step}
+																</div>
+															{/if}
+														</div>
+													{:else}
+														<!-- Normal Stuck State -->
+														<div class="mb-1 flex items-center space-x-2">
+															<svg
+																class="h-5 w-5 text-orange-400"
+																fill="none"
+																stroke="currentColor"
+																viewBox="0 0 24 24"
+															>
+																<path
+																	stroke-linecap="round"
+																	stroke-linejoin="round"
+																	stroke-width="2"
+																	d="M12 9v2m0 4h.01m-6.938 4h16 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+																/>
+															</svg>
+															<span class="font-medium text-orange-600">Stuck</span>
+														</div>
+														<div class="mb-2 text-xs text-orange-600">
+															{getStuckLetterAge(letter)} - Taking longer than usual
+														</div>
+														<div class="flex space-x-2">
+															{#if isLetterMissingSettings(letter)}
+																<button
+																	on:click={() => fixLetterSettings(letter)}
+																	disabled={retryingLetters.has(letter.id)}
+																	class="rounded bg-yellow-600 px-3 py-1 text-xs text-white transition-colors hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed"
+																	type="button"
+																	title="Fix missing tone/language settings"
+																>
+																	Fix Settings
+																</button>
+															{:else}
+																<button
+																	on:click={() => retryStuckLetter(letter)}
+																	disabled={retryingLetters.has(letter.id)}
+																	class="rounded bg-orange-600 px-3 py-1 text-xs text-white transition-colors hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+																	type="button"
+																title="Retry generation"
+																>
+																	Retry
+																</button>
+															{/if}
+															<button
+																on:click={() => deleteLetter(letter.id, letter.company_name)}
+																disabled={retryingLetters.has(letter.id)}
+																class="rounded bg-red-600 px-3 py-1 text-xs text-white transition-colors hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+																type="button"
+																title="Delete stuck letter"
+															>
+																Delete
+															</button>
+														</div>
+													{/if}
+												</div>
+											{:else if isLetterMissingSettings(letter)}
+												<!-- Letter Missing Required Settings -->
+												<div class="flex min-w-[200px] flex-col items-end">
+													<div class="mb-1 flex items-center space-x-2">
+														<svg
+															class="h-5 w-5 text-yellow-500"
+															fill="none"
+															stroke="currentColor"
+															viewBox="0 0 24 24"
+														>
+															<path
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="2"
+																d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+															/>
+														</svg>
+														<span class="font-medium text-yellow-600">Missing Settings</span>
+													</div>
+													<div class="mb-2 text-xs text-yellow-600">
+														No tone or language set
+													</div>
+													<div class="flex space-x-2">
+														<button
+															on:click={() => fixLetterSettings(letter)}
+															class="rounded bg-yellow-600 px-3 py-1 text-xs text-white transition-colors hover:bg-yellow-700"
+															type="button"
+															title="Fix missing tone/language settings"
+														>
+															Fix Settings
+														</button>
 													</div>
 												</div>
 											{:else if isActivelyGenerating(letter)}
@@ -3856,12 +4353,17 @@
 
 						<!-- Copy Button -->
 						<button
-							on:click={() => {
-								// Copy plain text from HTML
-								const tempDiv = document.createElement('div');
-								tempDiv.innerHTML = currentLetterContent;
-								const text = tempDiv.innerText || tempDiv.textContent || '';
-								navigator.clipboard.writeText(text);
+							on:click={async () => {
+								try {
+									// Extract clean text from HTML content
+									const cleanText = extractCleanText(currentLetterContent);
+									
+									await navigator.clipboard.writeText(cleanText);
+									showToastNotification('Letter content copied to clipboard!', 'success');
+								} catch (err) {
+									console.error('Failed to copy:', err);
+									showToastNotification('Failed to copy to clipboard', 'error');
+								}
 							}}
 							class="rounded bg-gray-100 px-3 py-2 text-sm text-gray-800 transition-colors hover:bg-gray-200"
 							type="button"
@@ -4106,6 +4608,34 @@
 							</div>
 						</div>
 					{/if}
+				</div>
+			</div>
+		</div>
+	{/if}
+
+	<!-- Toast Notification -->
+	{#if showToast}
+		<div class="fixed top-4 right-4 z-50 max-w-sm">
+			<div class="rounded-lg border-l-4 p-4 shadow-lg transition-all duration-300 ease-in-out {
+				toastType === 'success' ? 'border-green-500 bg-green-50 text-green-800' :
+				toastType === 'error' ? 'border-red-500 bg-red-50 text-red-800' :
+				'border-blue-500 bg-blue-50 text-blue-800'
+			}">
+				<div class="flex items-center">
+					{#if toastType === 'success'}
+						<svg class="h-5 w-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+						</svg>
+					{:else if toastType === 'error'}
+						<svg class="h-5 w-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+						</svg>
+					{:else}
+						<svg class="h-5 w-5 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+							<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+						</svg>
+					{/if}
+					<div class="text-sm font-medium">{toastMessage}</div>
 				</div>
 			</div>
 		</div>

@@ -160,140 +160,146 @@
 </script>
 
 {#if localeReady}
-	<div class="flex min-h-screen flex-col">
-		<header class="flex items-center justify-between bg-white p-4 shadow">
-			{#if $page.params?.sessionId}
-				<a
-					href="/dashboard/{$page.params.sessionId}"
-					class="text-2xl font-bold text-indigo-700 hover:underline">{$t('app.title')}</a
-				>
-			{:else}
-				<a href="/" class="text-2xl font-bold text-indigo-700 hover:underline">{$t('app.title')}</a>
-			{/if}
-			<div class="flex items-center space-x-4">
+	<!-- Only show main layout for non-agency routes -->
+	{#if !$page.url.pathname.startsWith('/agency')}
+		<div class="flex min-h-screen flex-col">
+			<header class="flex items-center justify-between bg-white p-4 shadow">
 				{#if $page.params?.sessionId}
 					<a
 						href="/dashboard/{$page.params.sessionId}"
-						class="flex items-center space-x-1 font-medium text-gray-700 transition-colors hover:text-indigo-600"
+						class="text-2xl font-bold text-indigo-700 hover:underline">{$t('app.title')}</a
 					>
-						<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
-							/>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"
-							/>
-						</svg>
-						<span>{$t('layout.dashboard')}</span>
-					</a>
+				{:else}
+					<a href="/" class="text-2xl font-bold text-indigo-700 hover:underline">{$t('app.title')}</a>
 				{/if}
-				<div class="relative inline-flex items-center">
-					<select
-						class="appearance-none rounded-lg border bg-none p-2 pr-8 text-base font-normal text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-						bind:value={$locale}
-						on:change={(e) => changeLang((e.target as HTMLSelectElement).value)}
-						aria-label="Select language"
-					>
-						{#each availableLangs as lang}
-							<option value={lang.code}>{lang.label}</option>
-						{/each}
-					</select>
-					<svg
-						class="pointer-events-none absolute right-2 h-4 w-4 text-gray-400"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M19 9l-7 7-7-7"
-						/>
-					</svg>
-				</div>
-
-				<!-- Profile Avatar -->
-				{#if userData}
-					<div class="relative">
-						<button
-							bind:this={profileButtonRef}
-							on:click={() => (showProfileMenu = !showProfileMenu)}
-							class="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-gray-100"
-							type="button"
+				<div class="flex items-center space-x-4">
+					{#if $page.params?.sessionId}
+						<a
+							href="/dashboard/{$page.params.sessionId}"
+							class="flex items-center space-x-1 font-medium text-gray-700 transition-colors hover:text-indigo-600"
 						>
-							<div
-								class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-sm font-semibold text-white"
-							>
-								{userData.user_firstname ? userData.user_firstname.charAt(0).toUpperCase() : 'U'}
-							</div>
-							<span class="hidden text-sm font-medium text-gray-700 sm:block">
-								{userData.user_firstname || 'User'}
-							</span>
-							<svg
-								class="h-4 w-4 text-gray-400"
-								fill="none"
-								stroke="currentColor"
-								viewBox="0 0 24 24"
-							>
+							<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
 									stroke-linecap="round"
 									stroke-linejoin="round"
 									stroke-width="2"
-									d="M19 9l-7 7-7-7"
+									d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"
+								/>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8 5a2 2 0 012-2h4a2 2 0 012 2v6H8V5z"
 								/>
 							</svg>
-						</button>
-
-						<!-- Profile Dropdown Menu -->
-						{#if showProfileMenu}
-							<div
-								bind:this={profileMenuRef}
-								class="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-gray-200 bg-white py-2 shadow-lg"
-							>
-								<a
-									href={$page.params?.sessionId ? `/profile/${$page.params.sessionId}` : '/profile'}
-									class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
-								>
-									{$t('layout.profile_settings')}
-								</a>
-								<div class="my-1 border-t border-gray-200"></div>
-								<button
-									on:click={() => {
-										showProfileMenu = false;
-										// Clear user data from localStorage
-										if (typeof window !== 'undefined') {
-											localStorage.removeItem('userId');
-											localStorage.removeItem('userLang');
-										}
-										// Clear user data
-										userData = null;
-										userId = '';
-										goto('/');
-									}}
-									class="block w-full px-4 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-gray-100"
-									type="button"
-								>
-									{$t('layout.sign_out')}
-								</button>
-							</div>
-						{/if}
+							<span>{$t('layout.dashboard')}</span>
+						</a>
+					{/if}
+					<div class="relative inline-flex items-center">
+						<select
+							class="appearance-none rounded-lg border bg-none p-2 pr-8 text-base font-normal text-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+							bind:value={$locale}
+							on:change={(e) => changeLang((e.target as HTMLSelectElement).value)}
+							aria-label="Select language"
+						>
+							{#each availableLangs as lang}
+								<option value={lang.code}>{lang.label}</option>
+							{/each}
+						</select>
+						<svg
+							class="pointer-events-none absolute right-2 h-4 w-4 text-gray-400"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M19 9l-7 7-7-7"
+							/>
+						</svg>
 					</div>
-				{/if}
 
-				{#if errorMsg}
-					<div class="mt-1 text-xs text-red-600">{errorMsg}</div>
-				{/if}
-			</div>
-		</header>
-		<main class="flex-1">
-			<slot />
-		</main>
-	</div>
+					<!-- Profile Avatar -->
+					{#if userData}
+						<div class="relative">
+							<button
+								bind:this={profileButtonRef}
+								on:click={() => (showProfileMenu = !showProfileMenu)}
+								class="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-gray-100"
+								type="button"
+							>
+								<div
+									class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-sm font-semibold text-white"
+								>
+									{userData.user_firstname ? userData.user_firstname.charAt(0).toUpperCase() : 'U'}
+								</div>
+								<span class="hidden text-sm font-medium text-gray-700 sm:block">
+									{userData.user_firstname || 'User'}
+								</span>
+								<svg
+									class="h-4 w-4 text-gray-400"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M19 9l-7 7-7-7"
+									/>
+								</svg>
+							</button>
+
+							<!-- Profile Dropdown Menu -->
+							{#if showProfileMenu}
+								<div
+									bind:this={profileMenuRef}
+									class="absolute right-0 z-50 mt-2 w-48 rounded-lg border border-gray-200 bg-white py-2 shadow-lg"
+								>
+									<a
+										href={$page.params?.sessionId ? `/profile/${$page.params.sessionId}` : '/profile'}
+										class="block px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-100"
+									>
+										{$t('layout.profile_settings')}
+									</a>
+									<div class="my-1 border-t border-gray-200"></div>
+									<button
+										on:click={() => {
+											showProfileMenu = false;
+											// Clear user data from localStorage
+											if (typeof window !== 'undefined') {
+												localStorage.removeItem('userId');
+												localStorage.removeItem('userLang');
+											}
+											// Clear user data
+											userData = null;
+											userId = '';
+											goto('/');
+										}}
+										class="block w-full px-4 py-2 text-left text-sm text-gray-700 transition-colors hover:bg-gray-100"
+										type="button"
+									>
+										{$t('layout.sign_out')}
+									</button>
+								</div>
+							{/if}
+						</div>
+					{/if}
+
+					{#if errorMsg}
+						<div class="mt-1 text-xs text-red-600">{errorMsg}</div>
+					{/if}
+				</div>
+			</header>
+			<main class="flex-1">
+				<slot />
+			</main>
+		</div>
+	{:else}
+		<!-- For agency routes, just render the slot without main layout -->
+		<slot />
+	{/if}
 {/if}

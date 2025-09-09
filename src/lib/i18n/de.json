@@ -381,11 +381,17 @@
 		"doubts_barriers": {
 			"title": "Zweifel & Hindernisse",
 			"explainer": "Sei ehrlich bezüglich deiner Sorgen:",
+			"bullet1": "Welche Sorgen oder Unsicherheiten hast du bezüglich deiner nächsten Schritte?",
+			"bullet2": "Gibt es Hindernisse oder Ängste, die dich zurückhalten?",
+			"bullet3": "Das Teilen dieser Gedanken kann uns helfen, dich besser zu unterstützen.",
 			"textarea_placeholder": "Welche Sorgen oder Hindernisse beschäftigen dich bezüglich deines Karrierewegs?"
 		},
 		"emotional_landscape": {
 			"title": "Wie fühlst du dich bezüglich deiner Reise?",
 			"explainer": "Checke mit dir selbst ein:",
+			"bullet1": "Fühlst du dich aufgeregt, ängstlich, hoffnungsvoll oder unsicher?",
+			"bullet2": "Es ist normal, gemischte Gefühle während Übergängen zu haben.",
+			"bullet3": "Das Benennen deiner Gefühle kann dir helfen, mit Klarheit voranzukommen.",
 			"textarea_placeholder": "Aufgeregt, unsicher, bereit für Veränderung? Teile deine aktuelle emotionale Verfassung mit...",
 			"continue_to_step2": "Weiter zu Schritt 2"
 		}

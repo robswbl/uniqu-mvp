@@ -111,6 +111,7 @@
 	emoji="🤔"
 	explainer={$t('step1.doubts_barriers.explainer')}
 	explainerColor="indigo"
+	explainerBullets={[$t('step1.doubts_barriers.bullet1'), $t('step1.doubts_barriers.bullet2'), $t('step1.doubts_barriers.bullet3')]}
 	textareaPlaceholder={$t('step1.doubts_barriers.textarea_placeholder')}
 	bind:textareaValue={doubtsBarriers}
 	{saveStatus}

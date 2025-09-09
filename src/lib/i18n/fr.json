@@ -369,11 +369,17 @@
 		"doubts_barriers": {
 			"title": "Doutes et obstacles",
 			"explainer": "Soyez honnête sur vos préoccupations :",
+			"bullet1": "Quelles inquiétudes ou incertitudes avez-vous concernant vos prochaines étapes ?",
+			"bullet2": "Y a-t-il des obstacles ou des peurs qui vous retiennent ?",
+			"bullet3": "Partager ces pensées peut nous aider à mieux vous soutenir.",
 			"textarea_placeholder": "Quelles préoccupations ou obstacles considérez-vous concernant votre parcours professionnel ?"
 		},
 		"emotional_landscape": {
 			"title": "Comment vous sentez-vous par rapport à votre parcours ?",
 			"explainer": "Faites le point avec vous-même :",
+			"bullet1": "Vous sentez-vous excité(e), anxieux(se), plein(e) d'espoir ou incertain(e) ?",
+			"bullet2": "Il est normal d'avoir des émotions mitigées pendant les transitions.",
+			"bullet3": "Nommer vos sentiments peut vous aider à avancer avec clarté.",
 			"textarea_placeholder": "Excité(e), incertain(e), prêt(e) pour le changement ? Partagez votre état émotionnel actuel...",
 			"continue_to_step2": "Continuer à l'étape 2"
 		}
@@ -440,13 +446,17 @@
 			"step_heading": "Étape 3 : Qu'est-ce qui vous tient à cœur ?",
 			"explainer": "Réfléchissez aux causes ou questions qui vous tiennent profondément à cœur.",
 			"textarea_placeholder": "Quelles causes ou questions vous tiennent profondément à cœur ?",
-			"show_inspiration": "Montrer l'inspiration"
+			"show_inspiration": "Montrer l'inspiration",
+			"inspiration_text": "Quels enjeux sociétaux, environnementaux ou humanitaires enflamment votre passion ? Quels problèmes voyez-vous que vous voulez aider à résoudre ?",
+			"inspiration_examples": "Exemples : Meilleur accès à l'éducation dans les pays en développement. Construire une économie circulaire. Diversité et inclusion."
 		},
 		"inspires": {
 			"step_heading": "Étape 3 : Qu'est-ce qui vous inspire ?",
 			"explainer": "Considérez les industries, domaines ou personnes qui vous inspirent.",
 			"textarea_placeholder": "Quelles industries, domaines ou personnes vous inspirent ?",
-			"show_inspiration": "Montrer l'inspiration"
+			"show_inspiration": "Montrer l'inspiration",
+			"inspiration_text": "Quelles industries, domaines ou personnes vous inspirent ? Pensez à ce que vous admirez chez les autres ou ce que vous trouvez fascinant.",
+			"inspiration_examples": "Exemples : Exploration spatiale, entrepreneurs sociaux, artistes, scientifiques, activistes."
 		},
 		"want_to_be": {
 			"step_heading": "Étape 3 : Qui voulez-vous devenir ?",
@@ -454,6 +464,8 @@
 			"textarea_placeholder": "Qui voulez-vous devenir ? Quel impact voulez-vous avoir ?",
 			"finish": "Terminer",
 			"show_inspiration": "Montrer l'inspiration",
+			"inspiration_text": "Pensez aux qualités que vous admirez chez les autres, à l'héritage que vous voulez laisser, ou au type d'impact que vous espérez avoir sur votre communauté ou le monde.",
+			"inspiration_examples": "Exemples : Je veux être connu comme quelqu'un qui élève les autres. J'espère inspirer mes enfants à suivre leurs rêves. Je veux être un leader qui fait ressortir le meilleur de mon équipe.",
 			"speak_button": "Démarrer la reconnaissance vocale",
 			"speak": "Parler"
 		},

@@ -369,11 +369,17 @@
 		"doubts_barriers": {
 			"title": "Dubbi e ostacoli",
 			"explainer": "Sii onesto riguardo alle tue preoccupazioni:",
+			"bullet1": "Quali preoccupazioni o incertezze hai riguardo ai tuoi prossimi passi?",
+			"bullet2": "Ci sono ostacoli o paure che ti stanno trattenendo?",
+			"bullet3": "Condividere questi pensieri può aiutarci a supportarti meglio.",
 			"textarea_placeholder": "Quali preoccupazioni o ostacoli stai considerando riguardo al tuo percorso di carriera?"
 		},
 		"emotional_landscape": {
 			"title": "Come ti senti riguardo al tuo viaggio?",
 			"explainer": "Fai il punto con te stesso:",
+			"bullet1": "Ti senti eccitato, ansioso, speranzoso o incerto?",
+			"bullet2": "È normale avere emozioni miste durante le transizioni.",
+			"bullet3": "Nominare i tuoi sentimenti può aiutarti ad andare avanti con chiarezza.",
 			"textarea_placeholder": "Eccitato, incerto, pronto per il cambiamento? Condividi il tuo stato emotivo attuale...",
 			"continue_to_step2": "Continua al passo 2"
 		}

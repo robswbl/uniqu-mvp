@@ -117,6 +117,7 @@
 	emoji="💭"
 	explainer={$t('step1.emotional_landscape.explainer')}
 	explainerColor="indigo"
+	explainerBullets={[$t('step1.emotional_landscape.bullet1'), $t('step1.emotional_landscape.bullet2'), $t('step1.emotional_landscape.bullet3')]}
 	textareaPlaceholder={$t('step1.emotional_landscape.textarea_placeholder')}
 	bind:textareaValue={emotionalLandscape}
 	{saveStatus}

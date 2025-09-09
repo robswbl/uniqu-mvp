@@ -12,7 +12,7 @@
 	let saveStatus = '';
 	let isSaving = false;
 	let saveTimeout: ReturnType<typeof setTimeout> | null = null;
-	let showInspiration = false;
+	// Removed showInspiration - now using QuestionCard's built-in explainer
 
 	onMount(async () => {
 		const { data } = await supabase
@@ -107,8 +107,9 @@
 	stepHeading={$t('step3.love.step_heading')}
 	title={$t('step3.love.title')}
 	emoji="❤️"
-	explainer={$t('step3.love.explainer')}
+	explainer={$t('step3.love.inspiration_text')}
 	explainerColor="red"
+	explainerBullets={[$t('step3.love.inspiration_examples')]}
 	textareaPlaceholder={$t('step3.love.textarea_placeholder')}
 	bind:textareaValue={ikigaiLove}
 	{saveStatus}
@@ -118,20 +119,4 @@
 	nextLabel={$t('buttons.next')}
 	backLabel={$t('buttons.back')}
 	disabled={isSaving}
->
-	<div class="mb-4">
-		<button
-			type="button"
-			class="text-sm text-red-700 underline"
-			on:click={() => (showInspiration = !showInspiration)}
-		>
-			{showInspiration ? $t('step3.love.hide_inspiration') : $t('step3.love.show_inspiration')}
-		</button>
-		{#if showInspiration}
-			<div class="mt-2 space-y-3 rounded-lg border border-red-200 bg-red-50 p-4">
-				<p class="text-sm text-gray-600">{$t('step3.love.inspiration_text')}</p>
-				<p class="text-xs text-gray-500 italic">{$t('step3.love.inspiration_examples')}</p>
-			</div>
-		{/if}
-	</div>
-</QuestionCard>
+/>

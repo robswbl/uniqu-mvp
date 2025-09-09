@@ -386,11 +386,17 @@
 		"doubts_barriers": {
 			"title": "Doubts & Barriers",
 			"explainer": "Be honest about your concerns:",
+			"bullet1": "What worries or uncertainties do you have about your next steps?",
+			"bullet2": "Are there any obstacles or fears holding you back?",
+			"bullet3": "Sharing these can help us support you better.",
 			"textarea_placeholder": "What concerns or obstacles are you thinking about regarding your career path?"
 		},
 		"emotional_landscape": {
 			"title": "How are you feeling about your journey?",
 			"explainer": "Check in with yourself:",
+			"bullet1": "Are you feeling excited, anxious, hopeful, or uncertain?",
+			"bullet2": "It's normal to have mixed emotions during transitions.",
+			"bullet3": "Naming your feelings can help you move forward with clarity.",
 			"textarea_placeholder": "Excited, uncertain, ready for change? Share your current emotional state...",
 			"continue_to_step2": "Continue to Step 2"
 		}

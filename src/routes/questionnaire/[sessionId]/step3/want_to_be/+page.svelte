@@ -13,7 +13,7 @@
 	let saveStatus = '';
 	let isSaving = false;
 	let saveTimeout: ReturnType<typeof setTimeout> | null = null;
-	let showInspiration = false;
+	// Removed showInspiration - now using QuestionCard's built-in explainer
 	let recognizing = false;
 	let recognition;
 
@@ -127,8 +127,9 @@
 	stepHeading={$t('step3.want_to_be.step_heading')}
 	title={$t('step3.want_to_be.title')}
 	emoji="🎯"
-	explainer={$t('step3.want_to_be.explainer')}
+	explainer={$t('step3.want_to_be.inspiration_text')}
 	explainerColor="purple"
+	explainerBullets={[$t('step3.want_to_be.inspiration_examples')]}
 	textareaPlaceholder={$t('step3.want_to_be.textarea_placeholder')}
 	bind:textareaValue={ikigaiWantToBe}
 	{saveStatus}
@@ -139,23 +140,6 @@
 	backLabel={$t('buttons.back')}
 	disabled={isSaving}
 >
-	<div class="mb-4">
-		<button
-			type="button"
-			class="text-sm text-purple-700 underline"
-			on:click={() => (showInspiration = !showInspiration)}
-		>
-			{showInspiration
-				? $t('step3.want_to_be.hide_inspiration')
-				: $t('step3.want_to_be.show_inspiration')}
-		</button>
-		{#if showInspiration}
-			<div class="mt-2 space-y-3 rounded-lg border border-purple-200 bg-purple-50 p-4">
-				<p class="text-sm text-gray-600">{$t('step3.want_to_be.inspiration_text')}</p>
-				<p class="text-xs text-gray-500 italic">{$t('step3.want_to_be.inspiration_examples')}</p>
-			</div>
-		{/if}
-	</div>
 	<div class="mt-4 flex items-center">
 		<button
 			type="button"

@@ -369,11 +369,17 @@
 		"doubts_barriers": {
 			"title": "Dudas y obstáculos",
 			"explainer": "Sé honesto sobre tus preocupaciones:",
+			"bullet1": "¿Qué preocupaciones o incertidumbres tienes sobre tus próximos pasos?",
+			"bullet2": "¿Hay algún obstáculo o miedo que te esté frenando?",
+			"bullet3": "Compartir estos pensamientos puede ayudarnos a apoyarte mejor.",
 			"textarea_placeholder": "¿Qué preocupaciones u obstáculos estás considerando respecto a tu trayectoria profesional?"
 		},
 		"emotional_landscape": {
 			"title": "¿Cómo te sientes sobre tu viaje?",
 			"explainer": "Reflexiona contigo mismo:",
+			"bullet1": "¿Te sientes emocionado, ansioso, esperanzado o incierto?",
+			"bullet2": "Es normal tener emociones mixtas durante las transiciones.",
+			"bullet3": "Nombrar tus sentimientos puede ayudarte a avanzar con claridad.",
 			"textarea_placeholder": "¿Emocionado, incierto, listo para el cambio? Comparte tu estado emocional actual...",
 			"continue_to_step2": "Continuar al paso 2"
 		}

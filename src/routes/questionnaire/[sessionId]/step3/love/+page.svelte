@@ -90,10 +90,8 @@
 					: `/questionnaire/${sessionId}/step3/${prevQuestion}`;
 				goto(prevUrl);
 			} else {
-				const onboardingUrl = fromOnboarding
-					? `/onboarding/${sessionId}?from=onboarding`
-					: `/onboarding/${sessionId}`;
-				goto(onboardingUrl);
+				// First question, go to Step 2
+				goto(`/questionnaire/${sessionId}/step2`);
 			}
 		}
 	}

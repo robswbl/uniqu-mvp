@@ -70,6 +70,10 @@
 		try {
 			console.log('Loading dashboard for session:', sessionId);
 
+			// Debug: Check localStorage userId vs session user_id
+			const localStorageUserId = typeof window !== 'undefined' ? localStorage.getItem('userId') : null;
+			console.log('DEBUG: localStorage userId:', localStorageUserId);
+
 			// Fetch session data for summary (using correct column names from schema)
 			const { data: session, error: sessionError } = await supabase
 				.from('questionnaire_sessions')
@@ -80,6 +84,8 @@
 				.single();
 
 			console.log('Session fetch result:', { session, sessionError });
+			console.log('DEBUG: session.user_id:', session?.user_id);
+			console.log('DEBUG: localStorage vs session match:', localStorageUserId === session?.user_id);
 
 			if (sessionError) {
 				console.error('Session fetch error:', sessionError);
@@ -121,10 +127,12 @@
 					.single();
 
 				console.log('User fetch result (all columns):', { user, userError });
+				console.log('DEBUG: Fetched user firstname:', user?.user_firstname);
 
 				if (!userError && user) {
 					userData = user;
 					console.log('User data set:', userData);
+					console.log('DEBUG: Dashboard userData.user_firstname:', userData.user_firstname);
 				} else {
 					console.error('User fetch error:', userError);
 				}

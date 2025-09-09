@@ -72,30 +72,11 @@
 					: `/questionnaire/${sessionId}/step3/${prevQuestion}`;
 				goto(prevUrl);
 			} else if (currentIndex === 0) {
-				// Go to last step2 question
-				const { data: step2Data } = await supabase
-					.from('question_order')
-					.select('order')
-					.eq('step_id', 'step2')
-					.single();
-				if (
-					step2Data &&
-					step2Data.order &&
-					Array.isArray(step2Data.order) &&
-					step2Data.order.length > 0
-				) {
-					const lastStep2 = step2Data.order[step2Data.order.length - 1];
-					const prevUrl = fromOnboarding
-						? `/questionnaire/${sessionId}/step2/${lastStep2}?from=onboarding`
-						: `/questionnaire/${sessionId}/step2/${lastStep2}`;
-					goto(prevUrl);
-				} else {
-					// fallback to step2 root
-					const prevUrl = fromOnboarding
-						? `/questionnaire/${sessionId}/step2?from=onboarding`
-						: `/questionnaire/${sessionId}/step2`;
-					goto(prevUrl);
-				}
+				// Go to step2 root (step2 is a single page, not multiple sub-pages)
+				const prevUrl = fromOnboarding
+					? `/questionnaire/${sessionId}/step2?from=onboarding`
+					: `/questionnaire/${sessionId}/step2`;
+				goto(prevUrl);
 			} else {
 				const onboardingUrl = fromOnboarding
 					? `/onboarding/${sessionId}?from=onboarding`

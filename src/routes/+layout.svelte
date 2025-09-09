@@ -22,6 +22,21 @@
 	let profileMenuRef: HTMLElement | null = null;
 	let profileButtonRef: HTMLElement | null = null;
 
+	// Public routes where avatar/name should be hidden
+	const publicRoutes = [
+		'/',
+		'/signup',
+		'/create-user',
+		'/agency/login',
+		'/agency/signup',
+		'/agency-portal/login',
+		'/agency-portal/signup',
+		'/admin'
+	];
+
+	// Reactive flag for current route visibility
+	$: isPublicRoute = publicRoutes.includes($page.url.pathname);
+
 	// SSR-safe: check if window is defined before accessing localStorage
 	if (typeof window !== 'undefined') {
 		userLang = localStorage.getItem('userLang') || '';
@@ -126,13 +141,17 @@
 
 	async function fetchUserData() {
 		if (userId) {
+			console.log('DEBUG: Layout fetching user data for userId:', userId);
 			const { data, error } = await supabase
 				.from('users')
 				.select('user_firstname, user_lastname, user_email')
 				.eq('user_uuid', userId)
 				.single();
+			console.log('DEBUG: Layout user fetch result:', { data, error });
 			if (!error && data) {
 				userData = data;
+				console.log('DEBUG: Layout userData set:', userData);
+				console.log('DEBUG: Layout userData.user_firstname:', userData.user_firstname);
 			}
 		}
 	}
@@ -221,8 +240,8 @@
 						</svg>
 					</div>
 
-					<!-- Profile Avatar -->
-					{#if userData}
+					<!-- Profile Avatar (hidden on public routes) -->
+					{#if userData && !isPublicRoute}
 						<div class="relative">
 							<button
 								bind:this={profileButtonRef}

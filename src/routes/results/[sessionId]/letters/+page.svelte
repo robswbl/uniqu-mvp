@@ -124,11 +124,7 @@
 	// Track local creation time for new letters
 	let localLetterCreatedAt = {};
 
-	// Track which application letter boxes are collapsed
-	let collapsedLetterBoxes = [];
 
-	// Track if all boxes should be collapsed/expanded
-	let allBoxesCollapsed = false;
 
 	// Track which letters just finished generating for success message
 	let justGenerated = {};
@@ -139,8 +135,6 @@
 	// Track which letter is being continued (for inline address field)
 	let continuingLetterId = null;
 
-	// Track expanded pain points sections
-	let expandedPainPoints = [];
 
 	// Track which status dates are being edited
 	let editingStatusDates = {};
@@ -288,8 +282,7 @@
 
 			applicationLetters = lettersData || [];
 
-			// Initialize collapsedLetterBoxes as empty array
-			collapsedLetterBoxes = [];
+			// Don't reset collapsedLetterBoxes here - preserve user's collapse state
 
 			// Extract company names from the companies document (simple parsing)
 			if (companiesDoc?.content_html) {
@@ -2376,80 +2369,10 @@
 		return keywords;
 	}
 
-	// Function to truncate text for preview
-	function truncateText(text, maxLength = 300) {
-		if (!text || text.length <= maxLength) return text;
-		return text.substring(0, maxLength) + '...';
-	}
 
-	// Function to toggle pain points expansion
-	function togglePainPointsExpansion(letterId) {
-		if (expandedPainPoints.includes(letterId)) {
-			expandedPainPoints = expandedPainPoints.filter((id) => id !== letterId);
-		} else {
-			expandedPainPoints.push(letterId);
-		}
-		// Force reactivity by creating a new array
-		expandedPainPoints = [...expandedPainPoints];
-	}
 
-	// FIXED COLLAPSE FUNCTIONS with proper Svelte reactivity
-	function isLetterCollapsed(letterId) {
-		return collapsedLetterBoxes.includes(String(letterId));
-	}
 
-	function toggleLetterBoxCollapse(letterId) {
-		const stringId = String(letterId);
 
-		if (collapsedLetterBoxes.includes(stringId)) {
-			// Remove from collapsed array (expand)
-			collapsedLetterBoxes = collapsedLetterBoxes.filter((id) => id !== stringId);
-		} else {
-			// Add to collapsed array (collapse)
-			collapsedLetterBoxes = [...collapsedLetterBoxes, stringId];
-		}
-
-		// Force Svelte reactivity
-		collapsedLetterBoxes = collapsedLetterBoxes;
-	}
-
-	function collapseAllLetterBoxes() {
-		collapsedLetterBoxes = applicationLetters.map((letter) => String(letter.id));
-		allBoxesCollapsed = true;
-
-		// Force Svelte reactivity
-		collapsedLetterBoxes = collapsedLetterBoxes;
-	}
-
-	function expandAllLetterBoxes() {
-		collapsedLetterBoxes = [];
-		allBoxesCollapsed = false;
-
-		// Force Svelte reactivity
-		collapsedLetterBoxes = collapsedLetterBoxes;
-	}
-
-	// Add reactive statement to ensure UI updates
-	$: collapsedCount = collapsedLetterBoxes.length;
-
-	// Function to get first two lines of text for collapsed preview
-	function getFirstTwoLines(text, maxLength = 150) {
-		if (!text) return '';
-
-		// Remove HTML tags for preview
-		const plainText = text.replace(/<[^>]*>/g, '');
-
-		// Split into lines and take first two
-		const lines = plainText.split('\n').filter((line) => line.trim().length > 0);
-		const firstTwoLines = lines.slice(0, 2).join(' ');
-
-		// Truncate if too long
-		if (firstTwoLines.length > maxLength) {
-			return firstTwoLines.substring(0, maxLength) + '...';
-		}
-
-		return firstTwoLines;
-	}
 
 	function openNewLetterForm(type) {
 		newLetterType = type;
@@ -3015,35 +2938,9 @@
 									</label>
 									<div class="rounded-lg border border-gray-300 bg-green-50 p-3">
 										{#if painPoints}
-											{#if expandedPainPoints.includes('form')}
-												<!-- Show full content when expanded -->
-												<div class="prose prose-sm max-w-none text-sm text-gray-700">
-													{@html parseMarkdown(painPoints)}
-												</div>
-												<button
-													on:click={() => togglePainPointsExpansion('form')}
-													class="mt-2 text-xs font-medium text-indigo-600 transition-colors hover:text-indigo-800"
-													type="button"
-													aria-label={$t('letters.show_less')}
-												>
-													{$t('letters.show_less')}
-												</button>
-											{:else}
-												<!-- Show truncated content when collapsed -->
-												<div class="prose prose-sm max-w-none text-sm text-gray-700">
-													{@html parseMarkdown(truncateText(painPoints))}
-												</div>
-												{#if painPoints.length > 300}
-													<button
-														on:click={() => togglePainPointsExpansion('form')}
-														class="mt-2 text-xs font-medium text-indigo-600 transition-colors hover:text-indigo-800"
-														type="button"
-														aria-label={$t('letters.show_more')}
-													>
-														{$t('letters.show_more')}
-													</button>
-												{/if}
-											{/if}
+											<div class="prose prose-sm max-w-none text-sm text-gray-700">
+												{@html parseMarkdown(painPoints)}
+											</div>
 										{:else}
 											<p class="text-sm text-gray-500 italic">
 												{$t('letters.pain_points_will_appear')}
@@ -3205,15 +3102,12 @@
 							<div
 								class="rounded-xl border border-gray-200 bg-white p-6 shadow-lg transition-shadow duration-300 hover:shadow-xl"
 							>
-								<!-- Letter Header - ALWAYS VISIBLE -->
+								<!-- Letter Header -->
 								<div class="mb-4 flex items-start justify-between">
 									<div class="flex-1">
 										<div class="mb-1 flex items-center space-x-3">
 											<h3 class="text-xl font-semibold text-gray-900">{letter.company_name}</h3>
 										</div>
-										{#if letter.job_title}
-											<p class="mb-2 text-lg font-bold text-gray-800">{letter.job_title}</p>
-										{/if}
 									</div>
 
 									<!-- Action Buttons Section - ALWAYS VISIBLE -->
@@ -3628,41 +3522,19 @@
 
 								<!-- Letter Details -->
 								<div class="mb-4 space-y-2">
+									<!-- Job Title -->
+									{#if letter.job_title}
+										<p class="mb-2 text-lg font-bold text-gray-800">{letter.job_title}</p>
+									{/if}
 									{#if letter.pain_points}
 										<div>
 											<span class="text-xs font-medium text-gray-600"
 												>{$t('letters.key_pain_points')}</span
 											>
 											<div class="mt-1 rounded bg-gray-50 p-3">
-												{#if expandedPainPoints.includes(letter.id)}
-													<!-- Show full content when expanded -->
-													<div class="prose prose-sm max-w-none text-sm text-gray-700">
-														{@html parseMarkdown(letter.pain_points)}
-													</div>
-													<button
-														on:click={() => togglePainPointsExpansion(letter.id)}
-														class="mt-2 text-xs font-medium text-indigo-600 transition-colors hover:text-indigo-800"
-														type="button"
-														aria-label={$t('letters.show_less')}
-													>
-														{$t('letters.show_less')}
-													</button>
-												{:else}
-													<!-- Show truncated content when collapsed -->
-													<div class="prose prose-sm max-w-none text-sm text-gray-700">
-														{@html parseMarkdown(truncateText(letter.pain_points))}
-													</div>
-													{#if letter.pain_points.length > 300}
-														<button
-															on:click={() => togglePainPointsExpansion(letter.id)}
-															class="mt-2 text-xs font-medium text-indigo-600 transition-colors hover:text-indigo-800"
-															type="button"
-															aria-label={$t('letters.show_more')}
-														>
-															{$t('letters.show_more')}
-														</button>
-													{/if}
-												{/if}
+												<div class="prose prose-sm max-w-none text-sm text-gray-700">
+													{@html parseMarkdown(letter.pain_points)}
+												</div>
 											</div>
 
 											<!-- Continue Letter Generation Button (only for letters with pain points but no content) -->
@@ -3779,7 +3651,7 @@
 									{/if}
 								</div>
 
-								<!-- Additional Letter Details (only shown when expanded) -->
+								<!-- Additional Letter Details -->
 								<div class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-4">
 									<!-- Job URL Line -->
 									{#if letter.job_url}

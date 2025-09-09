@@ -1,0 +1,101 @@
+# UniqU MVP - Cursor Rules
+
+You are working on the UniqU MVP, a career guidance platform built with SvelteKit, Supabase, and TypeScript.
+
+## Critical Project Rules
+
+### Authentication & Database
+- This MVP does NOT use Supabase Auth
+- All database tables are accessed via the ANON role with permissions granted to ANON
+- User authentication is handled via custom password hashing (bcryptjs)
+- User IDs are stored in localStorage for session management
+
+### Routing Conventions
+- Use `/agency` prefix for all agency routes (not `/agency-direct` or `/agency-portal`)
+- Use `/agency/signup` and `/agency/login` (not `/agency-auth/signup` and `/agency-auth/login`)
+- Apply simplified pattern to other routes for consistency
+- All agency routes should be under `/agency` rather than using `/agency-direct` or `/agency-portal`
+
+### Terminology
+- Use "application letters" instead of "motivational letters" throughout the application
+- Be consistent with terminology across all files and user-facing text
+
+### Internationalization (i18n)
+- The project supports 5 languages: English, German, French, Spanish, Italian
+- ALL user-facing text must be internationalized using the i18n system
+- When adding new text, always add translations to all language files in `src/lib/i18n/`
+- Use the `$t('key')` function for all user-facing strings
+- Never hardcode text strings in components
+- Follow the existing i18n key structure and naming conventions
+
+### Git Workflow
+- Wait for explicit user request before pushing to git
+- Do not automatically push changes unless specifically asked
+- Review changes as you go and automatically implement requested changes unless there are multiple options requiring user opinion
+- Work in batches, folder by folder when possible
+
+## Code Standards
+
+### TypeScript & Svelte
+- Use TypeScript for all new files
+- Follow existing Svelte component patterns
+- Prefer composition over inheritance
+- Use reactive statements (`$:`) for derived state
+- Keep components focused and single-purpose
+
+### Supabase Queries
+```typescript
+const { data, error } = await supabase
+  .from('table_name')
+  .select('columns')
+  .eq('condition', value)
+  .single();
+```
+
+### Error Handling
+```typescript
+if (error) {
+  console.error('Error:', error);
+  // Handle error appropriately
+  return;
+}
+```
+
+### Svelte Component Structure
+```svelte
+<script lang="ts">
+  // Imports
+  // Reactive variables
+  // Functions
+  // onMount
+</script>
+
+<!-- Template -->
+```
+
+## Development Guidelines
+
+### User Experience
+- Prioritize clean, modern UI with good UX practices
+- Use consistent color schemes and design patterns
+- Ensure responsive design across devices
+- Focus on accessibility and usability
+
+### Quality & Testing
+- Add appropriate error handling
+- Include loading states for async operations
+- Validate user inputs
+- Test navigation flows thoroughly
+- Check for linting errors before committing
+
+### File Organization
+- Keep related components in the same directory
+- Use descriptive file names
+- Group by feature/functionality
+- Maintain consistent folder structure
+
+## Project Context
+- This is an MVP - focus on core functionality first
+- User experience is paramount
+- Code should be maintainable and well-documented
+- Consider future scalability but don't over-engineer

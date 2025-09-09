@@ -120,7 +120,7 @@
 						bind:value={ikigai_love}
 						on:input={markAsChanged}
 						placeholder={$t('step3.love.textarea_placeholder')}
-						class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-red-400 focus:ring-red-400"
+						class="mb-2 min-h-[100px] w-full resize-y rounded-lg border-gray-300 p-4 shadow-sm focus:border-red-400 focus:ring-red-400"
 					></textarea>
 				</div>
 			</div>
@@ -148,7 +148,7 @@
 						bind:value={ikigai_good_at}
 						on:input={markAsChanged}
 						placeholder={$t('step3.good_at.textarea_placeholder')}
-						class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-blue-400 focus:ring-blue-400"
+						class="mb-2 min-h-[100px] w-full resize-y rounded-lg border-gray-300 p-4 shadow-sm focus:border-blue-400 focus:ring-blue-400"
 					></textarea>
 				</div>
 			</div>
@@ -176,7 +176,7 @@
 						bind:value={ikigai_care_about}
 						on:input={markAsChanged}
 						placeholder={$t('step3.care_about.textarea_placeholder')}
-						class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-green-400 focus:ring-green-400"
+						class="mb-2 min-h-[100px] w-full resize-y rounded-lg border-gray-300 p-4 shadow-sm focus:border-green-400 focus:ring-green-400"
 					></textarea>
 				</div>
 			</div>
@@ -204,7 +204,7 @@
 						bind:value={ikigai_inspires}
 						on:input={markAsChanged}
 						placeholder={$t('step3.inspires.textarea_placeholder')}
-						class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-orange-400 focus:ring-orange-400"
+						class="mb-2 min-h-[100px] w-full resize-y rounded-lg border-gray-300 p-4 shadow-sm focus:border-orange-400 focus:ring-orange-400"
 					></textarea>
 				</div>
 			</div>
@@ -232,7 +232,7 @@
 						bind:value={ikigai_want_to_be}
 						on:input={markAsChanged}
 						placeholder={$t('step3.want_to_be.textarea_placeholder')}
-						class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-purple-400 focus:ring-purple-400"
+						class="mb-2 min-h-[100px] w-full resize-y rounded-lg border-gray-300 p-4 shadow-sm focus:border-purple-400 focus:ring-purple-400"
 					></textarea>
 				</div>
 			</div>

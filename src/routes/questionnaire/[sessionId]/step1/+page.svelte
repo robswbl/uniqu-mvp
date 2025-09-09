@@ -196,7 +196,7 @@
 						bind:value={lifeContext}
 						on:input={markAsChanged}
 						placeholder={$t('step1.overview.life_context_placeholder')}
-						class="h-28 w-full resize-none rounded-lg border border-gray-300 p-4 focus:border-transparent focus:ring-2 focus:ring-green-500"
+						class="h-28 w-full resize-y rounded-lg border border-gray-300 p-4 focus:border-transparent focus:ring-2 focus:ring-green-500"
 					></textarea>
 				</div>
 			</div>
@@ -229,7 +229,7 @@
 						bind:value={personalityValues}
 						on:input={markAsChanged}
 						placeholder={$t('step1.overview.personality_placeholder')}
-						class="h-32 w-full resize-none rounded-lg border border-gray-300 p-4 focus:border-transparent focus:ring-2 focus:ring-blue-500"
+						class="h-32 w-full resize-y rounded-lg border border-gray-300 p-4 focus:border-transparent focus:ring-2 focus:ring-blue-500"
 						required
 					></textarea>
 				</div>
@@ -259,7 +259,7 @@
 						bind:value={goals}
 						on:input={markAsChanged}
 						placeholder={$t('step1.overview.goals_placeholder')}
-						class="h-32 w-full resize-none rounded-lg border border-gray-300 p-4 focus:border-transparent focus:ring-2 focus:ring-purple-500"
+						class="h-32 w-full resize-y rounded-lg border border-gray-300 p-4 focus:border-transparent focus:ring-2 focus:ring-purple-500"
 						required
 					></textarea>
 				</div>
@@ -289,7 +289,7 @@
 						bind:value={doubtsBarriers}
 						on:input={markAsChanged}
 						placeholder={$t('step1.overview.doubts_placeholder')}
-						class="h-24 w-full resize-none rounded-lg border border-gray-300 p-3 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
+						class="h-24 w-full resize-y rounded-lg border border-gray-300 p-3 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
 					></textarea>
 				</div>
 			</div>
@@ -322,7 +322,7 @@
 						bind:value={emotionalLandscape}
 						on:input={markAsChanged}
 						placeholder={$t('step1.overview.emotional_placeholder')}
-						class="h-24 w-full resize-none rounded-lg border border-gray-300 p-3 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
+						class="h-24 w-full resize-y rounded-lg border border-gray-300 p-3 text-sm focus:border-transparent focus:ring-2 focus:ring-indigo-500"
 					></textarea>
 				</div>
 			</div>

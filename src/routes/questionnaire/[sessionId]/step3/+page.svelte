@@ -14,13 +14,7 @@
 	let ikigai_want_to_be = '';
 	let isSaving = false;
 	let saveTimeout: ReturnType<typeof setTimeout> | null = null;
-	let showInspiration = {
-		love: false,
-		good_at: false,
-		care_about: false,
-		inspires: false,
-		want_to_be: false
-	};
+	// Removed showInspiration - now using consistent bullet point pattern
 
 	onMount(async () => {
 		const { data } = await supabase
@@ -113,27 +107,22 @@
 					</div>
 					<h2 class="text-2xl font-bold text-gray-800">{$t('step3.love.title')}</h2>
 				</div>
-				<button
-					type="button"
-					class="mb-2 text-sm text-red-700 underline"
-					on:click={() => (showInspiration.love = !showInspiration.love)}
-				>
-					{showInspiration.love
-						? $t('step3.love.hide_inspiration')
-						: $t('step3.love.show_inspiration')}
-				</button>
-				{#if showInspiration.love}
-					<div class="mb-2 space-y-3 rounded-lg border border-red-200 bg-red-50 p-4">
-						<p class="text-sm text-gray-600">{$t('step3.love.inspiration_text')}</p>
-						<p class="text-xs text-gray-500 italic">{$t('step3.love.inspiration_examples')}</p>
+				<div class="mb-4 space-y-4">
+					<div class="rounded-lg bg-red-50 p-4">
+						<p class="mb-2 text-sm text-red-800">
+							💡 <strong>{$t('step3.love.inspiration_text')}</strong>
+						</p>
+						<ul class="space-y-1 text-sm text-red-700">
+							<li>• {$t('step3.love.inspiration_examples')}</li>
+						</ul>
 					</div>
-				{/if}
-				<textarea
-					bind:value={ikigai_love}
-					on:input={markAsChanged}
-					placeholder={$t('step3.love.textarea_placeholder')}
-					class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-red-400 focus:ring-red-400"
-				></textarea>
+					<textarea
+						bind:value={ikigai_love}
+						on:input={markAsChanged}
+						placeholder={$t('step3.love.textarea_placeholder')}
+						class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-red-400 focus:ring-red-400"
+					></textarea>
+				</div>
 			</div>
 
 			<!-- Ikigai: What are you great at? -->
@@ -146,27 +135,22 @@
 					</div>
 					<h2 class="text-2xl font-bold text-gray-800">{$t('step3.good_at.title')}</h2>
 				</div>
-				<button
-					type="button"
-					class="mb-2 text-sm text-blue-700 underline"
-					on:click={() => (showInspiration.good_at = !showInspiration.good_at)}
-				>
-					{showInspiration.good_at
-						? $t('step3.good_at.hide_inspiration')
-						: $t('step3.good_at.show_inspiration')}
-				</button>
-				{#if showInspiration.good_at}
-					<div class="mb-2 space-y-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
-						<p class="text-sm text-gray-600">{$t('step3.good_at.inspiration_text')}</p>
-						<p class="text-xs text-gray-500 italic">{$t('step3.good_at.inspiration_examples')}</p>
+				<div class="mb-4 space-y-4">
+					<div class="rounded-lg bg-blue-50 p-4">
+						<p class="mb-2 text-sm text-blue-800">
+							💡 <strong>{$t('step3.good_at.inspiration_text')}</strong>
+						</p>
+						<ul class="space-y-1 text-sm text-blue-700">
+							<li>• {$t('step3.good_at.inspiration_examples')}</li>
+						</ul>
 					</div>
-				{/if}
-				<textarea
-					bind:value={ikigai_good_at}
-					on:input={markAsChanged}
-					placeholder={$t('step3.good_at.textarea_placeholder')}
-					class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-blue-400 focus:ring-blue-400"
-				></textarea>
+					<textarea
+						bind:value={ikigai_good_at}
+						on:input={markAsChanged}
+						placeholder={$t('step3.good_at.textarea_placeholder')}
+						class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-blue-400 focus:ring-blue-400"
+					></textarea>
+				</div>
 			</div>
 
 			<!-- Ikigai: What do you care about? -->
@@ -179,29 +163,22 @@
 					</div>
 					<h2 class="text-2xl font-bold text-gray-800">{$t('step3.care_about.title')}</h2>
 				</div>
-				<button
-					type="button"
-					class="mb-2 text-sm text-green-700 underline"
-					on:click={() => (showInspiration.care_about = !showInspiration.care_about)}
-				>
-					{showInspiration.care_about
-						? $t('step3.care_about.hide_inspiration')
-						: $t('step3.care_about.show_inspiration')}
-				</button>
-				{#if showInspiration.care_about}
-					<div class="mb-2 space-y-3 rounded-lg border border-green-200 bg-green-50 p-4">
-						<p class="text-sm text-gray-600">{$t('step3.care_about.inspiration_text')}</p>
-						<p class="text-xs text-gray-500 italic">
-							{$t('step3.care_about.inspiration_examples')}
+				<div class="mb-4 space-y-4">
+					<div class="rounded-lg bg-green-50 p-4">
+						<p class="mb-2 text-sm text-green-800">
+							💡 <strong>{$t('step3.care_about.inspiration_text')}</strong>
 						</p>
+						<ul class="space-y-1 text-sm text-green-700">
+							<li>• {$t('step3.care_about.inspiration_examples')}</li>
+						</ul>
 					</div>
-				{/if}
-				<textarea
-					bind:value={ikigai_care_about}
-					on:input={markAsChanged}
-					placeholder={$t('step3.care_about.textarea_placeholder')}
-					class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-green-400 focus:ring-green-400"
-				></textarea>
+					<textarea
+						bind:value={ikigai_care_about}
+						on:input={markAsChanged}
+						placeholder={$t('step3.care_about.textarea_placeholder')}
+						class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-green-400 focus:ring-green-400"
+					></textarea>
+				</div>
 			</div>
 
 			<!-- Ikigai: What inspires you? -->
@@ -214,27 +191,22 @@
 					</div>
 					<h2 class="text-2xl font-bold text-gray-800">{$t('step3.inspires.title')}</h2>
 				</div>
-				<button
-					type="button"
-					class="mb-2 text-sm text-orange-700 underline"
-					on:click={() => (showInspiration.inspires = !showInspiration.inspires)}
-				>
-					{showInspiration.inspires
-						? $t('step3.inspires.hide_inspiration')
-						: $t('step3.inspires.show_inspiration')}
-				</button>
-				{#if showInspiration.inspires}
-					<div class="mb-2 space-y-3 rounded-lg border border-orange-200 bg-orange-50 p-4">
-						<p class="text-sm text-gray-600">{$t('step3.inspires.inspiration_text')}</p>
-						<p class="text-xs text-gray-500 italic">{$t('step3.inspires.inspiration_examples')}</p>
+				<div class="mb-4 space-y-4">
+					<div class="rounded-lg bg-orange-50 p-4">
+						<p class="mb-2 text-sm text-orange-800">
+							💡 <strong>{$t('step3.inspires.inspiration_text')}</strong>
+						</p>
+						<ul class="space-y-1 text-sm text-orange-700">
+							<li>• {$t('step3.inspires.inspiration_examples')}</li>
+						</ul>
 					</div>
-				{/if}
-				<textarea
-					bind:value={ikigai_inspires}
-					on:input={markAsChanged}
-					placeholder={$t('step3.inspires.textarea_placeholder')}
-					class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-orange-400 focus:ring-orange-400"
-				></textarea>
+					<textarea
+						bind:value={ikigai_inspires}
+						on:input={markAsChanged}
+						placeholder={$t('step3.inspires.textarea_placeholder')}
+						class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-orange-400 focus:ring-orange-400"
+					></textarea>
+				</div>
 			</div>
 
 			<!-- Ikigai: Who do you want to become? -->
@@ -247,29 +219,22 @@
 					</div>
 					<h2 class="text-2xl font-bold text-gray-800">{$t('step3.want_to_be.title')}</h2>
 				</div>
-				<button
-					type="button"
-					class="mb-2 text-sm text-purple-700 underline"
-					on:click={() => (showInspiration.want_to_be = !showInspiration.want_to_be)}
-				>
-					{showInspiration.want_to_be
-						? $t('step3.want_to_be.hide_inspiration')
-						: $t('step3.want_to_be.show_inspiration')}
-				</button>
-				{#if showInspiration.want_to_be}
-					<div class="mb-2 space-y-3 rounded-lg border border-purple-200 bg-purple-50 p-4">
-						<p class="text-sm text-gray-600">{$t('step3.want_to_be.inspiration_text')}</p>
-						<p class="text-xs text-gray-500 italic">
-							{$t('step3.want_to_be.inspiration_examples')}
+				<div class="mb-4 space-y-4">
+					<div class="rounded-lg bg-purple-50 p-4">
+						<p class="mb-2 text-sm text-purple-800">
+							💡 <strong>{$t('step3.want_to_be.inspiration_text')}</strong>
 						</p>
+						<ul class="space-y-1 text-sm text-purple-700">
+							<li>• {$t('step3.want_to_be.inspiration_examples')}</li>
+						</ul>
 					</div>
-				{/if}
-				<textarea
-					bind:value={ikigai_want_to_be}
-					on:input={markAsChanged}
-					placeholder={$t('step3.want_to_be.textarea_placeholder')}
-					class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-purple-400 focus:ring-purple-400"
-				></textarea>
+					<textarea
+						bind:value={ikigai_want_to_be}
+						on:input={markAsChanged}
+						placeholder={$t('step3.want_to_be.textarea_placeholder')}
+						class="mb-2 min-h-[100px] w-full resize-none overflow-hidden rounded-lg border-gray-300 p-4 shadow-sm focus:border-purple-400 focus:ring-purple-400"
+					></textarea>
+				</div>
 			</div>
 		</div>
 		<div class="mt-8 flex justify-between">

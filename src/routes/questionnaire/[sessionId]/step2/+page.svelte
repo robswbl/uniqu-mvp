@@ -385,9 +385,18 @@
 				{$t('buttons.back')}
 			</button>
 			<button
-				on:click={() => {
+				on:click={async () => {
 					if (fromOnboarding) {
-						goto(`/questionnaire/${sessionId}/step3/care_about?from=onboarding`);
+						// Get first step3 question from question_order
+						const { data } = await supabase
+							.from('question_order')
+							.select('order')
+							.eq('step_id', 'step3')
+							.single();
+						const firstStep3Question = data?.order?.[0] || 'love';
+						console.log('DEBUG: step3 question order:', data?.order);
+						console.log('DEBUG: first step3 question:', firstStep3Question);
+						goto(`/questionnaire/${sessionId}/step3/${firstStep3Question}?from=onboarding`);
 					} else {
 						goto(`/questionnaire/${sessionId}/step3`);
 					}

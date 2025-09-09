@@ -46,13 +46,31 @@
 		setTimeout(() => (saveStatus = ''), 1200);
 	}
 
-	function goToNext() {
-		const urlParams = get(page).url.searchParams;
-		const fromOnboarding = urlParams.get('from') === 'onboarding';
-		const nextUrl = fromOnboarding
-			? `/questionnaire/${sessionId}/step3/want_to_be?from=onboarding`
-			: `/questionnaire/${sessionId}/step3/want_to_be`;
-		goto(nextUrl);
+	async function goToNext() {
+		const { data } = await supabase
+			.from('question_order')
+			.select('order')
+			.eq('step_id', 'step3')
+			.single();
+		if (data && data.order && Array.isArray(data.order)) {
+			const order = data.order;
+			const currentIndex = order.indexOf('love');
+			const urlParams = get(page).url.searchParams;
+			const fromOnboarding = urlParams.get('from') === 'onboarding';
+			if (currentIndex < order.length - 1) {
+				const nextQuestion = order[currentIndex + 1];
+				const nextUrl = fromOnboarding
+					? `/questionnaire/${sessionId}/step3/${nextQuestion}?from=onboarding`
+					: `/questionnaire/${sessionId}/step3/${nextQuestion}`;
+				goto(nextUrl);
+			} else {
+				// Last question, go to generate
+				const nextUrl = fromOnboarding
+					? `/questionnaire/${sessionId}/step3/generate?from=onboarding`
+					: `/questionnaire/${sessionId}/step3/generate`;
+				goto(nextUrl);
+			}
+		}
 	}
 	async function goToBack() {
 		const { data } = await supabase

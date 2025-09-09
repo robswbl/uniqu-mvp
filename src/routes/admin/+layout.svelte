@@ -6,9 +6,16 @@
 	import { locale, waitLocale } from '$lib/i18n';
 	import { t } from 'svelte-i18n';
 
-	// Setup i18n
-	setupI18n('en');
-	waitLocale();
+	// Setup i18n - get language from localStorage or default to English
+	let userLang = 'en';
+	if (typeof window !== 'undefined') {
+		userLang = localStorage.getItem('userLang') || 'en';
+	}
+	setupI18n(userLang);
+	
+	// Debug i18n
+	$: console.log('Current locale:', $locale);
+	$: console.log('Translation test:', $t('admin.nav.access'));
 
 	let isAuthenticated = false;
 	let isLoading = true;
@@ -63,6 +70,13 @@
 		goto('/admin');
 	}
 
+	function changeLanguage(newLang: string) {
+		locale.set(newLang);
+		if (typeof window !== 'undefined') {
+			localStorage.setItem('userLang', newLang);
+		}
+	}
+
 	// Check if we're on the main admin page
 	$: isMainAdminPage = $page.url.pathname === '/admin';
 </script>
@@ -75,7 +89,7 @@
 	<div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center">
 		<div class="text-center">
 			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-			<p class="mt-4 text-gray-600">Loading...</p>
+			<p class="mt-4 text-gray-600">{$t('common.loading')}</p>
 		</div>
 	</div>
 {:else if !isAuthenticated}
@@ -83,8 +97,8 @@
 	<div class="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center p-4">
 		<div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
 			<div class="text-center mb-8">
-				<h1 class="text-3xl font-bold text-gray-900 mb-2">UniqU Admin</h1>
-				<p class="text-gray-600">Enter admin password to continue</p>
+				<h1 class="text-3xl font-bold text-gray-900 mb-2">{$t('admin.nav.heading')}</h1>
+				<p class="text-gray-600">{$t('admin.login.enter_password')}</p>
 			</div>
 
 			{#if error}
@@ -99,13 +113,13 @@
 			}}>
 				<div class="mb-6">
 					<label for="adminPassword" class="block text-sm font-medium text-gray-700 mb-2">
-						Admin Password
+						{$t('admin.login.password_label')}
 					</label>
 					<input
 						type="password"
 						id="adminPassword"
 						class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-						placeholder="Enter admin password"
+						placeholder={$t('admin.login.password_placeholder')}
 						required
 					/>
 				</div>
@@ -113,7 +127,7 @@
 					type="submit"
 					class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
 				>
-					Access Admin
+					{$t('admin.login.access_admin')}
 				</button>
 			</form>
 		</div>
@@ -126,12 +140,13 @@
 			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 				<div class="flex justify-between items-center py-4">
 					<div class="flex items-center">
-						<h1 class="text-2xl font-bold text-gray-900">UniqU Admin</h1>
+						<h1 class="text-2xl font-bold text-gray-900">{$t('admin.nav.heading')}</h1>
 					</div>
 					<div class="flex items-center space-x-4">
 						<!-- Language Selector -->
 						<select
 							bind:value={$locale}
+							on:change={(e) => changeLanguage((e.target as HTMLSelectElement)?.value || 'en')}
 							class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
 						>
 							<option value="en">English</option>
@@ -145,7 +160,7 @@
 							on:click={logout}
 							class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
 						>
-							Logout
+							{$t('admin.nav.logout')}
 						</button>
 					</div>
 				</div>

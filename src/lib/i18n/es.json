@@ -752,6 +752,29 @@
 		}
 	},
 	"admin": {
+		"nav": {
+			"title": "Herramientas de administración",
+			"heading": "UniqU Admin",
+			"subheading": "Aquí encontrarás todas las funciones de administración.",
+			"access": "Acceder",
+			"signup_codes": "Gestionar códigos de registro",
+			"signup_codes_desc": "Gestionar códigos de registro y su distribución",
+			"assign_agency": "Asignar usuarios a agencias",
+			"assign_agency_desc": "Asignar usuarios regulares a agencias",
+			"agency_overview": "Resumen de agencias",
+			"agency_overview_desc": "Ver y gestionar relaciones agencia-usuario",
+			"agency_users": "Gestión de usuarios de agencia",
+			"agency_users_desc": "Gestionar personal de agencia y asignaciones",
+			"question_order": "Gestionar orden de preguntas",
+			"question_order_desc": "Gestionar orden y flujo de preguntas",
+			"logout": "Cerrar sesión"
+		},
+		"login": {
+			"enter_password": "Ingresa la contraseña de administrador para continuar",
+			"password_label": "Contraseña de administrador",
+			"password_placeholder": "Ingresa la contraseña de administrador",
+			"access_admin": "Acceder al admin"
+		},
 		"signup_codes": {
 			"heading": "Gestión de códigos de registro",
 			"subheading": "Genera y rastrea códigos de registro únicos para el registro de usuarios.",
@@ -792,19 +815,6 @@
 			"clear_filters": "Limpiar",
 			"showing_results": "Mostrando {filtered} de {total} códigos",
 			"no_codes_match": "Ningún código coincide con tus filtros."
-		},
-		"nav": {
-			"heading": "Herramientas de administración",
-			"subheading": "Accede a todas las funciones de administración aquí.",
-			"password_label": "Introduce la contraseña de administrador:",
-			"unlock": "Desbloquear",
-			"incorrect_password": "Contraseña incorrecta.",
-			"pages": "Páginas de administración",
-			"signup_codes": "Gestión de códigos de registro",
-			"assign_agency": "Asignar usuarios a agencias",
-			"question_order": "Gestión del orden de preguntas",
-			"agency_overview": "Vista General de Agencias",
-			"agency_users": "Gestión de Usuarios de Agencia"
 		}
 	},
 	"agency": {

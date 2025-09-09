@@ -772,6 +772,30 @@
 		}
 	},
 	"admin": {
+		"nav": {
+			"title": "Admin-Tools",
+			"heading": "UniqU Admin",
+			"subheading": "Hier findest du alle Admin-Funktionen.",
+			"access": "Zugriff",
+			"signup_codes": "Registrierungscodes verwalten",
+			"signup_codes_desc": "Registrierungscodes und deren Verteilung verwalten",
+			"assign_agency": "Benutzer Agenturen zuweisen",
+			"assign_agency_desc": "Reguläre Benutzer Agenturen zuweisen",
+			"agency_overview": "Agentur Übersicht",
+			"agency_overview_desc": "Agentur-Benutzer-Beziehungen anzeigen und verwalten",
+			"agency_users": "Agentur-Benutzer Verwaltung",
+			"agency_users_desc": "Agentur-Mitarbeiter und Zuweisungen verwalten",
+			"question_order": "Fragenreihenfolge verwalten",
+			"question_order_desc": "Fragenreihenfolge und Ablauf verwalten",
+			"access": "Zugriff",
+			"logout": "Abmelden"
+		},
+		"login": {
+			"enter_password": "Admin-Passwort eingeben, um fortzufahren",
+			"password_label": "Admin-Passwort",
+			"password_placeholder": "Admin-Passwort eingeben",
+			"access_admin": "Admin-Zugang"
+		},
 		"signup_codes": {
 			"heading": "Registrierungscodes verwalten",
 			"subheading": "Erzeuge und verfolge eindeutige Registrierungscodes für die Benutzerregistrierung.",
@@ -787,6 +811,39 @@
 			"given_out": "Verteilt",
 			"given_by": "Verteilt von",
 			"available": "Verfügbar",
+			"distributed": "Verteilt",
+			"distributed_by": "Verteilt von",
+			"used_on": "Verwendet am",
+			"comment": "Kommentar",
+			"search_placeholder": "Codes, Namen suchen...",
+			"all_status": "Alle Status",
+			"all_distribution": "Alle Verteilung",
+			"delete": "Löschen",
+			"showing_codes": "Zeige {count} von {total} Codes",
+			"important_warning_title": "Wichtig: Registrierungscode-Status",
+			"important_warning_text": "Generierte Codes sind NICHT verwendbar, bis sie als \"Verteilt\" markiert wurden. Benutzer erhalten \"Ungültiger Code\"-Fehler, wenn sie versuchen, Codes zu verwenden, die noch als \"Verfügbar\" markiert sind. Stelle sicher, dass Codes als \"Verteilt\" markiert werden, bevor du sie an Benutzer verteilst.",
+			"optional_comment": "Optionaler Kommentar...",
+			"all_copied": "Alle Codes in die Zwischenablage kopiert!",
+			"copy_code": "Code kopieren",
+			"delete_code": "Code löschen",
+			"failed_load": "Fehler beim Laden der Codes.",
+			"failed_generate": "Fehler beim Generieren der Codes.",
+			"failed_mark": "Fehler beim Markieren des Codes.",
+			"failed_mark_bulk": "Fehler beim Markieren der Codes als verteilt.",
+			"failed_delete": "Fehler beim Löschen des Codes.",
+			"enter_given_by": "Bitte gib an, wer die Codes verteilt hat.",
+			"bulk_actions_title": "Massenaktionen für generierte Codes",
+			"generated_codes": "Generierte Codes",
+			"given_by_label": "Verteilt von (Optional)",
+			"given_by_placeholder": "z.B. Rob, Sarah, Marketing-Team, etc.",
+			"mark_as_given_out": "Als verteilt markieren",
+			"cancel": "Abbrechen",
+			"copy_all_codes": "Alle Codes kopieren",
+			"mark_all_given_out": "Alle als verteilt markieren",
+			"marking": "Markiere...",
+			"clear": "Löschen",
+			"mark_available": "Als verfügbar markieren",
+			"mark_given_out": "Als verteilt markieren",
 			"comment": "Kommentar",
 			"bulk_actions_title": "Massenaktionen für generierte Codes",
 			"generated_codes": "Generierte Codes",
@@ -812,19 +869,6 @@
 			"clear_filters": "Löschen",
 			"showing_results": "Zeige {filtered} von {total} Codes",
 			"no_codes_match": "Keine Codes entsprechen Ihren Filtern."
-		},
-		"nav": {
-			"heading": "Admin-Tools",
-			"subheading": "Hier findest du alle Admin-Funktionen.",
-			"password_label": "Admin-Passwort eingeben:",
-			"unlock": "Entsperren",
-			"incorrect_password": "Falsches Passwort.",
-			"pages": "Admin-Seiten",
-			"signup_codes": "Registrierungscodes verwalten",
-			"assign_agency": "Benutzer Agenturen zuweisen",
-			"question_order": "Fragenreihenfolge verwalten",
-			"agency_overview": "Agentur Übersicht",
-			"agency_users": "Agentur-Benutzer Verwaltung"
 		}
 	},
 	"agency": {
@@ -881,7 +925,7 @@
 			"already_have_account": "Haben Sie bereits ein Agenturkonto?",
 			"sign_in_here": "Hier anmelden"
 		},
-		"admin": {
+		"agency_admin": {
 			"agency_overview": {
 				"title": "Agentur Übersicht",
 				"subtitle": "Agentur-Benutzer-Beziehungen anzeigen und verwalten",

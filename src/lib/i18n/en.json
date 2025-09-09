@@ -777,6 +777,29 @@
 		"signing_up": "Signing up..."
 	},
 	"admin": {
+		"nav": {
+			"title": "Admin Tools",
+			"heading": "UniqU Admin",
+			"subheading": "Here you will find all Admin functions.",
+			"access": "Access",
+			"signup_codes": "Manage Registration Codes",
+			"signup_codes_desc": "Manage signup codes and their distribution",
+			"assign_agency": "Assign Users to Agencies",
+			"assign_agency_desc": "Assign regular users to agencies",
+			"agency_overview": "Agency Overview",
+			"agency_overview_desc": "View and manage agency-user relationships",
+			"agency_users": "Agency Users Management",
+			"agency_users_desc": "Manage agency staff users and assignments",
+			"question_order": "Manage Question Order",
+			"question_order_desc": "Manage question order and flow",
+			"logout": "Logout"
+		},
+		"login": {
+			"enter_password": "Enter admin password to continue",
+			"password_label": "Admin Password",
+			"password_placeholder": "Enter admin password",
+			"access_admin": "Access Admin"
+		},
 		"signup_codes": {
 			"heading": "Signup Code Management",
 			"subheading": "Generate and track unique signup codes for user registration.",
@@ -792,11 +815,33 @@
 			"given_out": "Given Out",
 			"given_by": "Given By",
 			"available": "Available",
+			"distributed": "Distributed",
+			"distributed_by": "Distributed By",
+			"used_on": "Used On",
 			"comment": "Comment",
+			"search_placeholder": "Search codes, names...",
+			"all_status": "All Status",
+			"all_distribution": "All Distribution",
+			"delete": "Delete",
+			"showing_codes": "Showing {count} of {total} codes",
+			"important_warning_title": "Important: Signup Code Status",
+			"important_warning_text": "Generated codes are NOT usable until marked as \"Given Out\". Users will receive \"Invalid code\" errors if they try to use codes that are still marked as \"Available\". Make sure to mark codes as \"Given Out\" before distributing them to users.",
+			"optional_comment": "Optional comment...",
+			"all_copied": "All codes copied to clipboard!",
+			"copy_code": "Copy code",
+			"delete_code": "Delete code",
+			"failed_load": "Failed to load codes.",
+			"failed_generate": "Failed to generate codes.",
+			"failed_mark": "Failed to mark code.",
+			"failed_mark_bulk": "Failed to mark codes as given out.",
+			"failed_delete": "Failed to delete code.",
+			"enter_given_by": "Please enter who gave out the codes.",
 			"bulk_actions_title": "Bulk Actions for Generated Codes",
 			"generated_codes": "Generated Codes",
 			"given_by_label": "Given By (Optional)",
 			"given_by_placeholder": "e.g., Rob, Sarah, Marketing Team, etc.",
+			"mark_as_given_out": "Mark as Given Out",
+			"cancel": "Cancel",
 			"copy_all_codes": "Copy All Codes",
 			"mark_all_given_out": "Mark All as Given Out",
 			"marking": "Marking...",
@@ -817,19 +862,6 @@
 			"clear_filters": "Clear",
 			"showing_results": "Showing {filtered} of {total} codes",
 			"no_codes_match": "No codes match your filters."
-		},
-		"nav": {
-			"heading": "Admin Tools",
-			"subheading": "Access all admin features from here.",
-			"password_label": "Enter admin password:",
-			"unlock": "Unlock",
-			"incorrect_password": "Incorrect password.",
-			"pages": "Admin Pages",
-			"signup_codes": "Signup Code Management",
-			"assign_agency": "Assign Users to Agencies",
-			"question_order": "Question Order Management",
-			"agency_overview": "Agency Overview",
-			"agency_users": "Agency Users Management"
 		}
 	},
 	"agency": {
@@ -944,7 +976,7 @@
 			"already_have_account": "Already have an agency account?",
 			"sign_in_here": "Sign in here"
 		},
-		"admin": {
+		"agency_admin": {
 			"agency_overview": {
 				"title": "Agency Overview",
 				"subtitle": "View and manage agency-user relationships",

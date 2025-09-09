@@ -754,6 +754,29 @@
 		}
 	},
 	"admin": {
+		"nav": {
+			"title": "Outils d'administration",
+			"heading": "UniqU Admin",
+			"subheading": "Ici vous trouverez toutes les fonctions d'administration.",
+			"access": "Accéder",
+			"signup_codes": "Gérer les codes d'inscription",
+			"signup_codes_desc": "Gérer les codes d'inscription et leur distribution",
+			"assign_agency": "Assigner les utilisateurs aux agences",
+			"assign_agency_desc": "Assigner les utilisateurs réguliers aux agences",
+			"agency_overview": "Aperçu des agences",
+			"agency_overview_desc": "Voir et gérer les relations agence-utilisateur",
+			"agency_users": "Gestion des utilisateurs d'agence",
+			"agency_users_desc": "Gérer le personnel d'agence et les affectations",
+			"question_order": "Gérer l'ordre des questions",
+			"question_order_desc": "Gérer l'ordre et le flux des questions",
+			"logout": "Déconnexion"
+		},
+		"login": {
+			"enter_password": "Entrez le mot de passe admin pour continuer",
+			"password_label": "Mot de passe admin",
+			"password_placeholder": "Entrez le mot de passe admin",
+			"access_admin": "Accéder à l'admin"
+		},
 		"signup_codes": {
 			"heading": "Gestion des codes d'inscription",
 			"subheading": "Générez et suivez des codes d'inscription uniques pour l'enregistrement des utilisateurs.",
@@ -794,19 +817,6 @@
 			"clear_filters": "Effacer",
 			"showing_results": "Affichage de {filtered} sur {total} codes",
 			"no_codes_match": "Aucun code ne correspond à vos filtres."
-		},
-		"nav": {
-			"heading": "Outils d'administration",
-			"subheading": "Accédez à toutes les fonctionnalités d'administration ici.",
-			"password_label": "Entrez le mot de passe admin :",
-			"unlock": "Déverrouiller",
-			"incorrect_password": "Mot de passe incorrect.",
-			"pages": "Pages d'administration",
-			"signup_codes": "Gestion des codes d'inscription",
-			"assign_agency": "Affecter des utilisateurs aux agences",
-			"question_order": "Gestion de l'ordre des questions",
-			"agency_overview": "Vue d'ensemble des agences",
-			"agency_users": "Gestion des utilisateurs d'agence"
 		}
 	},
 	"agency": {

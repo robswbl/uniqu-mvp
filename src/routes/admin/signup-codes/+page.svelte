@@ -101,11 +101,11 @@
 			if (data.codes) {
 				codes = data.codes;
 			} else {
-				message = data.error || 'Failed to load codes.';
+				message = data.error || $t('admin.signup_codes.failed_load');
 				messageType = 'error';
 			}
 		} catch (err: any) {
-			message = err.message || 'Failed to load codes.';
+			message = err.message || $t('admin.signup_codes.failed_load');
 			messageType = 'error';
 		} finally {
 			isLoading = false;
@@ -130,11 +130,11 @@
 				messageType = 'success';
 				await fetchCodes();
 			} else {
-				message = data.error || 'Failed to generate codes.';
+				message = data.error || $t('admin.signup_codes.failed_generate');
 				messageType = 'error';
 			}
 		} catch (err: any) {
-			message = err.message || 'Failed to generate codes.';
+			message = err.message || $t('admin.signup_codes.failed_generate');
 			messageType = 'error';
 		} finally {
 			isGenerating = false;
@@ -162,11 +162,11 @@
 				messageType = 'success';
 				await fetchCodes();
 			} else {
-				message = data.error || 'Failed to mark code.';
+				message = data.error || $t('admin.signup_codes.failed_mark');
 				messageType = 'error';
 			}
 		} catch (err: any) {
-			message = err.message || 'Failed to mark code.';
+			message = err.message || $t('admin.signup_codes.failed_mark');
 			messageType = 'error';
 		} finally {
 			markingCode = '';
@@ -175,7 +175,7 @@
 
 	async function markBulkAsGivenOut() {
 		if (!bulkGivenBy) {
-			message = 'Please enter who gave out the codes.';
+			message = $t('admin.signup_codes.enter_given_by');
 			messageType = 'error';
 			return;
 		}
@@ -199,7 +199,7 @@
 			bulkComment = '';
 			await fetchCodes();
 		} catch (err: any) {
-			message = err.message || 'Failed to mark codes as given out.';
+			message = err.message || $t('admin.signup_codes.failed_mark_bulk');
 			messageType = 'error';
 		}
 	}
@@ -222,11 +222,11 @@
 				messageType = 'success';
 				await fetchCodes();
 			} else {
-				message = data.error || 'Failed to delete code.';
+				message = data.error || $t('admin.signup_codes.failed_delete');
 				messageType = 'error';
 			}
 		} catch (err: any) {
-			message = err.message || 'Failed to delete code.';
+			message = err.message || $t('admin.signup_codes.failed_delete');
 			messageType = 'error';
 		}
 	}
@@ -264,11 +264,9 @@
 					/>
 				</svg>
 				<div>
-					<h3 class="mb-1 text-sm font-medium text-red-900">Important: Signup Code Status</h3>
+					<h3 class="mb-1 text-sm font-medium text-red-900">{$t('admin.signup_codes.important_warning_title')}</h3>
 					<p class="text-sm text-red-700">
-						<strong>Generated codes are NOT usable until marked as "Given Out".</strong> Users will receive
-						"Invalid code" errors if they try to use codes that are still marked as "Available". Make
-						sure to mark codes as "Given Out" before distributing them to users.
+						{$t('admin.signup_codes.important_warning_text')}
 					</p>
 				</div>
 			</div>
@@ -315,8 +313,8 @@
 				</h3>
 				<div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-4">
 					<div>
-						<label class="mb-2 block text-sm font-medium text-blue-700"
-							>{$t('admin.signup_codes.generated_codes')} ({bulkGeneratedCodes.length})</label
+						<div class="mb-2 block text-sm font-medium text-blue-700"
+							>{$t('admin.signup_codes.generated_codes')} ({bulkGeneratedCodes.length})</div
 						>
 						<div class="max-h-32 overflow-y-auto rounded-lg border border-blue-300 bg-white p-3">
 							{#each bulkGeneratedCodes as code}
@@ -345,7 +343,7 @@
 							id="bulk-comment"
 							type="text"
 							bind:value={bulkComment}
-							placeholder="Optional comment..."
+							placeholder={$t('admin.signup_codes.optional_comment')}
 							class="w-full rounded-lg border border-blue-300 px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500"
 						/>
 					</div>
@@ -354,7 +352,7 @@
 							on:click={() => {
 								const codesText = bulkGeneratedCodes.join('\n');
 								navigator.clipboard.writeText(codesText);
-								message = 'All codes copied to clipboard!';
+								message = $t('admin.signup_codes.all_copied');
 								messageType = 'success';
 							}}
 							class="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-blue-700"
@@ -499,7 +497,7 @@
 											<button
 												on:click={() => copyToClipboard(code.code)}
 												class="px-2 py-1 text-xs text-gray-600 transition-colors hover:text-gray-900 hover:scale-110"
-												title="Copy code"
+												title={$t('admin.signup_codes.copy_code')}
 											>
 												📋
 											</button>
@@ -575,7 +573,7 @@
 											<button
 												on:click={() => deleteCode(code.code)}
 												class="rounded-md bg-red-50 px-3 py-1 text-xs text-red-600 transition-colors hover:bg-red-100 hover:text-red-900"
-												title="Delete code"
+												title={$t('admin.signup_codes.delete_code')}
 											>
 												🗑️
 											</button>

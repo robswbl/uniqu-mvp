@@ -757,6 +757,29 @@
 		}
 	},
 	"admin": {
+		"nav": {
+			"title": "Strumenti di amministrazione",
+			"heading": "UniqU Admin",
+			"subheading": "Qui troverai tutte le funzioni di amministrazione.",
+			"access": "Accedi",
+			"signup_codes": "Gestisci codici di registrazione",
+			"signup_codes_desc": "Gestisci codici di registrazione e la loro distribuzione",
+			"assign_agency": "Assegna utenti alle agenzie",
+			"assign_agency_desc": "Assegna utenti regolari alle agenzie",
+			"agency_overview": "Panoramica agenzie",
+			"agency_overview_desc": "Visualizza e gestisci relazioni agenzia-utente",
+			"agency_users": "Gestione utenti agenzia",
+			"agency_users_desc": "Gestisci personale agenzia e assegnazioni",
+			"question_order": "Gestisci ordine domande",
+			"question_order_desc": "Gestisci ordine e flusso delle domande",
+			"logout": "Disconnetti"
+		},
+		"login": {
+			"enter_password": "Inserisci la password di amministratore per continuare",
+			"password_label": "Password di amministratore",
+			"password_placeholder": "Inserisci la password di amministratore",
+			"access_admin": "Accedi all'admin"
+		},
 		"signup_codes": {
 			"heading": "Gestione codici di registrazione",
 			"subheading": "Genera e traccia codici di registrazione unici per la registrazione degli utenti.",
@@ -797,19 +820,6 @@
 			"clear_filters": "Cancella",
 			"showing_results": "Mostrando {filtered} di {total} codici",
 			"no_codes_match": "Nessun codice corrisponde ai tuoi filtri."
-		},
-		"nav": {
-			"heading": "Strumenti di amministrazione",
-			"subheading": "Accedi a tutte le funzionalità di amministrazione da qui.",
-			"password_label": "Inserisci la password admin:",
-			"unlock": "Sblocca",
-			"incorrect_password": "Password errata.",
-			"pages": "Pagine di amministrazione",
-			"signup_codes": "Gestione codici di registrazione",
-			"assign_agency": "Assegna utenti alle agenzie",
-			"question_order": "Gestione ordine domande",
-			"agency_overview": "Panoramica Agenzie",
-			"agency_users": "Gestione Utenti Agenzia"
 		}
 	},
 	"agency": {
@@ -866,7 +876,7 @@
 			"already_have_account": "Hai già un account di agenzia?",
 			"sign_in_here": "Accedi qui"
 		},
-		"admin": {
+		"agency_admin": {
 			"agency_overview": {
 				"title": "Panoramica Agenzie",
 				"subtitle": "Visualizza e gestisci le relazioni agenzia-utente",
